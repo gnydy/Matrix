@@ -1,0 +1,5 @@
+# Docker — مُعطّل على جهاز التطوير (ثقيل على الجهاز)
+# للتشغيل المحلي: npm run stack:start (SQLite)
+# للنشر لاحقاً: docs/CLOUD-DEPLOY.md
+#
+# لاستعادة Docker على سيرفر آخر، انسخ من infra/archived/docker-compose.local.yml

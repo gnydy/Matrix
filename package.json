@@ -1,0 +1,49 @@
+{
+  "name": "matrix-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Matrix / AllInAll ERP — investment-grade SaaS platform",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "marketing:build": "npm run build --prefix apps/web-marketing",
+    "marketing:start": "npm run start --prefix apps/web-marketing",
+    "marketing:dev": "pnpm --filter @allinall/web-marketing exec next dev --port 3000 --hostname 127.0.0.1",
+    "platform:dev": "pnpm --filter @allinall/web-platform exec next dev --port 3001 --hostname 127.0.0.1",
+    "erp:dev": "pnpm --filter @allinall/web-erp dev",
+    "platform:build": "pnpm --filter @allinall/web-platform build",
+    "db:generate": "pnpm --filter @allinall/database db:generate",
+    "db:push": "pnpm --filter @allinall/database db:push",
+    "db:local": "node scripts/setup-sqlite-db.mjs",
+    "stack:kill": "powershell -NoProfile -Command \"Get-NetTCPConnection -LocalPort 80,3000,3001,3002,3010,4000,8080 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }\"",
+    "api:dev": "pnpm --filter @allinall/api dev",
+    "api:build": "pnpm --filter @allinall/api build",
+    "stack:start": "node scripts/stack-matrix.mjs",
+    "stack:test": "node scripts/smoke-test-matrix.mjs",
+    "stack:gateway": "node scripts/gateway-matrix.mjs",
+    "prod:hosts": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/add-hosts.ps1",
+    "stack:firewall": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/open-firewall.ps1",
+    "prod:tunnel": "npx --yes cloudflared tunnel --url http://127.0.0.1:80",
+    "deploy:netlify": "npx netlify deploy --prod --build",
+    "deploy:marketing": "npx netlify deploy --build",
+    "deploy:marketing:prod": "npx netlify deploy --prod --build",
+    "netlify:link": "npx netlify link --name cerulean-tartufo-5a529e",
+    "netlify:setup": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/netlify-setup.ps1",
+    "netlify:status": "npx netlify status",
+    "netlify:env:check": "npx netlify env:list",
+    "deploy:platform": "npx netlify deploy --build --cwd apps/web-platform",
+    "deploy:platform:prod": "npx netlify deploy --prod --build --cwd apps/web-platform",
+    "docs:pdf": "node docs/build-all-pdfs.js"
+  },
+  "devDependencies": {
+    "@netlify/plugin-nextjs": "^5.9.4",
+    "bcryptjs": "^2.4.3",
+    "netlify-cli": "^23.4.3",
+    "turbo": "^2.5.4"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20"
+  }
+}

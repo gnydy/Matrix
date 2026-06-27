@@ -1,0 +1,91 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: matrix-prod-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-matrix}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-matrix_prod_change_me}
+      POSTGRES_DB: ${POSTGRES_DB:-matrix_prod}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${POSTGRES_USER:-matrix} -d ${POSTGRES_DB:-matrix_prod}',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - matrix-public
+
+  db-migrate:
+    build:
+      context: ../..
+      dockerfile: infra/production/docker/db-migrate.Dockerfile
+    container_name: matrix-db-migrate
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-matrix}:${POSTGRES_PASSWORD:-matrix_prod_change_me}@postgres:5432/${POSTGRES_DB:-matrix_prod}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - matrix-public
+    restart: 'no'
+
+  web-marketing:
+    build:
+      context: ../..
+      dockerfile: infra/production/docker/web-marketing.Dockerfile
+    container_name: matrix-web-marketing
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-matrix}:${POSTGRES_PASSWORD:-matrix_prod_change_me}@postgres:5432/${POSTGRES_DB:-matrix_prod}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://matrixall}
+    depends_on:
+      db-migrate:
+        condition: service_completed_successfully
+    expose:
+      - '3000'
+    networks:
+      - matrix-public
+
+  web-platform:
+    build:
+      context: ../..
+      dockerfile: infra/production/docker/web-platform.Dockerfile
+    container_name: matrix-web-platform
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-matrix}:${POSTGRES_PASSWORD:-matrix_prod_change_me}@postgres:5432/${POSTGRES_DB:-matrix_prod}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@matrix.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-matrix_admin_change_me}
+      SESSION_SECRET: ${SESSION_SECRET:-matrix_session_secret_change_me}
+    depends_on:
+      db-migrate:
+        condition: service_completed_successfully
+    ports:
+      - '127.0.0.1:${PLATFORM_PORT:-3001}:3001'
+    networks:
+      - matrix-public
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: matrix-nginx
+    restart: unless-stopped
+    ports:
+      - '${HTTP_PORT:-80}:80'
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - web-marketing
+    networks:
+      - matrix-public
+
+networks:
+  matrix-public:
+    name: matrix-public-network

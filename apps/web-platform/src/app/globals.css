@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+  --primary: #3b82f6;
+  --primary-dark: #2563eb;
+  --muted: #94a3b8;
+  --card: #1e293b;
+  --border: #334155;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-muted: var(--muted);
+  --color-card: var(--card);
+  --color-border: var(--border);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --font-sans: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+.stat-card {
+  @apply rounded-2xl border border-border bg-card p-5;
+}
+
+.data-table {
+  @apply w-full text-sm;
+}
+
+.data-table th {
+  @apply border-b border-border px-4 py-3 text-right font-semibold text-muted;
+}
+
+.data-table td {
+  @apply border-b border-border/60 px-4 py-3 align-top;
+}
+
+.badge {
+  @apply inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium;
+}
+
+.field-input {
+  @apply w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary;
+}
+
+.btn-primary {
+  @apply inline-flex min-h-[44px] items-center justify-center rounded-xl bg-primary px-6 font-semibold text-white hover:bg-primary-dark disabled:opacity-60;
+}
+
+.btn-ghost {
+  @apply inline-flex min-h-[40px] items-center justify-center rounded-xl border border-border px-4 text-sm hover:border-primary/40;
+}

@@ -1,0 +1,39 @@
+# Matrix Marketing — Netlify (monorepo / pnpm)
+# الموقع: https://cerulean-tartufo-5a529e.netlify.app
+# لوحة التحكم: https://app.netlify.com/projects/cerulean-tartufo-5a529e
+
+[build]
+  command = "node scripts/netlify-build-marketing.mjs"
+  publish = "apps/web-marketing/.next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  PNPM_VERSION = "9.15.0"
+  ENABLE_COREPACK = "1"
+  NPM_FLAGS = "--legacy-peer-deps"
+  NEXT_TELEMETRY_DISABLED = "1"
+  # مطلوب في Netlify UI → Environment variables:
+  # DATABASE_URL = postgresql://...
+  # NEXT_PUBLIC_SITE_URL = https://cerulean-tartufo-5a529e.netlify.app
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[context.production.environment]
+  NODE_ENV = "production"
+
+[context.deploy-preview.environment]
+  NODE_ENV = "production"

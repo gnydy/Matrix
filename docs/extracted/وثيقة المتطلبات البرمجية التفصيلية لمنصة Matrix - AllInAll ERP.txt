@@ -1,0 +1,1451 @@
+وث᱆يقة المتطلبات الربمج᱆ية التفص᱆يل᱆ية لمنصة Matrix / AllInAll ERP
+1. تعر᱅يف النظام
+نريد بناء منصة برمجية باسم Matrix، والمنتج األسايس داخلها هو AllInAll ERP. الهدف ليس مجرد موقع تعريفي، بل نظام كامل إلدارة دورة العميل من
+أول طلب الخدمة، مرورًا بالمراجعة والعرض والسداد والتنفيذ، مث تشغيل نظام ERP للشركات.
+النظام يتكون من أربع طبقات رئيسية:
+الموقع العام Public Website.
+لوحة التحكم الداخلية Matrix Control Center.
+نظام إدارة العمالء والطلبات والعروض والتنفيذ.
+نظام ERP متعدد الشركات والفروع.
+يجب أن يدعم النظام العربية واإلنجلزيية من البداية، مع RTL/LTR، ووضع داكن وفاتح، وأن يكون قابال ً للتشغيل كـ SaaS أو كنسخة منفصلة للعميل.
+2. التقن᱆ية المقرتحة
+Frontend
+Next.js App Router.
+React.
+TypeScript.
+CSS Modules أو Tailwind حسب قرار الفريق.
+دعم كامل للعربية RTL واإلنجلزيية LTR.
+Forms مبنية بشكل type-safe.
+Client validation + Server validation.
+Backend
+NestJS أو Next.js API في البداية، مث فصل API مستقل عند التوسع.
+TypeScript.
+Prisma ORM.
+PostgreSQL.
+Redis ،للكاش rate limiting، queues الحقًا.
+JWT/Auth sessions.
+REST API كبداية، مع قابلية GraphQL الحقًا إن لزم.
+Infrastructure
+Ubuntu Server.
+Nginx Reverse Proxy.
+PM2 أو Docker Compose.
+SSL via Certbot.
+1.
+2.
+3.
+4.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+1
+
+-- 1 of 23 --
+
+GitHub Actions الحقًا للـ CI/CD.
+PostgreSQL backups.
+Logging + error monitoring.
+3. ه᱆يكل التطب᱆يقات
+المشروع يجب أن يكون Monorepo يحتوي على:
+apps/
+web-marketing 	الموقع العام
+web-platform 	الداخلية لوحة التحكم
+web-erp 	واجهة ERP للعميل
+api 	Backend API
+worker 	والرسائل الخلفية مهام
+packages/
+ui 	مكونات UI مشتركة
+i18n 	الترجمة
+contracts 	وواجهات أنواع API
+validation 	Zod schemas
+config 	إعدادات مشتركة
+4. األدوار والصالح᱆يات
+األدوار األساس᱆ية
+Owner
+Admin
+Sales
+Support
+Developer
+Project Manager
+Accountant
+HR Manager
+Client Owner
+Client Employee
+قواعد الصالح᱆يات
+Owner يرى كل شيء.
+Admin يدير المستخدمني والطلبات والعمالء.
+Sales يرى leads والعروض فقط.
+Project Manager يرى المشاريع والتنفيذ.
+•
+•
+•
+1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10.
+•
+•
+•
+•
+2
+
+-- 2 of 23 --
+
+Developer يرى المهام التقنية فقط.
+Accountant يرى المدفوعات والفواتري.
+Client Owner يرى شركته فقط.
+Client Employee يرى الموديوالت المصرح بها فقط.
+الموظف العادي ال يملك صالحية حذف نهائي.
+الحذف يجب أن يكون soft delete أو archive.
+األرباح والتقارير المالية الحساسة ال تظهر إال لصالحية محددة.
+HR يرى HR فقط ما لم يتم منحه صالحيات إضافية.
+5. مود᱅يول الموقع العام Web Marketing
+الهدف
+عرض خدمات Matrix واستقبال طلبات العمالء.
+الصفحات المطلوبة
+الصفحة الرئيسية.
+من نحن.
+الخدمات.
+ERP.
+األنظمة المخصصة.
+المواقع والتطبيقات.
+الباقات.
+احسب احتياجك المبدئي.
+اطلب نظامك.
+تواصل.
+األسئلة الشائعة.
+سياسة الخصوصية.
+الشروط واألحكام.
+المتطلبات
+دعم عربي وإنجلزيي.
+Header ثابت.
+اختيار اللغة.
+فاتح/اختيار الوضع داكن.
+أزرار CTA واضحة:
+اطلب نظامك.
+واتساب.
+تواصل.
+ال يتم عرض أسعار نهائية علنية.
+نموذج الطلب ال يقول للعميل سعر مباشر، بل يصنف الطلب ويرسله للوحة التحكم.
+حسب الطلب“ أو ”قريبًا“ ال تعرض خدمات غري جاهزة كخدمة مباشرة إال إذا كانت مكتوبة كـ”.
+•
+•
+•
+•
+•
+•
+•
+•
+1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10.
+11.
+12.
+13.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+3
+
+-- 3 of 23 --
+
+6. مود᱅يول استقبال الطلبات Public Request Intake
+أنواع الطلبات
+طلب ERP.
+طلب نظام مخصص.
+طلب موقع إلكرتوني.
+طلب تطبيق موبايل.
+طلب استشارة.
+طلب عرض سعر.
+طلب دعم أو تواصل.
+حقول نموذج الطلب
+االسم.
+اسم الشركة.
+رقم الهاتف.
+الربيد اإللكرتوني.
+نوع المشروع.
+حجم المشروع:
+صغري.
+متوسط.
+كبري.
+Enterprise.
+وصف مختصر.
+عدد المستخدمني المتوقع.
+عدد الفروع.
+هل يوجد نظام حالي؟
+هل يريد SaaS أم نسخة منفصلة؟
+اللغة المطلوبة.
+الموافقة على التواصل.
+قواعد الحما᱅ية
+Honeypot field ضد البوتات.
+formStartedAt لمنع اإلرسال السريع جدًا.
+Rate limiting حسب IP ورقم الهاتف.
+تنظيف البيانات قبل التخزين.
+عدم تسجيل بيانات حساسة في logs.
+نت᱆يجة اإلرسال
+إنشاء Lead Number بصيغة:
+AIA-YYYY-XXXXXX
+1.
+2.
+3.
+4.
+5.
+6.
+7.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+4
+
+-- 4 of 23 --
+
+إظهار رسالة نجاح:
+طلبك، سيتواصل معك فريق تم استالم Matrix.
+الطلب :رقم AIA-2026-000001
+7. مود᱅يول Matrix Control Center
+الهدف
+العمالء، الطلبات، العروض، المشاريع، المستخدمني، المدفوعات، والتقارير :لوحة داخلية إلدارة كل ما يحدث في الشركة.
+الصفحات األساس᱆ية
+Login.
+Dashboard.
+Leads.
+Lead Details.
+Customers.
+Customer Details.
+Quotes.
+Quote Builder.
+Projects.
+Project Details.
+Payments.
+Users.
+Roles & Permissions.
+Login Audit.
+Settings.
+Services Catalog.
+System Logs.
+Dashboard
+يعرض:
+عدد الطلبات الجديدة.
+الطلبات قيد المراجعة.
+العروض المرسلة.
+العروض المقبولة.
+العمالء النشطني.
+المشاريع المفتوحة.
+المدفوعات المنتظرة.
+آخر األنشطة.
+•
+1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10.
+11.
+12.
+13.
+14.
+15.
+16.
+17.
+•
+•
+•
+•
+•
+•
+•
+•
+5
+
+-- 5 of 23 --
+
+Lead Management
+كل Lead يحتوي على:
+Lead Number.
+بيانات العميل.
+مصدر الطلب.
+نوع المشروع.
+الحالة.
+األولوية.
+ ولؤ الموظف المسو.
+مالحظات داخلية.
+سجل نشاط.
+ملفات مرفقة.
+عروض سعر مرتبطة.
+تحويل إلى Customer عند القبول.
+حاالت Lead
+new
+contacted
+needs_review
+qualified
+proposal_sent
+won
+lost
+archived
+أفعال Lead
+Assign to user.
+Add note.
+Change status.
+Create quote.
+Convert to customer.
+Archive.
+View activity log.
+8. مود᱅يول العمالء Customers
+الهدف
+إدارة العمالء بعد قبول العرض.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+6
+
+-- 6 of 23 --
+
+ب᱆يانات العم᱆يل
+Customer ID.
+اسم الشركة.
+االسم التجاري.
+رقم الهاتف.
+الربيد.
+العنوان.
+المجال.
+عدد الفروع.
+عدد المستخدمني.
+حالة العميل:
+active.
+inactive.
+suspended.
+نوع التعاقد:
+SaaS.
+Dedicated deployment.
+On-premise.
+المشاريع المرتبطة.
+األنظمة المفعلة.
+المدفوعات.
+المالحظات.
+شاشات العم᱆يل
+Overview.
+Contacts.
+Contracts.
+Projects.
+Payments.
+ERP Tenants.
+Support history.
+Activity log.
+9. مود᱅يول العروض Quotes / Proposals
+الهدف
+إنشاء عروض سعر داخلية واحرتافية قابلة لإلرسال للعميل.
+ب᱆يانات العرض
+Quote Number.
+Lead/Customer.
+نوع المشروع.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+7
+
+-- 7 of 23 --
+
+Scope.
+Modules included.
+Timeline.
+Price items.
+Payment terms.
+Valid until.
+Status.
+حاالت العرض
+draft
+internal_review
+sent
+accepted
+rejected
+expired
+cancelled
+عناصر العرض
+Module name.
+Description.
+Quantity.
+Unit price.
+Discount.
+Tax.
+Total.
+قواعد مهمة
+ال يظهر السعر للعميل من الموقع مباشرة.
+التسعري يتم داخليًا.
+العرض يجب أن يكون قابال ً للتصدير PDF الحقًا.
+يمكن إنشاء أكرث من نسخة للعرض.
+كل تعديل يتم تسجيله في audit log.
+10. مود᱅يول المشار᱅يع Implementation Projects
+الهدف
+بعد قبول العرض يتم إنشاء مشروع تنفيذ للعميل.
+ب᱆يانات المشروع
+Project Number.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+8
+
+-- 8 of 23 --
+
+Customer.
+Quote.
+Project Manager.
+Start date.
+Target delivery date.
+Status.
+Scope.
+Milestones.
+Tasks.
+Attachments.
+Notes.
+حاالت المشروع
+not_started
+planning
+in_progress
+waiting_client
+testing
+delivered
+closed
+cancelled
+Milestones
+تحليل المتطلبات.
+تصميم قاعدة البيانات.
+تجهزي النظام.
+إعداد المستخدمني والصالحيات.
+إدخال البيانات األولية.
+اختبار داخلي.
+تجربة العميل.
+تدريب العميل.
+التسليم.
+Tasks
+كل Task يحتوي على:
+Title.
+Description.
+Assigned user.
+Status.
+Priority.
+Due date.
+Related milestone.
+Comments.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+9
+
+-- 9 of 23 --
+
+Attachments.
+11. مود᱅يول االشرتاكات والباقات Subscriptions
+الهدف
+إدارة الباقات واالشرتاكات حىت لو لم يوجد دفع إلكرتوني في البداية.
+Plan
+Plan name.
+Monthly price.
+Annual price.
+Max users.
+Max branches.
+Included modules.
+Support level.
+Deployment type.
+Active/inactive.
+Subscription
+Customer.
+Plan.
+Start date.
+End date.
+Billing cycle.
+Status:
+trial.
+active.
+overdue.
+suspended.
+cancelled.
+Entitlements.
+Entitlements
+صالحيات تشغيل الموديوالت حسب الباقة:
+accounting enabled.
+inventory enabled.
+HR enabled.
+sales enabled.
+purchases enabled.
+max users.
+max branches.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+10
+
+-- 10 of 23 --
+
+API access.
+mobile access.
+12. مود᱅يول المدفوعات Payments
+الهدف
+متابعة المدفوعات يدويًا في البداية.
+Payment Request
+Payment Number.
+Customer.
+Quote/Project/Subscription.
+Amount.
+Currency.
+Due date.
+Status:
+pending.
+paid.
+overdue.
+cancelled.
+Payment method:
+cash.
+bank transfer.
+wallet.
+manual.
+Notes.
+Receipt attachment.
+قواعد
+ال يوجد checkout حقيقي في البداية.
+يتم تسجيل حالة الدفع يدويًا.
+يمكن الحقًا دمج بوابات دفع.
+13. مود᱅يول ERP Core
+الهدف
+نظام ERP متعدد الشركات والفروع.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+11
+
+-- 11 of 23 --
+
+مفاه᱆يم أساس᱆ية
+Tenant.
+Company.
+Branch.
+Department.
+User.
+Role.
+Permission.
+Fiscal year.
+Currency.
+Audit log.
+Multi-Tenant
+كل عميل يكون له Tenant مستقل منطقيًا.
+كل Tenant يحتوي على:
+companies.
+branches.
+users.
+modules.
+settings.
+subscription.
+data isolation.
+يجب منع أي Tenant  ية بياناتؤ من رو Tenant آخر.
+14. ERP - Accounting Module
+الوظائف
+Chart of Accounts.
+Journal Entries.
+Fiscal Years.
+Cost Centers.
+Cash/Bank Accounts.
+Receivables.
+Payables.
+Trial Balance.
+General Ledger.
+Profit & Loss.
+Balance Sheet.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+12
+
+-- 12 of 23 --
+
+الجداول األساس᱆ية
+accounts.
+journal_entries.
+journal_entry_lines.
+fiscal_years.
+cost_centers.
+currencies.
+exchange_rates.
+قواعد
+ال يتم حذف القيود بعد اعتمادها.
+يمكن إلغاء القيد بقيد عكيس.
+الربح ال يظهر إال لصالحيات محددة.
+كل حركة مالية تسجل في audit log.
+15. ERP - Inventory Module
+الوظائف
+Warehouses.
+Products.
+Product Categories.
+Units of Measure.
+Stock Movements.
+Stock Adjustments.
+Stock Transfers.
+Minimum stock alerts.
+Inventory valuation الحقًا.
+الجداول األساس᱆ية
+products.
+product_categories.
+warehouses.
+stock_movements.
+stock_levels.
+units.
+inventory_adjustments.
+قواعد
+ال يوجد بيع بدون مخزون كاف ٍ إال بصالحية.
+كل حركة مخزون لها سبب ومستخدم.
+كل فرع يمكن أن يكون له مخازن مختلفة.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+13
+
+-- 13 of 23 --
+
+16. ERP - Sales Module
+الوظائف
+Customers.
+Sales Quotations.
+Sales Orders.
+Invoices.
+Returns.
+Payments.
+Receivables.
+دورة الب᱆يع
+Quotation → Sales Order → Invoice → Payment
+الجداول
+erp_customers.
+sales_quotes.
+sales_orders.
+sales_order_items.
+sales_invoices.
+sales_invoice_items.
+sales_payments.
+17. ERP - Purchases Module
+الوظائف
+Suppliers.
+Purchase Requests.
+Purchase Orders.
+Supplier Invoices.
+Purchase Returns.
+Payables.
+دورة الشراء
+Purchase Request → Purchase Order → Supplier Invoice → Payment
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+14
+
+-- 14 of 23 --
+
+الجداول
+suppliers.
+purchase_requests.
+purchase_orders.
+purchase_order_items.
+supplier_invoices.
+supplier_invoice_items.
+supplier_payments.
+18. ERP - HR Module
+الوظائف
+Employees.
+Departments.
+Job Titles.
+Attendance.
+Leaves.
+Payroll الحقًا.
+Employee documents.
+الصالح᱆يات
+HR يرى بيانات الموظفني.
+المدير يرى موظفي قسمه فقط إن مت تفعيل ذلك.
+الموظف يرى بياناته فقط.
+الرواتب ال تظهر إال لصالحيات محددة.
+الجداول
+employees.
+departments.
+job_titles.
+attendance_records.
+leave_requests.
+payroll_runs.
+payroll_items.
+19. ERP - Debts / Receivables / Payables
+الهدف
+إدارة الديون والمستحقات.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+15
+
+-- 15 of 23 --
+
+الوظائف
+ديون العمالء.
+مستحقات الموردين.
+تواريخ االستحقاق.
+مدفوعات جزئية.
+تنبيهات التأخري.
+تقارير المديونية.
+الجداول
+receivables.
+payables.
+debt_payments.
+payment_schedules.
+20. Reports Module
+تقار᱅ير Matrix الداخل᱆ية
+Leads by status.
+Sales conversion.
+Quotes sent/accepted.
+Revenue expected.
+Projects status.
+Payment pending.
+User activity.
+تقار᱅ير ERP
+Inventory stock.
+Sales report.
+Purchases report.
+Customer balances.
+Supplier balances.
+Trial balance.
+Profit & loss.
+HR attendance.
+Branch performance.
+متطلبات التقر᱅ير
+فلرتة بالتاريخ.
+فلرتة بالفرع.
+فلرتة بالشركة.
+Export CSV/PDF الحقًا.
+ ية التقريرؤ التحكم في صالحية رو.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+16
+
+-- 16 of 23 --
+
+21. Notifications Module
+القنوات
+Email.
+WhatsApp الحقًا.
+In-app notifications.
+أحداث تولد إشعارات
+Lead جديد.
+تغيري حالة Lead.
+عرض سعر مت إرساله.
+عرض سعر مت قبوله.
+مشروع تأخر.
+دفعة مستحقة.
+مهمة مت تعيينها.
+طلب إجازة.
+مخزون منخفض.
+الجداول
+notifications.
+notification_templates.
+notification_logs.
+22. Audit Log Module
+الهدف
+تسجيل كل فعل مهم داخل النظام.
+᱅يجب تسج᱆يل
+تسجيل الدخول.
+فشل تسجيل الدخول.
+إنشاء Lead.
+تغيري حالة.
+إنشاء عرض.
+تعديل عرض.
+قبول عرض.
+إنشاء مشروع.
+تعديل صالحيات.
+إنشاء قيد مالي.
+أرشفة/حذف.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+17
+
+-- 17 of 23 --
+
+ب᱆يانات السجل
+userId.
+action.
+entityType.
+entityId.
+oldValue.
+newValue.
+ipAddress.
+userAgent.
+createdAt.
+23. Authentication Module
+المتطلبات
+Login.
+Logout.
+Session.
+Password hashing.
+Reset password الحقًا.
+Login audit.
+Role based access.
+Tenant based access.
+قواعد أمن᱆ية
+Passwords hashed.
+Rate limit على login.
+Lockout بعد محاوالت كثرية.
+ال تخزن كلمة السر في logs.
+ال تسمح لمستخدم خارج Tenant أن يصل لبيانات Tenant آخر.
+24. API Design
+Public API
+POST /public/leads
+POST /public/contact
+POST /public/quote-request
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+18
+
+-- 18 of 23 --
+
+Internal API
+GET /internal/leads
+GET /internal/leads/:id
+PATCH /internal/leads/:id/status
+POST /internal/leads/:id/notes
+POST /internal/leads/:id/quotes
+POST /internal/leads/:id/convert-to-customer
+GET /internal/customers
+POST /internal/customers
+GET /internal/customers/:id
+GET /internal/quotes
+POST /internal/quotes
+PATCH /internal/quotes/:id
+POST /internal/quotes/:id/send
+POST /internal/quotes/:id/accept
+GET /internal/projects
+POST /internal/projects
+PATCH /internal/projects/:id
+POST /internal/projects/:id/tasks
+GET /internal/payments
+POST /internal/payments
+PATCH /internal/payments/:id/status
+ERP API
+GET /erp/companies
+POST /erp/companies
+GET /erp/branches
+POST /erp/branches
+GET /erp/products
+POST /erp/products
+GET /erp/inventory/movements
+POST /erp/inventory/movements
+GET /erp/sales/orders
+POST /erp/sales/orders
+GET /erp/purchases/orders
+19
+
+-- 19 of 23 --
+
+POST /erp/purchases/orders
+GET /erp/accounting/accounts
+POST /erp/accounting/accounts
+GET /erp/accounting/journal-entries
+POST /erp/accounting/journal-entries
+GET /erp/hr/employees
+POST /erp/hr/employees
+25. Database Entities األساس᱆ية
+Platform
+User
+Role
+Permission
+UserRole
+Lead
+LeadNote
+LeadActivity
+Customer
+CustomerContact
+Quote
+QuoteItem
+Project
+ProjectMilestone
+ProjectTask
+PaymentRequest
+Notification
+AuditLog
+LoginAudit
+Subscription
+Plan
+Entitlement
+ERP
+Tenant
+Company
+Branch
+Department
+Employee
+Product
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+20
+
+-- 20 of 23 --
+
+Warehouse
+StockMovement
+CustomerAccount
+Supplier
+SalesOrder
+SalesInvoice
+PurchaseOrder
+SupplierInvoice
+Account
+JournalEntry
+JournalEntryLine
+Receivable
+Payable
+26. س᱆ير العمل الكامل
+من الموقع إلى العم᱆يل
+يدخل الموقع زائر
+→ نظامك يضغط اطلب
+→ طلب نموذج يمأل
+→ إنشاء يتم Lead
+→ يظهر في Matrix Control Center
+→ Sales الطلب يراجع
+→ مع العميل التواصل يتم
+→ إنشاء يتم Quote
+→ العرض إرسال يتم
+→ العميل يقبل
+→ تحويل يتم Lead إلى Customer
+→ إنشاء يتم Project
+→ يتم تنفيذ النظام
+→ إنشاء يتم Tenant ERP للعميل
+→ يتم تدريب العميل
+→ يتم تسليم النظام
+→ تبدأ االشتراكات والدعم
+27. MVPاًل  المطلوب أوال
+المرحلة األولى
+إنجلزيي/موقع عام عربي.
+نماذج طلبات.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+21
+
+-- 21 of 23 --
+
+API حفظ Lead.
+Matrix Control Center.
+Leads management.
+Customers.
+Quotes basic.
+Projects basic.
+Payments basic.
+Auth basic.
+Audit log basic.
+المرحلة الثان᱆ية
+ERP Core.
+Multi company.
+Multi branch.
+Users & roles.
+Inventory.
+Sales.
+Purchases.
+Accounting basic.
+HR basic.
+المرحلة الثالثة
+Subscription engine.
+Notifications.
+WhatsApp/email integration.
+Reports.
+PDF export.
+Tenant provisioning.
+Advanced permissions.
+28. معا᱅ي᱆ير الجودة المطلوبة
+TypeScript strict قدر اإلمكان.
+Validation لكل request.
+No PII in logs.
+Error handling واضح.
+Responsive UI.
+RTL مضبوط.
+ال يوجد بيانات وهمية في production.
+Seed users فقط للبيئة الداخلية.
+Database migrations منظمة.
+Tests للـ validation والخدمات األساسية.
+ال يوجد delete نهائي إال للـ Owner وبشروط.
+كل العمليات الحساسة تسجل في audit log.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+22
+
+-- 22 of 23 --
+
+29. المطلوب من المربمج
+على المربمج أن يبين النظام على مراحل، وال يبدأ في ERP كامل قبل تثبيت منصة التشغيل الداخلية.
+األولوية:
+تثبيت Auth + Users + Roles.
+تثبيت Lead intake من الموقع العام.
+بناء Matrix Control Center.
+بناء Quotes وCustomers وProjects.
+بناء ERP Core.
+بناء أول موديوالت ERP:
+Inventory.
+Sales.
+Purchases.
+Accounting.
+HR.
+بناء Reports وNotifications.
+تجهزي النشر على VPS.
+أي موديول يجب أن يحتوي على:
+Database schema.
+API endpoints.
+UI pages.
+Validation.
+Permissions.
+Audit log.
+Tests.
+Error states.
+Empty states.
+Loading states.
+Arabic/English text.
+1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10.
+11.
+12.
+13.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+23
+
+-- 23 of 23 --
+

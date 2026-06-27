@@ -1,0 +1,25 @@
+# قاعدة بيانات محلية فقط — للتطوير أو قبل تشغيل الاستاك الكامل
+# الوصول: 127.0.0.1:5433 (صاحب السيرفر فقط)
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: matrix-prod-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-matrix}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-matrix_prod_change_me}
+      POSTGRES_DB: ${POSTGRES_DB:-matrix_prod}
+    ports:
+      - '127.0.0.1:5433:5432'
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${POSTGRES_USER:-matrix} -d ${POSTGRES_DB:-matrix_prod}',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
