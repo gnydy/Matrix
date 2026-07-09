@@ -1,0 +1,14 @@
+**/.next
+**/node_modules
+**/.git
+**/.env.local
+**/.env
+!infra/production/.env
+**/data
+infra/local/data
+infra/production/data
+docs
+*.md
+apps/web-marketing/.next
+apps/web-platform/.next
+packages/database/.env

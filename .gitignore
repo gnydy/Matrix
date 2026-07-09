@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build
+dist/
+.next/
+out/
+build/
+.turbo/
+
+# Environment
+.env
+.env.local
+.env.*.local
+infra/local/.env
+infra/production/.env
+.netlify/
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Prisma
+apps/api/prisma/*.db
+apps/api/prisma/*.db-journal
+
+# Docker volumes (local data)
+infra/local/data/
+
+# Local SQLite (no Docker)
+data/*.db
+data/*.db-journal
+!data/.gitkeep
+
+# Generated HTML (keep PDF)
+docs/**/*.html
+
+# Secrets
+*.pem
+*.key
+credentials.json

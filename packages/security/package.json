@@ -1,0 +1,47 @@
+{
+  "name": "@allinall/security",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./bot-protection": {
+      "types": "./dist/bot-protection.d.ts",
+      "require": "./dist/bot-protection.js",
+      "default": "./dist/bot-protection.js"
+    },
+    "./headers": {
+      "types": "./dist/headers.d.ts",
+      "require": "./dist/headers.js",
+      "default": "./dist/headers.js"
+    },
+    "./rate-limit": {
+      "types": "./dist/rate-limit.d.ts",
+      "require": "./dist/rate-limit.js",
+      "default": "./dist/rate-limit.js"
+    },
+    "./client-ip": {
+      "types": "./dist/client-ip.d.ts",
+      "require": "./dist/client-ip.js",
+      "default": "./dist/client-ip.js"
+    },
+    "./secrets": {
+      "types": "./dist/secrets.d.ts",
+      "require": "./dist/secrets.js",
+      "default": "./dist/secrets.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.1",
+    "typescript": "^5"
+  }
+}

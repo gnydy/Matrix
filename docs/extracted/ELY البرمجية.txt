@@ -1,0 +1,863 @@
+/ Matrix نموذج الذكاء المستقبل᱄ ي لمنصة	 — الربمج᱆ية ELY وث᱆يقة
+AllInAll ERP
+ELY تعر᱅يف .1
+وظيفته أن يعمل كمساعد ذكي يفهم بيانات الشركة، .عام Chatbot وليس مجرد ،Matrix / AllInAll ERP هو طبقة ذكاء اصطناعي داخل ELY
+التقارير، والمستندات، مث يقدم إجابات دقيقة أو اقرتاحات أو إجراءات قابلة للتنفيذ حسب صالحيات ،ERP النظام، العمالء، الطلبات، العروض، المشاريع، الـ
+.المستخدم
+أي إجراء مالي، حذف، تعديل صالحيات، اعتماد عرض، أو إرسال .للنظام، لكن ال يأخذ قرارات حساسة وحده ”العقل التشغيلي“اًل  يجب أن يكون مستقبال ELY
+.رسمي للعميل يجب أن يمر بموافقة بشرية أو صالحية واضحة
+ELY أهداف .2
+:األهداف األساسية
+.تحويل معرفة الشركة إلى قاعدة معرفة قابلة للبحث والفهم
+.في إدارة العمالء والطلبات والمشاريع Matrix مساعدة فريق
+.في فهم بياناتهم وتشغيل النظام ERP مساعدة مستخدمي
+.تحليل البيانات واستخراج تنبيهات وفرص ومخاطر
+.تقليل العمل اليدوي في التقارير والمراجعات والمتابعات
+.في العمل Matrix بناء نموذج مستقبلي قابل للتدريب على طريقة
+ELY نطاق .3
+:البداية الصحيحة تكون .ال يبدأ كنموذج ذكاء مستقل يتم تدريبه من الصفر ELY
+RAG + Knowledge Base + Tools + Workflow Actions
+.يستخدم نموذج لغوي جاهز، لكن يقرأ من قاعدة معرفة منظمة، ويستدعي أدوات داخلية، ويتقيد بالصالحيات ELY أي أن
+:مراحل التطور
+Phase 1: Knowledge Assistant
+Phase 2: Internal Operations Assistant
+Phase 3: ERP Assistant
+Phase 4: Automation-Aware Assistant
+Phase 5: Predictive Business Assistant
+Phase 6: Custom Fine-tuned Model إن لزم الحقًا
+.1
+.2
+.3
+.4
+.5
+.6
+1
+
+-- 1 of 15 --
+
+المستخدمون .4
+مستخدمون داخل᱆يون
+Owner
+Admin
+Sales
+Support
+Project Manager
+Developer
+Accountant
+HR Manager
+مستخدمون من العمالء
+Client Owner
+Branch Manager
+Accountant
+Warehouse Manager
+Sales Employee
+HR Employee
+Normal Employee
+.حسب صالحياته فقط ELY كل مستخدم يرى إجابات
+ELY صالح᱆يات .5
+.يجب أن يطبق نفس صالحيات النظام ELY
+:أمثلة
+.والعروض، لكن ال يرى أرباح الشركة Leads عن ELY  الؤ يستطيع سو Sales
+.عن الموظفني والحضور، لكن ال يرى المبيعات ELY  الؤ يستطيع سو HR
+.يرى بيانات شركته فقط Client Owner
+.يرى بياناته أو مهامه فقط Employee
+.آخر إطالقاًلا Tenant ال يعرض بيانات ELY
+.confirmation ال ينفذ عمليات خطرية بدون ELY
+ELY مصادر معرفة .6
+مصادر داخل᱆ية
+.Matrix وثائق
+.كتالوج الخدمات
+.ERP وثائق
+.أسئلة وأجوبة الدعم
+.بيانات العمالء
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+.1
+.2
+.3
+.4
+.5
+2
+
+-- 2 of 15 --
+
+.الطلبات والعروض
+.المشاريع والمهام
+.سجالت المدفوعات
+.إعدادات الموديوالت
+.سياسات الشركة
+.أخطاء النظام السابقة وحلولها
+.وثائق التدريب
+.محادثات الدعم المعتمدة
+.مستندات العميل المرفوعة
+ERP مصادر
+.المخزون
+.المبيعات
+.المشرتيات
+.الحسابات
+.الموارد البشرية
+.الفروع
+.المنتجات
+.العمالء
+.الموردين
+.التقارير
+ELY أنواع المعرفة داخل .7
+Knowledge Item
+:قطعة معرفة معتمدة، مثل
+.شرح خدمة
+.شرح موديول
+.سياسة داخلية
+.إجراء تشغيل
+. ال وجوابؤ سو
+.حل مشكلة
+.قاعدة تسعري
+.تعليمات تنفيذ
+Training Example
+:مثال تدرييب يحتوي على
+. ال المستخدمؤ سو
+.اإلجابة المثالية
+.التصنيف
+.السياق
+. يةؤ صالحية الرو
+.هل معتمد أم ال
+.6
+.7
+.8
+.9
+.10
+.11
+.12
+.13
+.14
+.1
+.2
+.3
+.4
+.5
+.6
+.7
+.8
+.9
+.10
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+3
+
+-- 3 of 15 --
+
+Business Rule
+:قاعدة تشغيلية مثل
+.ال يتم حذف قيد مالي معتمد
+.ال يتم إرسال عرض سعر بدون مراجعة داخلية
+.إال بعد قبول العرض Customer إلى Lead ال يتم تحويل
+.أو من يملك صالحية مالية Owner ال يتم عرض األرباح إال للـ
+Tool Definition
+:استدعاءها، مثل ELY أداة يستطيع
+getLeadDetails
+createLeadNote
+getCustomerBalance
+generateQuoteDraft
+summarizeProjectStatus
+listLowStockProducts
+analyzeSalesPerformance
+ELY مود᱅يوالت .8
+Knowledge Catalog Module 8.1
+.إدارة المعرفة المعتمدة :الغرض
+:الشاشات
+Knowledge List
+Knowledge Details
+Create Knowledge Item
+Edit Knowledge Item
+Approval Queue
+Categories
+Sources
+Version History
+:الحقول
+title
+summary
+body
+category
+tags
+sourceType
+visibility
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+4
+
+-- 4 of 15 --
+
+tenantScope
+status
+approvedBy
+approvedAt
+version
+:الحاالت
+draft
+pending_review
+approved
+rejected
+archived
+Document Ingestion Module 8.2
+.رفع المستندات وتحويلها إلى معرفة قابلة للفهم :الغرض
+:المدخالت
+PDF
+DOCX
+TXT
+Markdown
+CSV
+HTML
+صفحات داخلية
+:الخطوات
+Upload
+→ Extract text
+→ Clean text
+→ Split into chunks
+→ Classify
+→ Generate summary
+→ Create embeddings
+→ Send to approval
+→ Publish to ELY
+.ال يتم نشر أي معرفة تلقائياًلا بدون موافقة
+Semantic Search Module 8.3
+.البحث الداللي داخل المعرفة :الغرض
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+5
+
+-- 5 of 15 --
+
+:المطلوب
+.البحث بالكلمة
+.البحث بالمعىن
+.فلرتة حسب الصالحية
+.Tenant/فلرتة حسب العميل
+.إرجاع المصادر المستخدمة في اإلجابة
+.منع استخدام مصادر غري معتمدة في اإلجابات الرسمية
+RAG Answering Module 8.4
+.توليد إجابة من مصادر معتمدة :الغرض
+:خطوات اإلجابة
+User question
+→ Detect intent
+→ Detect permissions
+→ Search knowledge
+→ Retrieve relevant chunks
+→ Build prompt
+→ Generate answer
+→ Attach citations/internal references
+→ Log response
+→ Ask for feedback
+:قواعد
+.إنه غري متأكد ELY لو ال توجد مصادر كافية، يقول
+.ال يخرتع أسعار
+.ال يخرتع صالحيات
+.ال يغري بيانات بدون تأكيد
+.ال يجيب عن بيانات خارج صالحية المستخدم
+ELY Chat Module 8.5
+:الشاشات
+Chat
+Conversation History
+Suggested Questions
+Source References
+Action Suggestions
+Feedback Buttons
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+6
+
+-- 6 of 15 --
+
+:أنواع المحادثات
+. ال عام عن النظامؤ سو
+.Lead  ال عنؤ سو
+.Customer  ال عنؤ سو
+.Project  ال عنؤ سو
+.ERP  ال عنؤ سو
+. ال عن تقريرؤ سو
+.طلب إنشاء مسودة
+.طلب تحليل
+.Action طلب تنفيذ
+Tool Calling Module 8.6
+.من استدعاء وظائف النظام بدل اإلجابة النصية فقط ELY تمكني :الغرض
+:أمثلة أدوات
+getLead(leadNumber)
+listLeadsByStatus(status)
+createLeadNote(leadId, note)
+generateQuoteDraft(leadId)
+getProjectStatus(projectId)
+listOverduePayments()
+listLowStockProducts(tenantId)
+getCustomerBalance(customerId)
+summarizeSales(month)
+:قواعد
+.permission كل أداة لها
+.يتم تسجيله tool call كل
+.approval حساسة بدون tool call ال توجد
+.آمن API بل عرب ،ELY مباشرة من DB ال يتم استدعاء
+ELY for Sales 8.7
+:وظائفه
+.Lead تلخيص
+.اقرتاح أسئلة للعميل
+.تصنيف جدية العميل
+.اقرتاح نوع الخدمة المناسبة
+.إنشاء مسودة عرض سعر
+.تلخيص المكالمات والمالحظات
+.المتأخرة Leads متابعة
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+7
+
+-- 7 of 15 --
+
+.Lead تحليل سبب خسارة
+:أمثلة
+العميل" هذا "لخص
+السعر؟" عرض قبل أسألها التي يجب أن "ما األسئلة
+لـ" مناسب هل هذا العميل ERP "أم نظام مخصص؟
+بدون سعر نهائي" مسودة عرض مبدئي "اكتب
+ELY for Projects 8.8
+:وظائفه
+.تلخيص حالة المشروع
+.اكتشاف التأخري
+.اقرتاح المهام القادمة
+.تلخيص مالحظات العميل
+.إنشاء تقرير أسبوعي
+.Milestone تنبيه عند تأخر
+.األصلي بما يتم تنفيذه Scope مقارنة
+ELY for ERP Users 8.9
+:وظائفه
+.شرح كيفية استخدام موديول
+.ERP البحث داخل بيانات
+.تلخيص المبيعات
+.تنبيه بمخزون منخفض
+.تحليل مديونية العمالء
+.شرح قيود محاسبية
+.اقرتاح تقرير مناسب
+.إنشاء خطوات تشغيل للمستخدم
+:أمثلة
+قربت تخلص؟" "ما المنتجات التي
+مبيعات هذا الشهر" "لخص
+في السداد؟" "مين العمالء المتأخرين
+شراء" أسجل فاتورة إزاي "اشرح لي
+ELY Evaluation Module 8.10
+.ELY قياس جودة إجابات :الغرض
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+8
+
+-- 8 of 15 --
+
+:المقاييس
+هل اإلجابة صحيحة؟
+هل استخدمت مصادر معتمدة؟
+هل احرتمت الصالحيات؟
+هل كانت مفيدة؟
+هل فيها اخرتاع؟
+صحيح؟ Action هل نفذت
+:الشاشات
+Test Cases
+Evaluation Runs
+Failed Answers
+Feedback Review
+Model Performance
+Feedback & Training Module 8.11
+:بعد كل إجابة، يمكن للمستخدم تقييمها
+.مفيدة
+.غري مفيدة
+.خطأ
+.ناقصة
+.مخالفة للصالحيات
+.تحتاج تحسني
+.Training Example ويحوّل الجيد منه إلى feedback يراجع Admin الـ
+ELY قاعدة الب᱆يانات المقرتحة لـ .9
+الجداول األساس᱆ية
+ely_sources
+ely_documents
+ely_document_chunks
+ely_embeddings
+ely_knowledge_items
+ely_knowledge_versions
+ely_training_examples
+ely_conversations
+ely_messages
+ely_tool_calls
+ely_feedback
+ely_evaluation_tests
+ely_evaluation_runs
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+9
+
+-- 9 of 15 --
+
+ely_policies
+ely_access_rules
+ely_prompt_templates
+ely_action_approvals
+ely_run_logs
+ely_sources
+id
+name
+type
+ownerType
+tenantId
+status
+createdAt
+updatedAt
+ely_documents
+id
+sourceId
+title
+fileType
+storageUrl
+extractedText
+status
+uploadedBy
+approvedBy
+approvedAt
+createdAt
+ely_document_chunks
+id
+documentId
+chunkIndex
+content
+summary
+tokensCount
+visibility
+tenantId
+createdAt
+ely_knowledge_items
+id
+title
+body
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+10
+
+-- 10 of 15 --
+
+category
+tags
+visibility
+tenantId
+status
+version
+approvedBy
+approvedAt
+createdAt
+updatedAt
+ely_conversations
+id
+userId
+tenantId
+contextType
+contextId
+title
+createdAt
+updatedAt
+ely_messages
+id
+conversationId
+role
+content
+sourcesUsed
+toolCalls
+createdAt
+ely_tool_calls
+id
+conversationId
+messageId
+toolName
+input
+output
+status
+error
+executedBy
+createdAt
+ely_feedback
+id
+messageId
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+11
+
+-- 11 of 15 --
+
+userId
+rating
+reason
+comment
+reviewedBy
+createdAt
+ELY لـ API Endpoints .10
+Knowledge
+GET 	/ely/knowledge
+POST /ely/knowledge
+GET 	/ely/knowledge/:id
+PATCH /ely/knowledge/:id
+POST /ely/knowledge/:id/approve
+POST /ely/knowledge/:id/archive
+Documents
+POST /ely/documents/upload
+GET 	/ely/documents
+GET 	/ely/documents/:id
+POST /ely/documents/:id/process
+POST /ely/documents/:id/approve
+Chat
+POST /ely/chat
+GET 	/ely/conversations
+GET 	/ely/conversations/:id
+POST /ely/conversations/:id/messages
+Evaluation
+GET 	/ely/evaluations
+POST /ely/evaluations
+POST /ely/evaluations/:id/run
+GET 	/ely/evaluations/:id/results
+•
+•
+•
+•
+•
+•
+12
+
+-- 12 of 15 --
+
+Feedback
+POST /ely/messages/:id/feedback
+GET 	/ely/feedback
+POST /ely/feedback/:id/convert-to-training
+س᱆ياسات األمان .11
+.ال يتم تمرير بيانات غري مصرح بها للموديل
+.ال يتم إرسال كل قاعدة البيانات للموديل
+.يتم اسرتجاع أقل قدر مطلوب من البيانات
+.يحتوي على بيانات حساسة يتم تسجيله داخلياًلا بحذر Prompt أي
+.في الكود API ال يتم حفظ أسرار
+.Approval خطرية بدون Actions بتنفيذ ELY ال يتم السماح لـ
+.Tool Call لكل Audit Log يجب وجود
+Matrix Control Center داخل ELY واجهات .12
+صفحات مطلوبة
+ELY Dashboard
+Knowledge Catalog
+Document Upload
+Review Queue
+Training Examples
+Evaluation Tests
+Chat Playground
+Feedback Review
+Tool Calls Log
+ELY Settings
+Policies
+Prompt Templates
+ERP داخل ELY واجهات .13
+أماكن ظهوره
+.زر مساعد داخل كل صفحة
+.مستقلة Chat صفحة
+.اقرتاحات داخل التقارير
+.تنبيهات ذكية
+.شرح حقول الشاشة
+.تحليل سريع للبيانات
+:أمثلة
+•
+•
+•
+•
+•
+•
+•
+.1
+.2
+.3
+.4
+.5
+.6
+.7
+.8
+.9
+.10
+.11
+.12
+•
+•
+•
+•
+•
+•
+13
+
+-- 13 of 15 --
+
+:داخل المخزون
+بسرعة؟" المنتج ينفد هذا "لماذا
+يجب طلبها هذا األسبوع؟" التي "ما المنتجات
+:داخل المبيعات
+مبيعات الفرع" "لخص
+الشهر؟" هذا "ما أفضل عميل
+:داخل الحسابات
+العمالء المتأخرين" "اعرض
+"اشرح سبب فرق الميزان"
+ELY خطة تنف᱆يذ .14
+المرحلة األولى
+.Knowledge Catalog
+.Upload documents
+.Approval workflow
+.Basic chat with approved knowledge
+.Feedback
+المرحلة الثان᱆ية
+.Matrix Control Center داخل ELY
+.Leads assistant
+.Quotes assistant
+.Project assistant
+.محدود Tool calling
+المرحلة الثالثة
+.ERP assistant
+.قراءة التقارير
+.مخزون ومبيعات وحسابات
+.تنبيهات ذكية
+المرحلة الرابعة
+.Evaluation system
+.Training examples
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+14
+
+-- 14 of 15 --
+
+.تحسني جودة اإلجابات
+.n8n مرتبطة بـ Workflows
+المرحلة الخامسة
+.Predictive analytics
+.Recommendations
+.محتمل Fine-tuning
+.نماذج مخصصة حسب القطاع
+قواعد مهمة للمربمج .15
+.ليس بديال اًل عن صالحيات النظام ELY
+.ال يكتب مباشرة في قاعدة البيانات ELY
+.رسمي API يتم عرب Action أي
+.Approval حساس يحتاج Action أي
+.كل إجابة يجب أن تكون قابلة للتتبع
+.قبل استخدامه في إجابة رسمية Approved أي مصدر معرفة يجب أن يكون
+.ال يتم استخدام بيانات عميل لتدريب عام بدون موافقة واضحة
+.يجب أن يدعم العربية من البداية ELY
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+15
+
+-- 15 of 15 --
+

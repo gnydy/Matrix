@@ -1,0 +1,21 @@
+# Docker build context (monorepo root)
+.git
+**/.git
+**/node_modules
+**/.next
+**/.turbo
+**/.env.local
+**/.env
+!infra/production/.env
+!/.env.docker
+**/data
+infra/local/data
+infra/production/data
+docs
+*.md
+packages/database/.env
+apps/web-marketing/node_modules
+apps/web-marketing/.next
+apps/web-platform/node_modules
+apps/web-platform/.next
+.dockerignore

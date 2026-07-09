@@ -1,0 +1,12 @@
+# Matrix Control Center — Netlify (منفصل عن الموقع التسويقي)
+[build]
+  base = "../.."
+  command = "corepack enable && pnpm install && pnpm --filter @allinall/database db:generate && pnpm --filter @allinall/web-platform build"
+  publish = "apps/web-platform/.next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--legacy-peer-deps"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

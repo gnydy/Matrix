@@ -1,0 +1,517 @@
+/ AGENTS.md — Cursor Execution Rules for Matrix
+AllInAll
+ي
+الدور األساس᱄ .1
+دورك هو تنفيذ تغيريات .دورك ليس إعادة بناء المشروع بالكامل، وليس تنفيذ أفكار كبرية دفعة واحدة .Matrix / AllInAll أنت تعمل داخل مشروع
+.صغرية، آمنة، قابلة للمراجعة، مع تحليل األخطاء قبل تعديل الكود
+.ال تعيد كتابة ملفات كبرية بدون سبب قوي .ال تكسر البنية الحالية .ال تفرتض .حذر Senior يجب أن تتصرف كمطور
+قاعدة مهمة جدًا .2
+.ال تنفذ أي مهمة كبرية مرة واحدة
+:أي طلب كبري يجب تقسيمه إلى مهام صغرية جدًا
+Analyze → Plan → Change small part → Run checks → Fix errors → Document result
+.ال تنتقل للمرحلة التالية قبل نجاح المرحلة الحالية
+قبل تعد᱅يل أ᱇ ي كود .3
+:قبل أي تعديل
+.ً اقرأ الملف المطلوب تعديله كام⁓
+.افهم ع⁓قته بباقي المشروع
+.واألنواع المستخدمة imports ابحث عن
+.Client Component أو Server Component افحص إن كان الملف
+: ثر علىؤ افحص إن كان الكود يو
+Auth
+Permissions
+Database
+API
+Public forms
+Customer data
+Financial data
+.اكتب ملخصًا قصريًا لما ستعدله
+.1
+.2
+.3
+.4
+.5
+.6
+.7
+.8
+.9
+.10
+.11
+.12
+.13
+1
+
+-- 1 of 12 --
+
+.ال تعدّل إال الملفات الضرورية
+ال تضغط على نفسك .4
+.ال تحاول حل كل شيء في رد واحد
+:لو وجدت أكرث من خطأ
+- فقط .أصلح أول خطأ واضح
+- شغّل build/typecheck.
+- .ثم انتقل للخطأ التالي
+.ال تعمل تغيريات ضخمة لع⁓ج خطأ صغري
+ملف تتبع األخطاء .5
+:يجب إنشاء أو تحديث ملف
+docs/progress/error-analysis.md
+:كل خطأ يتم تسجيله بهذه الصيغة
+## Error: short title
+### Date
+YYYY-MM-DD
+### Area
+web-marketing / web-platform / api / worker / packages
+### Error Message
+Paste exact error here.
+### Root Cause
+Explain the real cause, not guesses.
+### Files Affected
+- path/to/file.tsx
+### Fix Applied
+Explain the exact change.
+.14
+2
+
+-- 2 of 12 --
+
+### Verification
+Command run:
+```bash
+pnpm ...
+Result: success / failed
+Notes
+.Any warning, risk, or follow-up
+الملف إذا كان الخطأ من هذا بدون تسجيلها في ممنوع إصالح أخطاء build أو runtime أو
+TypeScript أو API.
+---
+## 6. أسلوب تحليل األخطاء
+خطأ :عند ظهور
+.اقرأ رسالة الخطأ كاملة .1
+تركز على آخر سطر .2 ال pnpm .فقط
+عن أول سطر يحتوي على .3 :ابحث
+- Failed to compile
+- Type error
+- Module not found
+- Cannot read properties
+- Prisma error
+- Database error
+- Hydration error
+:حدد .4
+.الملف -
+.السطر -
+.السبب الحقيقي -
+هل الخطأ - type فقط أم runtime أم architecture.
+وليس العرض .5 السبب .أصلح
+:مثال
+```text
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL]
+3
+
+-- 3 of 12 --
+
+.السبب الحقيقي يكون أعلى منه في اللوج .هذا ليس السبب الحقيقي
+TypeScript قواعد .7
+ال تستخدم	any	.إال عند الضرورة ومع تعليق يشرح السبب
+ال تستخدم	as any	.كحل سريع
+.TypeScript errors ال تكتم
+.build فقط لتعدي ESLint ال توقف
+.عرّف األنواع بوضوح
+.عند الحاجة union types استخدم
+.متناسقة validation والـ DTOs اجعل الـ
+.واضحة للمدخ⁓ت schemas أو Zod استخدم
+:ممنوع
+لسبب قوي // ممنوع إال
+const data: any = ...
+:األفضل
+type LeadInput = {
+name: string;
+phone: string;
+projectType: string;
+};
+قواعد األمان .8
+.يجب بناء كل شيء بافرتاض أن النظام سيستخدم بيانات عم⁓ء حقيقية
+ممنوع
+.plain text تخزين كلمات مرور
+.داخل الكود API keys وضع
+.console logs تسجيل بيانات حساسة في
+.إرسال بيانات عميل كاملة لطرف خارجي بدون ضرورة
+.بدون حماية API endpoints فتح
+.فقط client-side validation االعتماد على
+.السماح بحذف نهائي بدون ص⁓حية واضحة
+.permission كشف أرباح أو بيانات مالية بدون
+.أو العم⁓ء tenants خلط بيانات
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+4
+
+-- 4 of 12 --
+
+مطلوب
+.لألسرار environment variables استخدام
+.لكلمات المرور Hashing
+.Server-side validation
+.public forms للـ Rate limiting
+.للعمليات الحساسة Audit log
+.RBAC permissions
+.Tenant isolation
+.hard delete بدل Soft delete
+.ال تكشف معلومات حساسة Error messages
+.auth حسب طريقة CSRF/session protection
+التعامل مع الب᱆يانات الحساسة .9
+:أي بيانات من هذا النوع تعترب حساسة
+.أرقام الهواتف
+.الربيد اإللكرتوني
+.بيانات العم⁓ء
+.بيانات مالية
+.مدفوعات
+.ص⁓حيات
+.Tokens
+.Passwords
+.Session IDs
+.Tenant IDs
+.ملفات مرفوعة من العم⁓ء
+.masked إال إذا كانت logs ال تكتب هذه البيانات في
+:مثال
+01234567890 → 012****7890
+email@example.com → e***@example.com
+قواعد التشف᱆ير والحما᱅ية .10
+:عند التعامل مع كلمات المرور
+.argon2 أو bcrypt استخدم
+.ال تحفظ كلمة السر األصلية
+.responses ال ترسل كلمة السر في
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+5
+
+-- 5 of 12 --
+
+:tokens عند التعامل مع
+.env خزّنها في
+.logs ال تطبعها في
+.frontend bundle ال تضعها في
+.Git ال تضعها في
+:عند التعامل مع ملفات
+.تحقق من نوع الملف
+.تحقق من الحجم
+.ال تسمح بتنفيذ ملفات مرفوعة
+.DB فقط في metadata خزّن
+.آمن الحقًا storage استخدم
+قواعد قاعدة الب᱆يانات .11
+:Prisma schema قبل تعديل
+.افهم الع⁓قات الحالية
+.واضحة migration قائمة بدون fields أو models ال تحذف
+.مستخدم في الكود بدون تحديث كامل field ال تغري اسم
+.للحقول اليت تستخدم في البحث indexes أضف
+.للحاالت enums استخدم
+.updatedAt و createdAt استخدم
+.بدل الحذف النهائي deletedAt أو archivedAt استخدم
+:مهم يجب أن يحتوي على entity كل
+id
+createdAt
+updatedAt
+createdBy إن أمكن
+tenantId الحاجة عند
+status الحاجة عند
+API قواعد .12
+:يجب أن يحتوي على endpoint أي
+.Validation
+.إذا كان داخليًا Auth check
+.Permission check
+•
+•
+•
+•
+•
+•
+•
+•
+•
+.1
+.2
+.3
+.4
+.5
+.6
+.7
+.1
+.2
+.3
+6
+
+-- 6 of 12 --
+
+.Tenant check
+.Error handling
+.واضح Response type
+.إذا كان يغري بيانات حساسة Audit log
+.فقط frontend ممنوع أن تعتمد على
+UI قواعد الواجهات .13
+:أي شاشة يجب أن تحتوي على
+.Loading state
+.Empty state
+.Error state
+.Success state
+.Responsive layout
+.مضبوط Arabic RTL
+.مضبوط إن وجدت English LTR
+.واضحة Labels
+.production ال توجد بيانات وهمية في
+.production UI وليس داخل ،dev-only file أو seed ضعها فقط في ،demo data لو تحتاج
+قواعد الفورمات .14
+:يجب أن يحتوي على form أي
+.Client validation
+.Server validation
+.Clear error messages
+.Submit loading state
+.Disabled submit while sending
+.Protection against duplicate submit
+.عند الفورمات الطويلة Autosave draft
+.عدم ضياع البيانات عند خطأ اإلرسال
+. كدؤ مو success إال بعد reset عدم
+:ممنوع
+event.currentTarget.reset()
+بعد	await	.ً بدون حفظ مرجع الفورم أوال
+:األفضل
+.4
+.5
+.6
+.7
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+7
+
+-- 7 of 12 --
+
+const form = event.currentTarget;
+await submitData();
+form.reset();
+:أو
+formRef.current?.reset();
+Next.js قواعد العمل مع .15
+.Client Components عن Server Components افصل
+.Server Components في browser APIs ال تستخدم
+يستخدم component أي	useState	,	useEffect	,	localStorage	,	window	:يجب أن يبدأ بـ
+'use client';
+ال تستخدم	require()	.الحديثة إال لضرورة TypeScript داخل ملفات
+:imports استخدم
+import path from 'node:path';
+import { readFile } from 'node:fs/promises';
+.build بعد أي تعديل مهم شغّل
+أوامر الفحص المطلوبة .16
+:web-marketing بعد كل تعديل في
+pnpm --filter @allinall/web-marketing build
+:web-platform بعد كل تعديل في
+pnpm --filter @allinall/web-platform build
+:API بعد كل تعديل في
+•
+•
+•
+•
+•
+•
+8
+
+-- 8 of 12 --
+
+pnpm --filter @allinall/api build
+:tests ولو يوجد
+pnpm test
+.ال تعترب المهمة انتهت بدون تشغيل الفحص المناسب
+ممنوعات صارمة .17
+:ممنوع
+git add .
+.حذف ملفات كثرية بدون إذن
+.إعادة كتابة المشروع بالكامل
+.بالكامل بدون خطة architecture نقل
+.build كتم أخطاء
+.في الكود secrets وضع
+.production استخدام بيانات وهمية في
+.تعديل صفحات كثرية بسبب خطأ في صفحة واحدة
+.بدون تحديث الروابط routes تغيري أسماء
+.build لتسهيل validation إزالة
+.بدل إص⁓ح السبب إال بعد موافقة ESLint rule إلغاء
+طر᱅يقة تنف᱆يذ أ᱇ ي مهمة .18
+:اتبع هذا الشكل
+1. Understand the request.
+2. Inspect relevant files.
+3. Write small plan.
+4. Implement smallest safe change.
+5. Run checks.
+6. Fix only errors caused by this change.
+7. Update docs/progress/error-analysis.md if errors were involved.
+8. Summarize changed files and verification result.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+9
+
+-- 9 of 12 --
+
+عند عدم التأكد .19
+:لو لست متأكدًا
+.ال تخرتع
+.ال تنفذ تعديل عشوائي
+.ابحث داخل المشروع
+.اقرأ الملفات
+. اال ً محددًاؤ اسأل سو
+.أو اكتب افرتاضك قبل التنفيذ
+:صيغة مقبولة
+I found two possible causes. I will fix the smaller and safer one first.
+أسلوب تنف᱆يذ المود᱅يولز .20
+:أي موديول جديد يجب أن يُبىن بالرتتيب
+1. Types / contracts
+2. Validation schemas
+3. Database schema
+4. Service layer
+5. API controller/routes
+6. UI pages
+7. Permissions
+8. Audit log
+9. Tests/build
+10. Documentation
+.عشوائيًا backend ال تبدأ بالواجهة فقط مث تحاول تركيب
+س᱆ياسة المهام الصغ᱆يرة .21
+:كل مهمة يجب أال تتجاوز غالبًا
+.ملفات 5 إلى 1
+.تغيري واحد واضح
+.واحد واضح build
+.نتيجة قابلة للمراجعة
+.لو المهمة تحتاج أكرث من ذلك، قسمها
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+10
+
+-- 10 of 12 --
+
+:مثال سيئ
+Build the whole ERP.
+:مثال جيد
+Implement Lead status change API with validation, permission check, activity
+log, and test build.
+ELY طر᱅يقة التعامل مع .22
+:يجب أن يبىن بحذر شديد ELY
+.ال يستخدم بيانات غري معتمدة
+.ال يجيب من غري مصادر عند الحاجة
+.ال يتخطى ص⁓حيات المستخدم
+.confirmation خطرية بدون Actions ال ينفذ
+.يتم تسجيله tool call كل
+.يتم حفظه للمراجعة feedback كل
+.تلقائيًا approved المعرفة ال تصبح
+n8n طر᱅يقة التعامل مع .23
+.مباشرة DB ال يعدل n8n
+:القواعد
+n8n receives event
+n8n performs automation
+n8n calls Matrix API
+Matrix API validates and writes data
+Matrix logs result
+:يجب أن يحتوي على workflow كل
+eventId
+idempotency
+retry
+error handling
+automation log
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+11
+
+-- 11 of 12 --
+
+Done Definition مع᱆يار النها᱅ية .24
+:ال تعترب المهمة منتهية إال إذا تحقق اآلتي
+- .الكود يعمل
+- build .نجح
+- ال توجد TypeScript errors.
+- أخطاء ال توجد runtime .ظاهرة
+- ال توجد secrets .مكشوفة
+- .الصالحيات محترمة
+- error-analysis.md وجود أخطاء عند .تم تحديثه
+- المعدلة الملفات تلخيص .تم
+Agent الـ/رسالة االلزتام للمطور .25
+.قبل تنفيذ أي مهمة، اقرأ هذا الملف
+.نفذ أقل تعديل آمن
+.ال تعمل أكرث مما طُلب
+.ال تضغط على نفسك بمهام كبرية
+.الجودة واألمان أهم من السرعة
+.كل شيء يجب أن يكون قاب⁓ ً للفحص، قاب⁓ ً للرتاجع، وقاب⁓ ً للتطوير
+12
+
+-- 12 of 12 --
+
