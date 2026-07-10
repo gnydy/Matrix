@@ -1,0 +1,78 @@
+name: GPT Automation
+
+on:
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: Describe the automation task
+        required: true
+        type: string
+      dryRun:
+        description: Run without making changes
+        required: false
+        default: false
+        type: boolean
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  automate:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.comment.body, '/matrix-automate')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Resolve prompt
+        id: prompt
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "prompt=${{ github.event.inputs.prompt }}" >> "$GITHUB_OUTPUT"
+          else
+            body="${{ github.event.comment.body }}"
+            prompt=$(printf '%s\n' "$body" | sed -E 's#^/matrix-automate[[:space:]]*##I' | xargs)
+            echo "prompt=$prompt" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run automation
+        id: run
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AI_AUTOMATION_PROMPT: ${{ steps.prompt.outputs.prompt }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${AI_AUTOMATION_PROMPT}" ]; then
+            echo "No prompt provided."
+            exit 1
+          fi
+
+          if [ "${{ github.event.inputs.dryRun }}" = "true" ]; then
+            node scripts/ai-automation.mjs --prompt "$AI_AUTOMATION_PROMPT" --workspace "$GITHUB_WORKSPACE" --repo "$GITHUB_REPOSITORY" --dry-run | tee automation-output.txt
+          else
+            node scripts/ai-automation.mjs --prompt "$AI_AUTOMATION_PROMPT" --workspace "$GITHUB_WORKSPACE" --repo "$GITHUB_REPOSITORY" | tee automation-output.txt
+          fi
+
+      - name: Comment result
+        if: github.event_name == 'issue_comment' && always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          if [ -f automation-output.txt ]; then
+            gh issue comment "${{ github.event.issue.number }}" --body "$(cat automation-output.txt)"
+          else
+            gh issue comment "${{ github.event.issue.number }}" --body "Automation finished."
+          fi
