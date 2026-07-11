@@ -1,0 +1,32 @@
+# Vault Legal Corporate
+
+## Commercial Description
+Legal practice layout with case workflow, risk intake and consultation routing
+
+## Target Client
+Corporate law office serving companies, founders and investors
+
+## Difference From Other Templates
+This V2 template has its own UX structure and page composition. It is not a recolor of the other templates.
+
+## Tech
+Next.js App Router, TypeScript, Tailwind CSS, component-based structure, mock corporate data, SEO metadata.
+
+## Run
+```powershell
+npm install
+npm run dev -- --port 3013
+```
+
+## Build
+```powershell
+npm run build
+```
+
+## ZIP
+```powershell
+.\zip.ps1
+```
+
+## Customization
+Edit `data/site.ts` for content, `app/page.tsx` for layout, and Tailwind classes for visual identity.

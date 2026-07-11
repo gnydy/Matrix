@@ -1,0 +1,22 @@
+# ERP Systems Batch 04 V2 Ports
+
+- Finance Command ERP: http://localhost:3060
+- Factory Floor ERP: http://localhost:3061
+- Inventory Control ERP: http://localhost:3062
+- Procurement Hub ERP: http://localhost:3063
+- People Payroll ERP: http://localhost:3064
+- Sales Order ERP: http://localhost:3065
+- Construct Cost ERP: http://localhost:3066
+- Fleet Route ERP: http://localhost:3067
+- Hospital Ops ERP: http://localhost:3068
+- Campus Admin ERP: http://localhost:3069
+- Property Asset ERP: http://localhost:3070
+- Hotel Chain ERP: http://localhost:3071
+- Retail Branch ERP: http://localhost:3072
+- Restaurant Ops ERP: http://localhost:3073
+- Service Maintenance ERP: http://localhost:3074
+- AgriFlow ERP: http://localhost:3075
+- Project Cost ERP: http://localhost:3076
+- Legal Office ERP: http://localhost:3077
+- Energy Asset ERP: http://localhost:3078
+- Holding Executive ERP: http://localhost:3079

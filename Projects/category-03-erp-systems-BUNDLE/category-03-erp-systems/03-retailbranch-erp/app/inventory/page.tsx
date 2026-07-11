@@ -1,0 +1,5 @@
+import ModulePage from '@/components/ModulePage';
+
+export default function Page() {
+  return <ModulePage title="Inventory" description="Inventory module for RetailBranch ERP. Includes realistic cards, tables, actions and frontend states." />;
+}

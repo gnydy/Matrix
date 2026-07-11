@@ -1,0 +1,57 @@
+﻿name: Monthly Maintenance
+
+on:
+  schedule:
+    - cron: "0 6 1 * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  create-maintenance-issue:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create monthly maintenance issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const date = new Date().toISOString().slice(0, 10);
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Monthly Project Maintenance - ${date}`,
+              body: `
+## Monthly Maintenance Checklist
+
+### Code Quality
+- Review bugs
+- Review warnings
+- Review duplicated code
+- Review dead code without deleting it
+
+### UX / UI
+- Review layout
+- Review responsiveness
+- Review accessibility
+- Suggest UX refresh if needed
+
+### Security
+- Review dependencies
+- Review exposed secrets
+- Review authentication flow
+- Review permissions
+
+### Performance
+- Review loading speed
+- Review bundle size
+- Review database queries
+- Review images and assets
+
+### Important Rule
+Do not delete files or remove features. Create improvements in a separate branch and open a Pull Request.
+              `
+            });

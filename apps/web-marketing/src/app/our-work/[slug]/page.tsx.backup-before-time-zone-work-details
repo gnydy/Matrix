@@ -1,0 +1,5 @@
+import { OurWorkDetail } from '../../../components/marketing/our-work-detail';
+
+export default function OurWorkDetailPage() {
+  return <OurWorkDetail />;
+}

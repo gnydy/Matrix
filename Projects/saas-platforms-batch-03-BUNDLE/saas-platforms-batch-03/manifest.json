@@ -1,0 +1,222 @@
+[
+  {
+    "name": "FlowLedger SaaS",
+    "slug": "flowledger-saas",
+    "industry": "Finance Ops",
+    "audience": "CFOs, finance teams, accounting firms",
+    "use_case": "Recurring billing, invoice workflows, approvals, and finance analytics for subscription businesses.",
+    "layout": "Split hero with finance cockpit and approval rail",
+    "tone": "dark operating-room finance UI",
+    "price": "$89-$249",
+    "complexity": "Advanced"
+  },
+  {
+    "name": "PulseCRM Cloud",
+    "slug": "pulsecrm-cloud",
+    "industry": "CRM / Sales",
+    "audience": "B2B sales teams, agencies, service companies",
+    "use_case": "Sales pipeline management with leads, deals, follow-ups, and account health scoring.",
+    "layout": "Pipeline-first hero with kanban preview",
+    "tone": "high-energy revenue command center",
+    "price": "$79-$219",
+    "complexity": "Advanced"
+  },
+  {
+    "name": "HireNest HR Suite",
+    "slug": "hirenest-hr-suite",
+    "industry": "HR / Recruitment",
+    "audience": "HR departments, recruiters, staffing firms",
+    "use_case": "Recruitment pipeline, employee records, onboarding tasks, and leave management dashboards.",
+    "layout": "People directory hero with hiring funnel",
+    "tone": "clean people-operations interface",
+    "price": "$99-$299",
+    "complexity": "Advanced"
+  },
+  {
+    "name": "OpsPilot Workflow",
+    "slug": "opspilot-workflow",
+    "industry": "Operations / Automation",
+    "audience": "Operations managers, agencies, internal teams",
+    "use_case": "Workflow builder with triggers, approvals, automations, and SLA monitoring.",
+    "layout": "Automation canvas hero with trigger/action cards",
+    "tone": "workflow-builder command UI",
+    "price": "$119-$349",
+    "complexity": "Advanced"
+  },
+  {
+    "name": "SalesForge AI",
+    "slug": "salesforge-ai",
+    "industry": "AI Sales",
+    "audience": "Sales teams, founders, B2B agencies",
+    "use_case": "AI pitch generation, objection handling, proposal drafts, and sales playbooks.",
+    "layout": "AI prompt studio hero with revenue assistant",
+    "tone": "AI assistant workspace",
+    "price": "$69-$199",
+    "complexity": "Advanced"
+  },
+  {
+    "name": "ClinicOS SaaS",
+    "slug": "clinicos-saas",
+    "industry": "Healthcare SaaS",
+    "audience": "Clinics, doctors, small medical centers",
+    "use_case": "Patient scheduling, visit queue, billing mock, and clinic performance dashboards.",
+    "layout": "Appointment timeline hero with patient queue",
+    "tone": "medical operations dashboard",
+    "price": "$129-$399",
+    "complexity": "Advanced"
+  },
+  {
+    "name": "EduSphere LMS",
+    "slug": "edusphere-lms",
+    "industry": "Education / LMS",
+    "audience": "Academies, tutors, training companies",
+    "use_case": "Course catalog, student dashboard, lesson progress, certificates, and instructor analytics.",
+    "layout": "Learning journey hero with student progress ring",
+    "tone": "premium academy LMS",
+    "price": "$99-$279",
+    "complexity": "Advanced"
+  },
+  {
+    "name": "StockWise Inventory",
+    "slug": "stockwise-inventory",
+    "industry": "Inventory SaaS",
+    "audience": "Retailers, warehouses, distributors",
+    "use_case": "Stock movement, warehouse views, low-stock alerts, purchase orders, and supplier management.",
+    "layout": "Warehouse grid hero with stock alerts",
+    "tone": "warehouse command dashboard",
+    "price": "$89-$259",
+    "complexity": "Advanced"
+  },
+  {
+    "name": "SupportIQ Helpdesk",
+    "slug": "supportiq-helpdesk",
+    "industry": "Support / Tickets",
+    "audience": "SaaS companies, agencies, service teams",
+    "use_case": "Ticket inbox, knowledge base, agent workload, SLA tracking, and customer satisfaction dashboard.",
+    "layout": "Ticket inbox hero with SLA heatmap",
+    "tone": "support-center operating UI",
+    "price": "$79-$229",
+    "complexity": "Advanced"
+  },
+  {
+    "name": "MarketPulse Analytics",
+    "slug": "marketpulse-analytics",
+    "industry": "Marketing Analytics",
+    "audience": "Marketing agencies, CMOs, growth teams",
+    "use_case": "Campaign analytics, acquisition channels, attribution mock, and client reporting dashboards.",
+    "layout": "Analytics chart hero with channel cards",
+    "tone": "growth analytics dashboard",
+    "price": "$109-$329",
+    "complexity": "Advanced"
+  },
+  {
+    "name": "ContractVault Legal SaaS",
+    "slug": "contractvault-legal-saas",
+    "industry": "LegalTech",
+    "audience": "Law firms, legal departments, contract managers",
+    "use_case": "Contract lifecycle UI, matter records, approval status, and legal document vault.",
+    "layout": "Document vault hero with matter timeline",
+    "tone": "confidential legal workspace",
+    "price": "$149-$449",
+    "complexity": "Advanced"
+  },
+  {
+    "name": "SecureGate Compliance",
+    "slug": "securegate-compliance",
+    "industry": "Security / Compliance",
+    "audience": "Security teams, SaaS companies, compliance officers",
+    "use_case": "Control library, policy status, evidence collection, risk dashboard, and audit readiness UX.",
+    "layout": "Compliance matrix hero with risk console",
+    "tone": "security governance dashboard",
+    "price": "$159-$499",
+    "complexity": "Advanced"
+  },
+  {
+    "name": "RouteNova Delivery SaaS",
+    "slug": "routenova-delivery-saas",
+    "industry": "Logistics SaaS",
+    "audience": "Delivery companies, restaurants, couriers",
+    "use_case": "Order dispatch, driver tracking mock, route planning, and delivery performance dashboards.",
+    "layout": "Map-inspired hero with dispatch queue",
+    "tone": "live dispatch command center",
+    "price": "$119-$369",
+    "complexity": "Advanced"
+  },
+  {
+    "name": "Bookify Booking Engine",
+    "slug": "bookify-booking-engine",
+    "industry": "Booking SaaS",
+    "audience": "Clinics, salons, consultants, hotels, service providers",
+    "use_case": "Availability calendar, booking flow, staff schedules, deposits, and customer reminders.",
+    "layout": "Calendar-first hero with booking preview",
+    "tone": "reservation management interface",
+    "price": "$69-$249",
+    "complexity": "Intermediate-Advanced"
+  },
+  {
+    "name": "DesignBoard Approval",
+    "slug": "designboard-approval",
+    "industry": "Creative Operations",
+    "audience": "Design studios, agencies, marketing teams",
+    "use_case": "Asset review boards, client approvals, version comments, and campaign delivery status.",
+    "layout": "Gallery board hero with comment pins",
+    "tone": "creative review workspace",
+    "price": "$79-$239",
+    "complexity": "Intermediate-Advanced"
+  },
+  {
+    "name": "BuildTrack Construction SaaS",
+    "slug": "buildtrack-construction-saas",
+    "industry": "Construction SaaS",
+    "audience": "Contractors, project managers, engineering offices",
+    "use_case": "Project milestones, site reports, issue tracking, material status, and budget snapshots.",
+    "layout": "Project timeline hero with site health cards",
+    "tone": "engineering project control UI",
+    "price": "$139-$429",
+    "complexity": "Advanced"
+  },
+  {
+    "name": "MemberCore Community SaaS",
+    "slug": "membercore-community-saas",
+    "industry": "Membership / Community",
+    "audience": "Creators, private communities, training groups",
+    "use_case": "Member plans, gated content, community posts, moderation dashboard, and subscription management.",
+    "layout": "Community feed hero with membership tiers",
+    "tone": "modern community membership UI",
+    "price": "$59-$199",
+    "complexity": "Intermediate-Advanced"
+  },
+  {
+    "name": "CloudMeter Billing",
+    "slug": "cloudmeter-billing",
+    "industry": "Cloud / Hosting Billing",
+    "audience": "Hosting providers, API startups, cloud teams",
+    "use_case": "Usage metering, invoices, plan limits, API keys, and customer usage dashboards.",
+    "layout": "Metering console hero with usage graph",
+    "tone": "developer-grade billing console",
+    "price": "$149-$549",
+    "complexity": "Advanced"
+  },
+  {
+    "name": "InsightDeck BI",
+    "slug": "insightdeck-bi",
+    "industry": "Business Intelligence",
+    "audience": "Executives, analysts, SaaS teams, agencies",
+    "use_case": "KPI dashboards, report builder, dataset cards, anomaly notes, and executive reporting.",
+    "layout": "BI wall hero with KPI cards and insight feed",
+    "tone": "executive analytics suite",
+    "price": "$129-$399",
+    "complexity": "Advanced"
+  },
+  {
+    "name": "AutoAgent Operations",
+    "slug": "autoagent-operations",
+    "industry": "AI Automation SaaS",
+    "audience": "Operations teams, founders, agencies",
+    "use_case": "AI agents dashboard, task queues, prompt templates, run history, and automation monitoring.",
+    "layout": "Agent swarm hero with task execution console",
+    "tone": "AI operations control center",
+    "price": "$119-$399",
+    "complexity": "Advanced"
+  }
+]

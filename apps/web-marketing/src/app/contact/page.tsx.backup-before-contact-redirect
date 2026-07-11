@@ -1,0 +1,5 @@
+import { RealRequestForm } from '../../components/requests/real-request-form';
+
+export default function ContactPage() {
+  return <RealRequestForm sourcePage="/contact" defaultRequestType="consultation" />;
+}

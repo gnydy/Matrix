@@ -1,0 +1,22 @@
+# Portfolio Index
+
+- InvoiceLedger Pro — Invoice issuing and receivable control. Includes frontend screens and backend mock API routes.
+- ExpenseGuard Finance Desk — Expense review and approval workspace. Includes frontend screens and backend mock API routes.
+- TaxBridge Compliance UI — Tax overview, VAT mock and filing status. Includes frontend screens and backend mock API routes.
+- BalanceSheet Executive — Executive balance sheet and cash flow board. Includes frontend screens and backend mock API routes.
+- CashFlow Command — Cash inflow/outflow and runway tracking. Includes frontend screens and backend mock API routes.
+- VendorPay Accounts Payable — Vendor bills and payment run manager. Includes frontend screens and backend mock API routes.
+- ReceivableHub AR Console — A/R aging, collections and client balances. Includes frontend screens and backend mock API routes.
+- SmallBiz Accounting Lite — Simple accounting system for micro-business. Includes frontend screens and backend mock API routes.
+- RetailFinance POS Books — Retail daily sales and reconciliation. Includes frontend screens and backend mock API routes.
+- ConstructionCost Accounting — Project expenses, advances and cost codes. Includes frontend screens and backend mock API routes.
+- ClinicFinance Billing — Medical billing and claim mock dashboards. Includes frontend screens and backend mock API routes.
+- SchoolFees Finance — Tuition payments and student balances. Includes frontend screens and backend mock API routes.
+- SubscriptionRevenue Desk — MRR, billing cycles and failed payments. Includes frontend screens and backend mock API routes.
+- MultiBranch Finance HQ — Branch cashbooks and consolidated reports. Includes frontend screens and backend mock API routes.
+- AuditTrail Accounting — Audit logs, corrections and approvals. Includes frontend screens and backend mock API routes.
+- TreasuryControl Board — Bank accounts and liquidity operations. Includes frontend screens and backend mock API routes.
+- PayrollAccounting Link — Payroll journal and salary liabilities. Includes frontend screens and backend mock API routes.
+- InventoryCost Finance — Stock valuation and COGS dashboard. Includes frontend screens and backend mock API routes.
+- RealEstate Finance Desk — Property collections and maintenance costs. Includes frontend screens and backend mock API routes.
+- EnterpriseBooks Command — Large finance operations console. Includes frontend screens and backend mock API routes.

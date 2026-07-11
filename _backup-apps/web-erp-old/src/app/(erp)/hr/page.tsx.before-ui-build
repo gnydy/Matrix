@@ -1,0 +1,77 @@
+﻿import { redirect } from 'next/navigation';
+import { ErpShell } from '@/components/erp-shell';
+import { ModuleFaq } from '@/components/module-faq';
+import { ModuleAuditChecklist } from '@/components/module-audit-checklist';
+import { getSession } from '@/lib/auth';
+import { erpFetch } from '@/lib/api';
+
+export default async function HrPage() {
+  const session = await getSession();
+  if (!session) redirect('/login');
+
+  const [employees, leaveRequests] = await Promise.all([
+    erpFetch<Array<{ employeeNo: string; name: string; jobTitle: string | null; status: string }>>(
+      '/erp/hr/employees',
+    ),
+    erpFetch<Array<{ reason: string | null; status: string; employee: { name: string } }>>(
+      '/erp/hr/leave-requests',
+    ),
+  ]);
+
+  return (
+    <ErpShell userName={session.name}>
+      <h1 className="text-2xl font-bold">Ø§Ù„Ù…ÙˆØ§Ø±Ø¯ Ø§Ù„Ø¨Ø´Ø±ÙŠØ©</h1>
+      <p className="mt-1 text-muted">Ø§Ù„Ù…ÙˆØ¸ÙÙˆÙ†ØŒ Ø§Ù„Ø­Ø¶ÙˆØ±ØŒ Ø§Ù„Ø¥Ø¬Ø§Ø²Ø§Øª</p>
+
+      <h2 className="mb-3 mt-6 text-lg font-semibold">Ø§Ù„Ù…ÙˆØ¸ÙÙˆÙ†</h2>
+      <div className="overflow-x-auto rounded-2xl border border-border">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Ø§Ù„Ø±Ù‚Ù…</th>
+              <th>Ø§Ù„Ø§Ø³Ù…</th>
+              <th>Ø§Ù„Ù…Ø³Ù…Ù‰</th>
+              <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
+            </tr>
+          </thead>
+          <tbody>
+            {employees.map((e) => (
+              <tr key={e.employeeNo}>
+                <td>{e.employeeNo}</td>
+                <td>{e.name}</td>
+                <td>{e.jobTitle ?? 'â€”'}</td>
+                <td>{e.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h2 className="mb-3 mt-8 text-lg font-semibold">Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø¥Ø¬Ø§Ø²Ø©</h2>
+      <div className="overflow-x-auto rounded-2xl border border-border">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Ø§Ù„Ù…ÙˆØ¸Ù</th>
+              <th>Ø§Ù„Ø³Ø¨Ø¨</th>
+              <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
+            </tr>
+          </thead>
+          <tbody>
+            {leaveRequests.map((l, i) => (
+              <tr key={i}>
+                <td>{l.employee.name}</td>
+                <td>{l.reason ?? 'â€”'}</td>
+                <td>{l.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <ModuleAuditChecklist module="hr" />
+      <ModuleFaq module="hr" />
+    </ErpShell>
+  );
+}
+

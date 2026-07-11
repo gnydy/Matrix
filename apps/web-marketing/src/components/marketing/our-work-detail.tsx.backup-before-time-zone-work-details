@@ -1,0 +1,117 @@
+'use client';
+
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useSiteSettings } from '../../i18n/site/client';
+
+function palette(isLight: boolean) {
+  return {
+    bg: isLight ? '#f8fafc' : '#020617',
+    card: isLight ? '#ffffff' : '#0f172a',
+    text: isLight ? '#0f172a' : '#e5e7eb',
+    title: isLight ? '#0f172a' : '#f8fafc',
+    muted: isLight ? '#64748b' : '#94a3b8',
+    border: isLight ? '#e2e8f0' : 'rgba(148, 163, 184, 0.18)',
+    blue: isLight ? '#2563eb' : '#60a5fa',
+  };
+}
+
+export function OurWorkDetail() {
+  const params = useParams();
+  const { copy, locale, dir, isLight } = useSiteSettings();
+  const c = palette(isLight);
+
+  const slugParam = params?.slug;
+  const slug = Array.isArray(slugParam) ? slugParam[0] : String(slugParam || '');
+
+  const project = copy.ourWork.projects.find((item) => item.slug === slug);
+
+  return (
+    <main
+      lang={locale}
+      dir={dir}
+      style={{
+        minHeight: '100vh',
+        background: isLight ? '#f8fafc' : '#020617',
+        color: c.text,
+        padding: '72px 0',
+      }}
+    >
+      <section
+        style={{
+          width: 'min(980px, calc(100% - 32px))',
+          margin: '0 auto',
+        }}
+      >
+        <Link
+          href="/our-work"
+          style={{
+            color: c.blue,
+            textDecoration: 'none',
+            fontWeight: 900,
+          }}
+        >
+          {locale === 'ar' ? '← العودة إلى أعمالنا' : '← Back to Our Work'}
+        </Link>
+
+        {!project ? (
+          <div
+            style={{
+              marginTop: 30,
+              padding: 28,
+              borderRadius: 24,
+              background: c.card,
+              border: `1px solid ${c.border}`,
+            }}
+          >
+            {locale === 'ar' ? 'المشروع غير موجود.' : 'Project not found.'}
+          </div>
+        ) : (
+          <article
+            style={{
+              marginTop: 30,
+              padding: 30,
+              borderRadius: 28,
+              background: c.card,
+              border: `1px solid ${c.border}`,
+            }}
+          >
+            <div
+              style={{
+                display: 'inline-flex',
+                color: c.blue,
+                fontWeight: 900,
+                marginBottom: 16,
+              }}
+            >
+              {project.category}
+            </div>
+
+            <h1
+              style={{
+                margin: 0,
+                color: c.title,
+                fontSize: 'clamp(38px, 6vw, 68px)',
+                lineHeight: 1.08,
+                letterSpacing: '-0.05em',
+              }}
+            >
+              {project.title}
+            </h1>
+
+            <p
+              style={{
+                marginTop: 22,
+                color: c.muted,
+                fontSize: 19,
+                lineHeight: 1.9,
+              }}
+            >
+              {project.description}
+            </p>
+          </article>
+        )}
+      </section>
+    </main>
+  );
+}

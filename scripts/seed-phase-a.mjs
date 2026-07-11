@@ -1,5 +1,5 @@
-/**
- * Seed Phase A — Tenant, Roles, Owner user
+﻿/**
+ * Seed Phase A — Tenant, Roles, and ERP demo users
  */
 import path from 'node:path';
 import { createRequire } from 'node:module';
@@ -17,26 +17,94 @@ process.env.DATABASE_URL = process.env.DATABASE_URL ?? `file:${dbFile.replace(/\
 
 const prisma = new PrismaClient();
 
-const ADMIN_EMAIL = (process.env.ADMIN_EMAIL ?? 'admin@matrix.local').toLowerCase();
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? 'matrix_admin_change_me';
-const ADMIN_NAME = process.env.ADMIN_NAME ?? 'المسؤول';
+const DEFAULT_PASSWORD = process.env.ADMIN_PASSWORD ?? 'Matrix@2030';
 
-const OWNER_PERMS = ['*'];
-const ADMIN_PERMS = [
-  'users:read',
-  'roles:read',
-  'leads:read',
-  'leads:write',
-  'customers:read',
-  'customers:write',
-  'quotes:read',
-  'quotes:write',
-  'projects:read',
-  'projects:write',
-  'payments:read',
-  'payments:write',
-  'settings:read',
-  'audit:read',
+const roles = [
+  {
+    slug: 'owner',
+    name: 'Owner',
+    permissions: ['*'],
+  },
+  {
+    slug: 'admin',
+    name: 'Admin',
+    permissions: [
+      'erp:*',
+      'users:read',
+      'users:write',
+      'roles:read',
+      'roles:write',
+      'audit:read',
+      'settings:read',
+      'settings:write',
+      'core:read',
+      'core:write',
+      'inventory:read',
+      'inventory:write',
+      'sales:read',
+      'sales:write',
+      'purchases:read',
+      'purchases:write',
+      'accounting:read',
+      'accounting:write',
+      'hr:read',
+      'hr:write',
+      'debts:read',
+      'debts:write',
+      'workflow:read',
+      'workflow:write',
+    ],
+  },
+  {
+    slug: 'cashier',
+    name: 'Cashier',
+    permissions: [
+      'erp:read',
+      'core:read',
+      'inventory:read',
+      'sales:read',
+      'sales:write',
+      'debts:read',
+      'debts:write',
+    ],
+  },
+  {
+    slug: 'employee',
+    name: 'Employee',
+    permissions: [
+      'erp:read',
+      'core:read',
+      'inventory:read',
+      'sales:read',
+      'purchases:read',
+      'hr:read',
+      'workflow:read',
+    ],
+  },
+];
+
+const users = [
+  {
+    email: (process.env.ADMIN_EMAIL ?? 'admin@matrix.local').toLowerCase(),
+    name: process.env.ADMIN_NAME ?? 'الأدمن',
+    roleSlug: 'owner',
+    password: DEFAULT_PASSWORD,
+    adminRole: 'owner',
+  },
+  {
+    email: 'cashier@matrix.local',
+    name: 'الكاشير',
+    roleSlug: 'cashier',
+    password: DEFAULT_PASSWORD,
+    adminRole: 'cashier',
+  },
+  {
+    email: 'employee@matrix.local',
+    name: 'الموظف',
+    roleSlug: 'employee',
+    password: DEFAULT_PASSWORD,
+    adminRole: 'employee',
+  },
 ];
 
 async function main() {
@@ -46,51 +114,57 @@ async function main() {
     create: { name: 'Matrix Internal', slug: 'matrix-internal', status: 'active' },
   });
 
-  const ownerRole = await prisma.role.upsert({
-    where: { slug: 'owner' },
-    update: { name: 'Owner', permissions: OWNER_PERMS },
-    create: { name: 'Owner', slug: 'owner', permissions: OWNER_PERMS },
-  });
+  const roleBySlug = new Map();
 
-  await prisma.role.upsert({
-    where: { slug: 'admin' },
-    update: { name: 'Admin', permissions: ADMIN_PERMS },
-    create: { name: 'Admin', slug: 'admin', permissions: ADMIN_PERMS },
-  });
+  for (const role of roles) {
+    const saved = await prisma.role.upsert({
+      where: { slug: role.slug },
+      update: { name: role.name, permissions: role.permissions },
+      create: { name: role.name, slug: role.slug, permissions: role.permissions },
+    });
+    roleBySlug.set(role.slug, saved);
+  }
 
-  const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 12);
+  for (const account of users) {
+    const role = roleBySlug.get(account.roleSlug);
+    if (!role) throw new Error(`Missing role: ${account.roleSlug}`);
 
-  const user = await prisma.user.upsert({
-    where: { email: ADMIN_EMAIL },
-    update: {
-      name: ADMIN_NAME,
-      passwordHash,
-      status: 'active',
-      tenantId: tenant.id,
-      deletedAt: null,
-    },
-    create: {
-      email: ADMIN_EMAIL,
-      name: ADMIN_NAME,
-      passwordHash,
-      status: 'active',
-      tenantId: tenant.id,
-    },
-  });
+    const passwordHash = await bcrypt.hash(account.password, 12);
 
-  await prisma.userRole.upsert({
-    where: { userId_roleId: { userId: user.id, roleId: ownerRole.id } },
-    update: {},
-    create: { userId: user.id, roleId: ownerRole.id },
-  });
+    const user = await prisma.user.upsert({
+      where: { email: account.email },
+      update: {
+        name: account.name,
+        passwordHash,
+        status: 'active',
+        tenantId: tenant.id,
+        deletedAt: null,
+      },
+      create: {
+        email: account.email,
+        name: account.name,
+        passwordHash,
+        status: 'active',
+        tenantId: tenant.id,
+      },
+    });
 
-  await prisma.adminUser.upsert({
-    where: { email: ADMIN_EMAIL },
-    update: { name: ADMIN_NAME, role: 'owner', active: true },
-    create: { email: ADMIN_EMAIL, name: ADMIN_NAME, role: 'owner', active: true },
-  });
+    await prisma.userRole.upsert({
+      where: { userId_roleId: { userId: user.id, roleId: role.id } },
+      update: {},
+      create: { userId: user.id, roleId: role.id },
+    });
 
-  console.log('Phase A seed OK:', { tenant: tenant.slug, user: user.email });
+    await prisma.adminUser.upsert({
+      where: { email: account.email },
+      update: { name: account.name, role: account.adminRole, active: true },
+      create: { email: account.email, name: account.name, role: account.adminRole, active: true },
+    });
+
+    console.log('Seed user OK:', account.email, 'role:', account.roleSlug);
+  }
+
+  console.log('Phase A seed OK:', { tenant: tenant.slug, users: users.length });
 }
 
 main()

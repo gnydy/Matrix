@@ -1,0 +1,57 @@
+import { Controller, Get } from '@nestjs/common';
+import { CurrentUser } from '../auth/auth.decorators';
+import type { JwtPayload } from '../auth/jwt.strategy';
+import { PrismaService } from '../prisma/prisma.service';
+import { ErpContextService } from './erp-context.service';
+
+@Controller('erp/debts')
+export class ErpDebtsController {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly ctx: ErpContextService,
+  ) {}
+
+  @Get('receivables')
+  async receivables(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const data = await this.prisma.erpReceivable.findMany({
+      where: { companyId: company.id },
+      include: { party: true, schedules: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    return { ok: true, data };
+  }
+
+  @Get('payables')
+  async payables(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const data = await this.prisma.erpPayable.findMany({
+      where: { companyId: company.id },
+      include: { party: true, schedules: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    return { ok: true, data };
+  }
+
+  @Get('overview')
+  async overview(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const [receivables, payables] = await Promise.all([
+      this.prisma.erpReceivable.findMany({ where: { companyId: company.id } }),
+      this.prisma.erpPayable.findMany({ where: { companyId: company.id } }),
+    ]);
+
+    const sumOpen = (rows: { amount: unknown; paidAmount: unknown }[]) =>
+      rows.reduce((s, r) => s + (Number(r.amount) - Number(r.paidAmount)), 0);
+
+    return {
+      ok: true,
+      data: {
+        receivableOpen: sumOpen(receivables),
+        payableOpen: sumOpen(payables),
+        receivableCount: receivables.length,
+        payableCount: payables.length,
+      },
+    };
+  }
+}

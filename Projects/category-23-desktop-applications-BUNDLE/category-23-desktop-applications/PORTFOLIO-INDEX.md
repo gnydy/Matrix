@@ -1,0 +1,22 @@
+# Portfolio Index
+
+- DesktopERP Classic — Desktop ERP shell with module launcher. Includes frontend screens and backend mock API routes.
+- DesktopPOS Counter — Cashier-focused desktop point of sale. Includes frontend screens and backend mock API routes.
+- AccountingDesk Pro — Desktop accounting and ledger interface. Includes frontend screens and backend mock API routes.
+- InventoryDesk Warehouse — Warehouse desktop management UI. Includes frontend screens and backend mock API routes.
+- CRMDesk Sales Console — Sales desktop with pipeline and accounts. Includes frontend screens and backend mock API routes.
+- ClinicDesktop EMR Mock — Clinic desktop patient records mock. Includes frontend screens and backend mock API routes.
+- FactoryControl Desktop — Factory machine and work order console. Includes frontend screens and backend mock API routes.
+- HotelFrontDesk Desktop — Hotel check-in and reservations UI. Includes frontend screens and backend mock API routes.
+- LogisticsDispatcher Desktop — Dispatcher desktop with routes and drivers. Includes frontend screens and backend mock API routes.
+- LegalCase Desktop — Legal case files and calendar desktop. Includes frontend screens and backend mock API routes.
+- SchoolAdmin Desktop — School desktop management interface. Includes frontend screens and backend mock API routes.
+- HRDesktop Manager — Desktop HR employee and payroll shell. Includes frontend screens and backend mock API routes.
+- CallCenter Desktop — Agent calls, scripts and tickets UI. Includes frontend screens and backend mock API routes.
+- BankBranch Desktop — Teller and customer operations desktop. Includes frontend screens and backend mock API routes.
+- RestaurantKDS Desktop — Kitchen display and order control desktop. Includes frontend screens and backend mock API routes.
+- PharmacyDesktop POS — Pharmacy counter, stock and prescription mock. Includes frontend screens and backend mock API routes.
+- ProjectStudio Desktop — Project tasks and document workspace. Includes frontend screens and backend mock API routes.
+- AssetControl Desktop — Assets, custody and maintenance desktop. Includes frontend screens and backend mock API routes.
+- SecuritySOC Desktop — Threat monitoring desktop console. Includes frontend screens and backend mock API routes.
+- EnterpriseSuite Desktop — All-in-one enterprise desktop workspace. Includes frontend screens and backend mock API routes.

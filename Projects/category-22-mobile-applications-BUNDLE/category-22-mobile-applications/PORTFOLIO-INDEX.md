@@ -1,0 +1,22 @@
+# Portfolio Index
+
+- SwiftCart Mobile Commerce — Mobile commerce app with storefront flow. Includes frontend screens and backend mock API routes.
+- RideLink Driver App — Ride and driver trip interface. Includes frontend screens and backend mock API routes.
+- MealDash Delivery App — Food order and tracking application. Includes frontend screens and backend mock API routes.
+- LearnByte Study App — Learning app with lessons and quizzes. Includes frontend screens and backend mock API routes.
+- CareCall Telehealth App — Doctor booking and video visit mock. Includes frontend screens and backend mock API routes.
+- RentHome Mobile App — Rental property mobile experience. Includes frontend screens and backend mock API routes.
+- FitHabit Coach App — Fitness habits and training dashboard. Includes frontend screens and backend mock API routes.
+- PayPocket Wallet App — Wallet, transfers and spending insights. Includes frontend screens and backend mock API routes.
+- TaskNest Productivity App — Tasks, notes and focus sessions. Includes frontend screens and backend mock API routes.
+- EventPass Ticket App — Event discovery and ticket wallet. Includes frontend screens and backend mock API routes.
+- MarketCourier App — Courier dispatch and proof of delivery. Includes frontend screens and backend mock API routes.
+- BeautyBook Salon App — Salon services, booking and loyalty. Includes frontend screens and backend mock API routes.
+- GroceryRun Shopper App — Grocery shopping and delivery tracking. Includes frontend screens and backend mock API routes.
+- PetCare Mobile App — Vet appointments and pet records. Includes frontend screens and backend mock API routes.
+- LanguageSprint App — Language learning streaks and practice. Includes frontend screens and backend mock API routes.
+- NewsBrief Mobile App — News feed, topics and saved reads. Includes frontend screens and backend mock API routes.
+- TravelCompanion App — Trips, booking and itinerary assistant. Includes frontend screens and backend mock API routes.
+- FinanceTracker App — Budget, goals and expense charts. Includes frontend screens and backend mock API routes.
+- CommunityCircle App — Groups, events and member profiles. Includes frontend screens and backend mock API routes.
+- EnterpriseField App — Field reports, tasks and offline sync mock. Includes frontend screens and backend mock API routes.

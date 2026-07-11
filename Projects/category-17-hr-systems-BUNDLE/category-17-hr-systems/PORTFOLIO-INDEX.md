@@ -1,0 +1,22 @@
+# Portfolio Index
+
+- PeopleCore HR Command — Enterprise HR dashboard for medium companies. Includes frontend screens and backend mock API routes.
+- ShiftPulse Attendance Suite — Attendance and shift control for retail teams. Includes frontend screens and backend mock API routes.
+- PayrollBridge Finance HR — Payroll mock portal linked to finance workflows. Includes frontend screens and backend mock API routes.
+- TalentGate Recruitment OS — Applicant tracking and hiring board. Includes frontend screens and backend mock API routes.
+- Performance360 Review Hub — Performance review system with goals and ratings. Includes frontend screens and backend mock API routes.
+- LeaveFlow Employee Portal — Leave requests, balances, and approval queue. Includes frontend screens and backend mock API routes.
+- Onboardly New Hire Journey — Onboarding checklist and document tracker. Includes frontend screens and backend mock API routes.
+- HR Legal Docs Vault — Employee contracts and compliance records. Includes frontend screens and backend mock API routes.
+- CulturePulse Engagement — Engagement surveys and sentiment cards. Includes frontend screens and backend mock API routes.
+- TrainingMatrix HR LMS — Internal training and certification tracker. Includes frontend screens and backend mock API routes.
+- BranchHR Multi Location — HR operations for branches and stores. Includes frontend screens and backend mock API routes.
+- ContractorPeople Portal — Freelancer and contractor HR workspace. Includes frontend screens and backend mock API routes.
+- ExecutiveHR Analytics — Leadership analytics for workforce planning. Includes frontend screens and backend mock API routes.
+- BlueCollar Workforce OS — Field staff, uniforms, tools, and attendance. Includes frontend screens and backend mock API routes.
+- RemoteTeam HR Desk — Remote team timezones, check-ins, and policy hub. Includes frontend screens and backend mock API routes.
+- MedicalStaff HR Board — Hospital staff scheduling and credential UI. Includes frontend screens and backend mock API routes.
+- FactoryShift HR Console — Factory shift roster and overtime control. Includes frontend screens and backend mock API routes.
+- Recruiter Pipeline Pro — Recruitment CRM with candidate stages. Includes frontend screens and backend mock API routes.
+- Compensation Planner — Salary bands, bonuses, and review cycles. Includes frontend screens and backend mock API routes.
+- PeopleOps Enterprise HQ — All-in-one enterprise PeopleOps cockpit. Includes frontend screens and backend mock API routes.

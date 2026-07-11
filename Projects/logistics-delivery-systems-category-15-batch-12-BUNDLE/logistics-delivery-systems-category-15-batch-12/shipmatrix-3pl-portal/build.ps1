@@ -1,0 +1,4 @@
+$ErrorActionPreference = "Stop"
+Write-Host "Building ShipMatrix 3PL Portal" -ForegroundColor Cyan
+if (!(Test-Path "node_modules")) { npm install }
+npm run build

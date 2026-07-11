@@ -1,0 +1,685 @@
+export const en = {
+  common: {
+    brandName: 'Matrix',
+    brandSub: 'AllInAll',
+    contactNow: 'Request a quote',
+    requestSystem: 'Request a quote',
+    learnMore: 'Learn more',
+    viewDetails: 'View details',
+    send: 'Send',
+    loading: 'Loading',
+  },
+
+  header: {
+    services: 'Services',
+    erp: 'ERP',
+    packages: 'Packages',
+    about: 'About',
+    work: 'Our Work',
+    contact: 'Request a quote',
+    contactNow: 'Request a quote',
+    language: 'العربية',
+    theme: 'Theme',
+  },
+
+  home: {
+    badge: 'Integrated Arabic ERP platform',
+    titleLine1: 'Your entire business',
+    titleLine2: 'in one system',
+    description:
+      'Accounting, inventory, sales, purchasing, HR, and full customer lifecycle — Arabic-first, multi-branch, cloud or dedicated deployment.',
+    primaryAction: 'Request a quote',
+    secondaryAction: 'Explore ERP',
+  },
+
+  services: {
+    badge: 'Matrix Services',
+    title: 'Complete digital services for companies that need clarity, control, and growth.',
+    description:
+      'We do not just build pages. We create practical digital solutions that help your company present itself professionally, receive customer requests, organize operations, and turn daily chaos into a manageable system.',
+    items: [
+      {
+        title: 'Professional Company Websites',
+        description:
+          'A trustworthy and polished website that presents your company clearly, explains your services, and turns visitors into potential clients.',
+      },
+      {
+        title: 'E-commerce Stores',
+        description:
+          'A professional store for products, categories, images, prices, and customer requests with a clean experience ready for advertising.',
+      },
+      {
+        title: 'Landing Pages for Campaigns',
+        description:
+          'Focused pages built for advertising campaigns, designed to collect requests and increase conversions without distracting the customer.',
+      },
+      {
+        title: 'ERP & Company Management Systems',
+        description:
+          'A unified system to manage customers, requests, inventory, sales, purchasing, accounting, users, and permissions in one place.',
+      },
+      {
+        title: 'Custom Business Systems',
+        description:
+          'A system built around how your company actually works, such as quotation management, order tracking, daily operations, or internal workflows.',
+      },
+      {
+        title: 'Dashboards & Control Centers',
+        description:
+          'A structured dashboard to manage website content, requests, customers, portfolio, packages, services, and users without editing code.',
+      },
+      {
+        title: 'Customer Request Management',
+        description:
+          'A system that receives customer requests from the website, organizes them by status, and helps your team follow every lead properly.',
+      },
+      {
+        title: 'CRM Customer Management',
+        description:
+          'Organize customer data, lead status, last follow-up, source, and important notes so sales opportunities are not lost.',
+      },
+      {
+        title: 'Portfolio & Work Management',
+        description:
+          'A professional section to showcase company work with project details, images, links, categories, and Arabic/English descriptions.',
+      },
+      {
+        title: 'Booking & Appointment Systems',
+        description:
+          'A suitable solution for clinics, centers, services, and consultations to organize appointments and reduce scattered WhatsApp messages.',
+      },
+      {
+        title: 'WhatsApp & Request Form Integration',
+        description:
+          'Make it easier for customers to contact the company and connect requests to the right follow-up channel.',
+      },
+      {
+        title: 'Google Visibility & SEO Setup',
+        description:
+          'Prepare the website for search engines through page structure, titles, descriptions, speed, and organized content.',
+      },
+      {
+        title: 'Analytics & Performance Tracking',
+        description:
+          'Understand where visitors come from, which pages perform best, which ads generate requests, and where customers drop off.',
+      },
+      {
+        title: 'Digital Positioning & Content Structure',
+        description:
+          'Organize how the company presents itself online: message, services, sections, copy, and communication style.',
+      },
+      {
+        title: 'Ongoing Support & Improvement',
+        description:
+          'Maintain the website or system after launch, fix issues, add improvements, and develop new features as the company grows.',
+      },
+    ],
+  },
+
+  erp: {
+    badge: 'AllInAll ERP',
+    title: 'A complete ERP system to manage your company from first request to final reports.',
+    description:
+      'A professional ERP platform that connects every department in one place: customers, sales, purchasing, inventory, accounting, HR, branches, permissions, reporting, and workflows. The goal is not just data entry; it is to organize the business and turn daily operations into clear, manageable processes.',
+    modulesTitle: 'ERP modules we can build',
+    modulesDescription:
+      'The system can be implemented gradually based on company needs, or built as a complete custom ERP for a specific industry and workflow.',
+    features: [
+      'Multi-company and multi-branch',
+      'Advanced role-based permissions',
+      'Full customer lifecycle management',
+      'Inventory, sales, and purchasing',
+      'Operational and executive reports',
+      'Cloud or dedicated deployment',
+    ],
+    modules: [
+      {
+        title: 'CRM Customer Management',
+        category: 'Sales & Relationships',
+        description:
+          'Manage customer data, source, follow-up status, notes, last contact, and sales opportunities so no opportunity is lost.',
+      },
+      {
+        title: 'Lead Management',
+        category: 'Sales & Relationships',
+        description:
+          'Receive requests from the website, WhatsApp, or campaigns, classify them, assign them to the right person, and track each lead until it becomes a customer.',
+      },
+      {
+        title: 'Quotations',
+        category: 'Sales & Relationships',
+        description:
+          'Create structured quotations with items, prices, terms, delivery scope, and approval status, then convert accepted quotes into projects or sales orders.',
+      },
+      {
+        title: 'Sales Management',
+        category: 'Sales',
+        description:
+          'Manage sales orders, invoices, customer accounts, discounts, taxes, payment status, and connect sales with inventory and accounting.',
+      },
+      {
+        title: 'Point of Sale POS',
+        category: 'Sales',
+        description:
+          'A fast selling interface for branches, stores, and showrooms with inventory connection, cashier workflow, returns, and daily reports.',
+      },
+      {
+        title: 'Purchasing Management',
+        category: 'Purchasing',
+        description:
+          'Manage purchase requests, purchase orders, suppliers, prices, receiving, invoices, and the full purchasing cycle.',
+      },
+      {
+        title: 'Supplier Management',
+        category: 'Purchasing',
+        description:
+          'Store supplier data, terms, products, pricing, contact details, and supplier balances or payables.',
+      },
+      {
+        title: 'Inventory Management',
+        category: 'Inventory',
+        description:
+          'Track product quantities, movements, balances, minimum stock levels, alerts, stocktaking, warehouse transfers, and inventory cost.',
+      },
+      {
+        title: 'Warehouse & Branch Management',
+        category: 'Inventory',
+        description:
+          'Manage multiple warehouses and branches, stock per branch, transfers, responsible users, and product movements.',
+      },
+      {
+        title: 'Barcode & Product Tracking',
+        category: 'Inventory',
+        description:
+          'Use barcodes or internal codes to speed up search, selling, receiving, stocktaking, and reduce manual entry errors.',
+      },
+      {
+        title: 'General Accounting',
+        category: 'Finance',
+        description:
+          'Manage chart of accounts, journal entries, expenses, revenues, receivables, payables, and organized financial records.',
+      },
+      {
+        title: 'Cash & Bank Management',
+        category: 'Finance',
+        description:
+          'Track cash movements, bank transfers, deposits, withdrawals, petty cash, payments, and connect them to invoices and accounts.',
+      },
+      {
+        title: 'Collections & Payments',
+        category: 'Finance',
+        description:
+          'Track paid and remaining amounts, due dates, partial payments, and collection alerts.',
+      },
+      {
+        title: 'Expense Management',
+        category: 'Finance',
+        description:
+          'Record company expenses by category, department, or project and connect them with financial reports.',
+      },
+      {
+        title: 'Invoices & Taxes',
+        category: 'Finance',
+        description:
+          'Manage invoices, invoice numbers, customer details, taxes, discounts, payment status, printing, and exporting based on business needs.',
+      },
+      {
+        title: 'HR Employee Management',
+        category: 'HR',
+        description:
+          'Manage employees, departments, positions, contracts, files, employment status, and employee history.',
+      },
+      {
+        title: 'Attendance Management',
+        category: 'HR',
+        description:
+          'Track attendance, check-out, lateness, absence, leaves, and connect attendance with reports or payroll policies.',
+      },
+      {
+        title: 'Leaves & Internal Requests',
+        category: 'HR',
+        description:
+          'Allow employees to request leaves, advances, approvals, or internal actions through clear approval workflows.',
+      },
+      {
+        title: 'Payroll',
+        category: 'HR',
+        description:
+          'Calculate salaries, deductions, allowances, advances, incentives, lateness, absence, and prepare structured payroll sheets.',
+      },
+      {
+        title: 'Project Management',
+        category: 'Operations',
+        description:
+          'Convert customers or approved quotes into projects, define phases, owners, deadlines, progress, notes, and deliverables.',
+      },
+      {
+        title: 'Task Management',
+        category: 'Operations',
+        description:
+          'Assign tasks, priorities, status, deadlines, owners, and comments so work is clear and trackable.',
+      },
+      {
+        title: 'Contract Management',
+        category: 'Operations',
+        description:
+          'Store customer, supplier, and employee contracts with start dates, end dates, terms, alerts, and attachments.',
+      },
+      {
+        title: 'Document Management',
+        category: 'Operations',
+        description:
+          'Keep customer, project, employee, invoice, and contract files inside the system instead of scattered devices and chats.',
+      },
+      {
+        title: 'Workflows & Approvals',
+        category: 'Management',
+        description:
+          'Define approval flows for quotations, discounts, expenses, internal requests, purchases, and sensitive actions.',
+      },
+      {
+        title: 'Roles & Permissions',
+        category: 'Management',
+        description:
+          'Control exactly what each user can see or edit. Employees see their scope, managers see their department, and owners see everything.',
+      },
+      {
+        title: 'Audit Logs',
+        category: 'Management',
+        description:
+          'Track important actions: who created, edited, deleted, approved, or changed sensitive information and when.',
+      },
+      {
+        title: 'Soft Delete & Trash',
+        category: 'Management',
+        description:
+          'Avoid permanent deletion. Deleted records move to trash and can be reviewed or restored based on permissions.',
+      },
+      {
+        title: 'Notifications & Alerts',
+        category: 'Management',
+        description:
+          'Notify users about new requests, due invoices, low stock, required approvals, project deadlines, and customer follow-ups.',
+      },
+      {
+        title: 'Reports & Dashboards',
+        category: 'Reports',
+        description:
+          'Clear reports for sales, inventory, profit, customers, requests, collections, team performance, and projects.',
+      },
+      {
+        title: 'Executive Reports',
+        category: 'Reports',
+        description:
+          'A focused owner dashboard showing key numbers: sales, expenses, requests, profit, collections, and critical issues.',
+      },
+      {
+        title: 'Subscription & Plan Management',
+        category: 'SaaS',
+        description:
+          'If the ERP is delivered as SaaS, manage plans, usage limits, subscription status, renewal, and suspension.',
+      },
+      {
+        title: 'Multi-Company Management',
+        category: 'SaaS',
+        description:
+          'Support multiple companies on the same platform while separating each company’s data, branches, users, and permissions.',
+      },
+      {
+        title: 'Website Integration',
+        category: 'Integrations',
+        description:
+          'Connect website requests directly to the ERP so customers and leads appear in the system without manual entry.',
+      },
+      {
+        title: 'WhatsApp & Email Integration',
+        category: 'Integrations',
+        description:
+          'Support follow-up and notifications through WhatsApp or email based on the company’s communication policy.',
+      },
+      {
+        title: 'Backup & Security',
+        category: 'Security',
+        description:
+          'Protect company data with access control, backup readiness, and safer data management practices.',
+      },
+    ],
+  },
+
+  packages: {
+    badge: 'Matrix Packages',
+    title: 'Flexible packages built around your company’s real needs, not fixed templates.',
+    description:
+      'Every company has a different size, workflow, and growth stage. Our packages are designed to be highly flexible: start simple, then add pages, modules, dashboards, WhatsApp integration, reports, or a complete system as needed.',
+    note:
+      'We do not force fixed prices because every project differs by page count, system size, integrations, languages, dashboard scope, and customization level. After you send your request, we prepare a clear quote based on your case.',
+    plans: [
+      {
+        title: 'Start',
+        name: 'Start',
+        subtitle: 'Professional beginning',
+        priceLabelAr: 'عرض مخصص',
+        priceLabelEn: 'Custom quote',
+        bestFor: 'Small companies, new businesses, or teams that need a clean and professional digital presence.',
+        description:
+          'A focused package for a strong start without unnecessary complexity. It presents the company clearly and opens a direct path for customer requests.',
+        scope: [
+          'Professional homepage',
+          'Structured service presentation',
+          'Request a quote page',
+          'Requests connected to dashboard',
+          'Responsive mobile and desktop design',
+          'Basic Google visibility setup',
+        ],
+        flexibility: [
+          'Add more pages later',
+          'Upgrade into a full website',
+          'Add WhatsApp or analytics',
+        ],
+        cta: 'Request a quote',
+      },
+      {
+        title: 'Growth',
+        name: 'Growth',
+        subtitle: 'Growth and marketing',
+        priceLabelAr: 'عرض مخصص',
+        priceLabelEn: 'Custom quote',
+        bestFor: 'Companies that need a stronger website for ads, search traffic, and customer acquisition.',
+        description:
+          'A growth-focused package for companies that rely on campaigns or want better positioning and higher conversion.',
+        scope: [
+          'Multi-page company website',
+          'Detailed service pages',
+          'Landing pages for campaigns',
+          'Request forms connected to dashboard',
+          'SEO setup for key pages',
+          'Analytics and performance tracking',
+          'Commercial copy improvement',
+        ],
+        flexibility: [
+          'Add pages based on service count',
+          'Add multiple request forms',
+          'Add portfolio section',
+          'Update services and packages later',
+        ],
+        cta: 'Request a quote',
+      },
+      {
+        title: 'Business Pro',
+        name: 'Business Pro',
+        subtitle: 'Website plus internal management',
+        priceLabelAr: 'عرض مخصص',
+        priceLabelEn: 'Custom quote',
+        bestFor: 'Companies that need more than a website: they need to manage requests, customers, content, and operations.',
+        description:
+          'A practical package for serious companies. It combines a professional website with a control center for leads, customers, services, packages, portfolio, and content.',
+        scope: [
+          'Complete company website',
+          'Internal dashboard',
+          'Lead management',
+          'Basic CRM',
+          'Services and packages management',
+          'Portfolio management',
+          'Audit logs',
+          'Basic user roles',
+        ],
+        flexibility: [
+          'Add internal sections as needed',
+          'Customize request follow-up stages',
+          'Extend CRM later',
+          'Connect WhatsApp or email alerts',
+        ],
+        cta: 'Request a quote',
+      },
+      {
+        title: 'ERP Core',
+        name: 'ERP Core',
+        subtitle: 'Core company management system',
+        priceLabelAr: 'عرض مخصص',
+        priceLabelEn: 'Custom quote',
+        bestFor: 'Companies that need to organize internal operations instead of relying on Excel, WhatsApp, and scattered workflows.',
+        description:
+          'A flexible ERP package that starts with the essential modules your company needs, such as customers, sales, inventory, purchasing, accounting, and permissions.',
+        scope: [
+          'Business workflow analysis',
+          'Core ERP module design',
+          'Customer and request management',
+          'Inventory or sales module as needed',
+          'Purchasing or suppliers module as needed',
+          'Basic operational reports',
+          'User roles and permissions',
+        ],
+        flexibility: [
+          'Choose only the required modules',
+          'Add modules in phases',
+          'Customize the system by industry',
+          'Run as a platform or dedicated system',
+        ],
+        cta: 'Request a quote',
+      },
+      {
+        title: 'Enterprise Custom',
+        name: 'Enterprise Custom',
+        subtitle: 'Fully custom solution',
+        priceLabelAr: 'عرض مخصص',
+        priceLabelEn: 'Custom quote',
+        bestFor: 'Companies that need a fully tailored system or have workflows that do not fit ready-made templates.',
+        description:
+          'A custom package for building a complete solution around the company: internal system, ERP, CRM, reports, permissions, integrations, and multiple branches.',
+        scope: [
+          'Full operations analysis',
+          'Custom experience design',
+          'System built around company departments',
+          'Custom modules by industry',
+          'Advanced permissions',
+          'Executive reports',
+          'Future scalability',
+        ],
+        flexibility: [
+          'Fully customized screens and workflows',
+          'Multi-company or multi-branch support',
+          'External integrations',
+          'Phased implementation by priority',
+        ],
+        cta: 'Request a quote',
+      },
+    ],
+    addonsTitle: 'Add-ons available for any package',
+    addons: [
+      'Website control dashboard',
+      'Requests connected to dashboard',
+      'WhatsApp integration',
+      'Analytics and tracking',
+      'Landing pages for ads',
+      'Portfolio section',
+      'User permissions',
+      'Reports and dashboards',
+      'Arabic and English support',
+      'SEO setup',
+      'CRM customer management',
+      'Additional ERP modules',
+    ],
+  },
+
+  about: {
+    badge: 'About us',
+    title: 'Matrix is a digital solutions company that builds websites and systems to help companies work with clarity and control.',
+    description:
+      'We are not just a page-building service. We work as a technical partner that helps companies understand their needs, improve their digital presence, receive customer requests properly, and build practical systems that reduce chaos and support growth.',
+    introTitle: 'Who are we?',
+    introParagraphs: [
+      'Matrix is a digital solutions company focused on building professional websites, management systems, dashboards, and custom solutions for companies that want better organization and stronger customer presentation.',
+      'We believe a website or system is not valuable only because it looks good. Its real value appears when it helps the company receive requests, follow up with customers, present services clearly, and manage operations more easily.',
+      'We start by understanding how the company works, then turn that understanding into a clear digital experience: a website, dashboard, internal system, or complete solution based on the client’s needs.',
+    ],
+    whatWeDoTitle: 'What do we do?',
+    whatWeDoItems: [
+      {
+        title: 'We build professional digital presence',
+        description:
+          'We design and develop websites that present the company with trust, explain services clearly, and help visitors take action.',
+      },
+      {
+        title: 'We turn requests into a clear process',
+        description:
+          'Instead of losing requests between messages and calls, we connect request forms with dashboards so every request appears in a structured place.',
+      },
+      {
+        title: 'We organize internal operations',
+        description:
+          'We help companies move from scattered Excel sheets and WhatsApp workflows into clearer systems for customers, requests, projects, and content.',
+      },
+      {
+        title: 'We build custom solutions',
+        description:
+          'When ready-made templates are not enough, we build around the company’s real workflow: quotation systems, customer follow-up, dashboards, or complete operational systems.',
+      },
+    ],
+    howWeWorkTitle: 'How do we work?',
+    howWeWorkItems: [
+      {
+        title: 'We understand the problem first',
+        description:
+          'Before execution, we identify what the company actually needs: better presentation, customer acquisition, follow-up, management, or internal operations.',
+      },
+      {
+        title: 'We suggest the right level of solution',
+        description:
+          'We do not force a large system on a company that needs a simple start, and we do not offer a basic website when the company needs internal management.',
+      },
+      {
+        title: 'We build in scalable phases',
+        description:
+          'A company can start with a website and request forms, then add a dashboard, CRM, and deeper management features as it grows.',
+      },
+      {
+        title: 'We focus on real daily use',
+        description:
+          'We care about more than design. The owner and team must be able to use the solution daily without unnecessary complexity.',
+      },
+    ],
+    differenceTitle: 'What makes us different?',
+    differenceItems: [
+      'We think commercially and operationally, not only technically.',
+      'We write clear content that helps customers understand the company’s value.',
+      'We build scalable solutions instead of temporary fixes.',
+      'We connect the website with requests and dashboards so it is not just a silent interface.',
+      'We keep the scope flexible: small, medium, or complete systems based on budget and need.',
+    ],
+    closingTitle: 'Our goal',
+    closingDescription:
+      'Matrix helps companies present themselves professionally, receive customers better, and organize internal work through clear digital solutions that can grow over time.',
+  },
+
+  ourWork: {
+    badge: 'Our Work',
+    title: 'Projects built with a clear commercial and operational mindset.',
+    description:
+      'This section shows how Matrix turns business needs into professional digital experiences that present the brand clearly, support customer trust, and create a path toward real requests.',
+    projects: [
+      {
+        slug: 'time-zone-watches',
+        title: 'Time Zone Watches',
+        client: 'Time Zone',
+        category: 'Luxury Watch Store',
+        logoUrl: '/work/time-zone/logo.jpg',
+        description:
+          'A luxury watch-store project focused on presenting the brand identity, showcasing products elegantly, and creating a clear path for customer requests.',
+        overview:
+          'Time Zone Watches is a watch brand that needs a digital presence matching the nature of the product. Watches depend heavily on trust, visuals, details, and a premium impression, so the website direction should not feel like a generic store. It should feel refined from the first interaction.',
+        logoDescription:
+          'The Time Zone logo uses a dark background with a premium gold identity. The TZ monogram appears strongly with a watch-inspired symbol above it, supported by an eagle or wing shape that gives the logo a sense of power and luxury. The gold-on-black direction fits a watch brand very well.',
+        challenge:
+          'The challenge was to turn the premium visual identity into a clear website experience without making the interface crowded or over-designed. The focus had to stay on product presentation, trust, and a simple customer request path.',
+        solution:
+          'We used a refined dark visual direction with premium spacing, strong image presentation, structured product display, and a direct request path through a quote/request page or WhatsApp based on the brand need.',
+        delivered: [
+          'Luxury interface direction suitable for a watch brand.',
+          'Clear presentation of the logo and brand identity.',
+          'Expandable product pages.',
+          'Responsive experience for mobile and desktop.',
+          'Clear path for product requests or inquiries.',
+          'Future-ready catalog and filtering structure.',
+        ],
+        visualDirection: [
+          'Dark colors with gold accents suitable for watches.',
+          'Logo used as a main identity element.',
+          'Calm premium layout instead of visual clutter.',
+          'Focus on images, details, and trust.',
+        ],
+        result:
+          'The target result is a digital presence that makes Time Zone feel more premium, helps customers understand the value of the products, and turns interest into a clear request.',
+      },
+      {
+        slug: 'aether-education-platform',
+        title: 'Aether',
+        client: 'Matrix Concept',
+        category: 'Comprehensive Education Platform',
+        logoUrl: '',
+        description:
+          'A concept for a comprehensive education platform that helps institutions and creators manage learning, students, courses, content, and follow-up from one place.',
+        overview:
+          'Aether is a comprehensive education platform concept designed to organize the full digital learning experience. It is not just a course display platform. It connects learning content, students, instructors, subscriptions, assessments, progress tracking, and dashboards into one clear experience.',
+        logoDescription:
+          'A final Aether logo has not been approved yet. It is currently presented as a future platform concept within Matrix’s vision for independent digital platforms.',
+        challenge:
+          'Aether targets the problem of scattered education workflows: videos in one place, files in another, WhatsApp groups, manual schedules, and weak follow-up. This makes the student journey unclear and makes educational management harder to measure.',
+        solution:
+          'The solution is a central education platform that brings courses, lessons, assessments, student records, progress tracking, payments, notifications, and management dashboards into one scalable system.',
+        delivered: [
+          'Complete concept for a multi-role education platform.',
+          'Student, instructor, and admin experiences.',
+          'Course, lesson, and content management.',
+          'Assessment and quiz support.',
+          'Student progress tracking.',
+          'Dashboards for management and instructors.',
+          'Future readiness for an AI learning assistant.',
+        ],
+        visualDirection: [
+          'Calm and trustworthy identity suitable for education.',
+          'Structured interface focused on learning clarity.',
+          'Simple experience for students, instructors, and admins.',
+          'Scalable design for different education models.',
+        ],
+        result:
+          'The target result is an integrated education platform that can support academies, training centers, educational creators, schools, or institutions that need professional digital learning management.',
+      },
+      {
+        slug: 'rafiq',
+        title: 'Rafiq',
+        client: 'Rafiq',
+        category: 'Services Platform',
+        logoUrl: '',
+        description:
+          'A digital interface for presenting Rafiq services clearly, building trust, and helping users reach the right service faster.',
+      },
+      {
+        slug: 'aia-erp-platform',
+        title: 'AIA ERP Platform',
+        client: 'AllInAll',
+        category: 'ERP System',
+        logoUrl: '',
+        description:
+          'An ERP platform for managing companies, leads, customers, inventory, sales, purchasing, and permissions.',
+      },
+    ],
+  },
+
+  contact: {
+    badge: 'Request a quote',
+    title: 'Start your project or request a consultation.',
+    description:
+      'Send us your project details or company needs, and we will review the request and suggest the best execution path.',
+    name: 'Name',
+    phone: 'Phone number',
+    email: 'Email',
+    message: 'Request details',
+    submit: 'Send request',
+  },
+
+  footer: {
+    description:
+      'Matrix builds professional websites, ERP systems, dashboards, and custom digital solutions for companies.',
+    rights: 'All rights reserved.',
+  },
+} as const;

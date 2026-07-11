@@ -1,0 +1,78 @@
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { createPartySchema, createPurchaseDocSchema } from '@allinall/erp';
+import { CurrentUser } from '../auth/auth.decorators';
+import type { JwtPayload } from '../auth/jwt.strategy';
+import { PrismaService } from '../prisma/prisma.service';
+import { ErpContextService } from './erp-context.service';
+
+@Controller('erp/purchases')
+export class ErpPurchasesController {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly ctx: ErpContextService,
+  ) {}
+
+  @Get('documents')
+  async documents(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const data = await this.prisma.erpPurchaseDocument.findMany({
+      where: { companyId: company.id },
+      include: { party: true, lines: true },
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+    });
+    return { ok: true, data };
+  }
+
+  @Get('parties')
+  async parties(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const data = await this.prisma.erpParty.findMany({
+      where: {
+        companyId: company.id,
+        deletedAt: null,
+        type: { in: ['supplier', 'both'] },
+      },
+      orderBy: { name: 'asc' },
+    });
+    return { ok: true, data };
+  }
+
+  @Post('parties')
+  async createParty(@CurrentUser() user: JwtPayload, @Body() body: unknown) {
+    const company = await this.ctx.requireCompany(user);
+    const input = createPartySchema.parse({ ...(body as Record<string, unknown>), type: 'supplier' });
+    const data = await this.prisma.erpParty.create({
+      data: { companyId: company.id, ...input, email: input.email || null },
+    });
+    return { ok: true, data };
+  }
+
+  @Post('documents')
+  async createDocument(@CurrentUser() user: JwtPayload, @Body() body: unknown) {
+    const company = await this.ctx.requireCompany(user);
+    const input = createPurchaseDocSchema.parse(body);
+    const ref = input.ref ?? this.ctx.nextRef('PUR');
+
+    const lines = input.lines.map((l) => ({
+      ...l,
+      lineTotal: l.quantity * l.unitPrice,
+    }));
+    const subtotal = lines.reduce((s, l) => s + l.lineTotal, 0);
+
+    const data = await this.prisma.erpPurchaseDocument.create({
+      data: {
+        companyId: company.id,
+        partyId: input.partyId,
+        type: input.type,
+        ref,
+        note: input.note,
+        subtotal,
+        grandTotal: subtotal,
+        lines: { create: lines },
+      },
+      include: { lines: true, party: true },
+    });
+    return { ok: true, data };
+  }
+}

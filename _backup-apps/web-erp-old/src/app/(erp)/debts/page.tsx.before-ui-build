@@ -1,0 +1,95 @@
+﻿import { redirect } from 'next/navigation';
+import { ErpShell } from '@/components/erp-shell';
+import { ModuleFaq } from '@/components/module-faq';
+import { ModuleAuditChecklist } from '@/components/module-audit-checklist';
+import { getSession } from '@/lib/auth';
+import { erpFetch } from '@/lib/api';
+
+export default async function DebtsPage() {
+  const session = await getSession();
+  if (!session) redirect('/login');
+
+  const [overview, receivables, payables] = await Promise.all([
+    erpFetch<{ receivableOpen: number; payableOpen: number }>('/erp/debts/overview'),
+    erpFetch<Array<{ ref: string; amount: number; paidAmount: number; status: string; party: { name: string } }>>(
+      '/erp/debts/receivables',
+    ),
+    erpFetch<Array<{ ref: string; amount: number; paidAmount: number; status: string; party: { name: string } }>>(
+      '/erp/debts/payables',
+    ),
+  ]);
+
+  return (
+    <ErpShell userName={session.name}>
+      <h1 className="text-2xl font-bold">Ø§Ù„Ø¯ÙŠÙˆÙ†</h1>
+      <p className="mt-1 text-muted">Ø§Ù„Ø°Ù…Ù… Ø§Ù„Ù…Ø¯ÙŠÙ†Ø© ÙˆØ§Ù„Ø¯Ø§Ø¦Ù†Ø©</p>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <div className="stat-card">
+          <p className="text-sm text-muted">Ø°Ù…Ù… Ù…Ø¯ÙŠÙ†Ø© Ù…ÙØªÙˆØ­Ø©</p>
+          <p className="mt-1 text-2xl font-bold">{overview.receivableOpen.toFixed(2)}</p>
+        </div>
+        <div className="stat-card">
+          <p className="text-sm text-muted">Ø°Ù…Ù… Ø¯Ø§Ø¦Ù†Ø© Ù…ÙØªÙˆØ­Ø©</p>
+          <p className="mt-1 text-2xl font-bold">{overview.payableOpen.toFixed(2)}</p>
+        </div>
+      </div>
+
+      <h2 className="mb-3 mt-8 text-lg font-semibold">Ø§Ù„Ø°Ù…Ù… Ø§Ù„Ù…Ø¯ÙŠÙ†Ø©</h2>
+      <div className="overflow-x-auto rounded-2xl border border-border">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Ø§Ù„Ù…Ø±Ø¬Ø¹</th>
+              <th>Ø§Ù„Ø¹Ù…ÙŠÙ„</th>
+              <th>Ø§Ù„Ù…Ø¨Ù„Øº</th>
+              <th>Ø§Ù„Ù…Ø¯ÙÙˆØ¹</th>
+              <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
+            </tr>
+          </thead>
+          <tbody>
+            {receivables.map((r) => (
+              <tr key={r.ref}>
+                <td>{r.ref}</td>
+                <td>{r.party.name}</td>
+                <td>{Number(r.amount).toFixed(2)}</td>
+                <td>{Number(r.paidAmount).toFixed(2)}</td>
+                <td>{r.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h2 className="mb-3 mt-8 text-lg font-semibold">Ø§Ù„Ø°Ù…Ù… Ø§Ù„Ø¯Ø§Ø¦Ù†Ø©</h2>
+      <div className="overflow-x-auto rounded-2xl border border-border">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Ø§Ù„Ù…Ø±Ø¬Ø¹</th>
+              <th>Ø§Ù„Ù…ÙˆØ±Ø¯</th>
+              <th>Ø§Ù„Ù…Ø¨Ù„Øº</th>
+              <th>Ø§Ù„Ù…Ø¯ÙÙˆØ¹</th>
+              <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
+            </tr>
+          </thead>
+          <tbody>
+            {payables.map((p) => (
+              <tr key={p.ref}>
+                <td>{p.ref}</td>
+                <td>{p.party.name}</td>
+                <td>{Number(p.amount).toFixed(2)}</td>
+                <td>{Number(p.paidAmount).toFixed(2)}</td>
+                <td>{p.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <ModuleAuditChecklist module="debts" />
+      <ModuleFaq module="debts" />
+    </ErpShell>
+  );
+}
+

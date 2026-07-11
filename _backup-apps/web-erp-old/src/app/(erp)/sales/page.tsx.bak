@@ -1,0 +1,51 @@
+﻿import { redirect } from 'next/navigation';
+import { ErpShell } from '@/components/erp-shell';
+import { ModuleFaq } from '@/components/module-faq';
+import { ModuleAuditChecklist } from '@/components/module-audit-checklist';
+import { getSession } from '@/lib/auth';
+import { erpFetch } from '@/lib/api';
+
+export default async function SalesPage() {
+  const session = await getSession();
+  if (!session) redirect('/login');
+
+  const docs = await erpFetch<
+    Array<{ id: string; ref: string; type: string; status: string; grandTotal: number; party: { name: string } }>
+  >('/erp/sales/documents');
+
+  return (
+    <ErpShell userName={session.name}>
+      <h1 className="text-2xl font-bold">Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª</h1>
+      <p className="mt-1 text-muted">Ø¹Ø±ÙˆØ¶ Ø§Ù„Ø£Ø³Ø¹Ø§Ø±ØŒ Ø£ÙˆØ§Ù…Ø± Ø§Ù„Ø¨ÙŠØ¹ØŒ Ø§Ù„ÙÙˆØ§ØªÙŠØ±</p>
+
+      <div className="mt-6 overflow-x-auto rounded-2xl border border-border">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Ø§Ù„Ù…Ø±Ø¬Ø¹</th>
+              <th>Ø§Ù„Ù†ÙˆØ¹</th>
+              <th>Ø§Ù„Ø¹Ù…ÙŠÙ„</th>
+              <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
+              <th>Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {docs.map((d) => (
+              <tr key={d.id}>
+                <td>{d.ref}</td>
+                <td>{d.type}</td>
+                <td>{d.party.name}</td>
+                <td>{d.status}</td>
+                <td>{Number(d.grandTotal).toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <ModuleAuditChecklist module="sales" />
+      <ModuleFaq module="sales" />
+    </ErpShell>
+  );
+}
+

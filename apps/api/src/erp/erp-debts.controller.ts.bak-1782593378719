@@ -1,0 +1,108 @@
+import { BadRequestException, Body, Controller, Get, Param, Patch } from '@nestjs/common';
+import { payPayableSchema, receiveReceivableSchema } from '@allinall/erp';
+import { Permissions } from '../auth/auth.guard';
+import { CurrentUser } from '../auth/auth.decorators';
+import type { JwtPayload } from '../auth/jwt.strategy';
+import { PrismaService } from '../prisma/prisma.service';
+import { ErpContextService } from './erp-context.service';
+
+type DebtRow = { amount: unknown; paidAmount: unknown };
+
+function openAmount(row: DebtRow): number {
+  return Number(row.amount) - Number(row.paidAmount);
+}
+
+function statusFor(amount: number, paid: number): 'open' | 'partial' | 'paid' {
+  if (paid <= 0) return 'open';
+  if (paid >= amount) return 'paid';
+  return 'partial';
+}
+
+@Controller('erp/debts')
+export class ErpDebtsController {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly ctx: ErpContextService,
+  ) {}
+
+  @Get('overview')
+  @Permissions('debts:read')
+  async overview(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const [receivables, payables] = await Promise.all([
+      this.prisma.erpReceivable.findMany({ where: { companyId: company.id } }),
+      this.prisma.erpPayable.findMany({ where: { companyId: company.id } }),
+    ]);
+    return {
+      ok: true,
+      data: {
+        receivableOpen: receivables.reduce((sum, row) => sum + openAmount(row), 0),
+        payableOpen: payables.reduce((sum, row) => sum + openAmount(row), 0),
+        receivableCount: receivables.length,
+        payableCount: payables.length,
+      },
+    };
+  }
+
+  @Get('receivables')
+  @Permissions('debts:read')
+  async receivables(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const data = await this.prisma.erpReceivable.findMany({
+      where: { companyId: company.id },
+      include: { party: true, salesDoc: true, schedules: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    return { ok: true, data };
+  }
+
+  @Patch('receivables/:id/receive')
+  @Permissions('debts:write')
+  async receive(@CurrentUser() user: JwtPayload, @Param('id') id: string, @Body() body: unknown) {
+    const company = await this.ctx.requireCompany(user);
+    const input = receiveReceivableSchema.parse(body);
+    const row = await this.prisma.erpReceivable.findFirst({ where: { id, companyId: company.id } });
+    if (!row) throw new BadRequestException('Receivable not found');
+    const amount = Number(row.amount);
+    const paid = Number(row.paidAmount);
+    const nextPaid = paid + input.amount;
+    if (nextPaid > amount + 0.001) throw new BadRequestException('Payment exceeds open amount');
+    const data = await this.prisma.erpReceivable.update({
+      where: { id },
+      data: { paidAmount: nextPaid, status: statusFor(amount, nextPaid) },
+      include: { party: true, salesDoc: true },
+    });
+    return { ok: true, data };
+  }
+
+  @Get('payables')
+  @Permissions('debts:read')
+  async payables(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const data = await this.prisma.erpPayable.findMany({
+      where: { companyId: company.id },
+      include: { party: true, purchaseDoc: true, schedules: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    return { ok: true, data };
+  }
+
+  @Patch('payables/:id/pay')
+  @Permissions('debts:write')
+  async pay(@CurrentUser() user: JwtPayload, @Param('id') id: string, @Body() body: unknown) {
+    const company = await this.ctx.requireCompany(user);
+    const input = payPayableSchema.parse(body);
+    const row = await this.prisma.erpPayable.findFirst({ where: { id, companyId: company.id } });
+    if (!row) throw new BadRequestException('Payable not found');
+    const amount = Number(row.amount);
+    const paid = Number(row.paidAmount);
+    const nextPaid = paid + input.amount;
+    if (nextPaid > amount + 0.001) throw new BadRequestException('Payment exceeds open amount');
+    const data = await this.prisma.erpPayable.update({
+      where: { id },
+      data: { paidAmount: nextPaid, status: statusFor(amount, nextPaid) },
+      include: { party: true, purchaseDoc: true },
+    });
+    return { ok: true, data };
+  }
+}

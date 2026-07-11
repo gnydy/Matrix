@@ -1,0 +1,22 @@
+# Portfolio Index
+
+- SupportBot Helpdesk — Customer support chatbot with ticket handoff. Includes frontend screens and backend mock API routes.
+- SalesBot Lead Qualifier — Sales lead qualification chat console. Includes frontend screens and backend mock API routes.
+- HRBot Employee Assistant — HR policy and leave assistant chat UI. Includes frontend screens and backend mock API routes.
+- EduBot Tutor Chat — Student tutoring and quiz chat interface. Includes frontend screens and backend mock API routes.
+- ClinicBot Triage Mock — Healthcare triage mock chatbot interface. Includes frontend screens and backend mock API routes.
+- RealEstateBot Advisor — Property matching and viewing booking bot. Includes frontend screens and backend mock API routes.
+- RestaurantBot Ordering — Food ordering chatbot and order summary. Includes frontend screens and backend mock API routes.
+- TravelBot Concierge — Travel planning chatbot with itinerary. Includes frontend screens and backend mock API routes.
+- FinanceBot Expense Coach — Budget and expense assistant chat. Includes frontend screens and backend mock API routes.
+- LegalBot Intake Assistant — Legal intake and case routing bot. Includes frontend screens and backend mock API routes.
+- RecruitBot Screening — Candidate screening and interview bot. Includes frontend screens and backend mock API routes.
+- CommerceBot Product Guide — E-commerce recommendation chat assistant. Includes frontend screens and backend mock API routes.
+- BankingBot Service Desk — Banking service chatbot mock. Includes frontend screens and backend mock API routes.
+- InsuranceBot Claims — Insurance claim intake chatbot. Includes frontend screens and backend mock API routes.
+- MaintenanceBot Dispatcher — Maintenance request and dispatch bot. Includes frontend screens and backend mock API routes.
+- SaaSBot Onboarding — SaaS onboarding and help chatbot. Includes frontend screens and backend mock API routes.
+- SecurityBot Incident Guide — Security incident guidance bot UI. Includes frontend screens and backend mock API routes.
+- AICompanion Chat — Personal assistant and productivity chat UI. Includes frontend screens and backend mock API routes.
+- VoiceBot Control Room — Voice/chat channel management bot console. Includes frontend screens and backend mock API routes.
+- AgentMesh MultiBot Hub — Multi-bot orchestration and analytics center. Includes frontend screens and backend mock API routes.

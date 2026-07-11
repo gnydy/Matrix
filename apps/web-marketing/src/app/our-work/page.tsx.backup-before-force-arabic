@@ -1,0 +1,167 @@
+'use client';
+
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { getOurWorkTranslation, type OurWorkLocale } from './_translations';
+import styles from './our-work.module.css';
+
+type Theme = 'light' | 'dark';
+
+function readCookie(name: string) {
+  if (typeof document === 'undefined') return '';
+
+  const row = document.cookie
+    .split('; ')
+    .find((item) => item.startsWith(`${name}=`));
+
+  return row ? decodeURIComponent(row.split('=').slice(1).join('=')) : '';
+}
+
+function readLocale(): OurWorkLocale {
+  if (typeof window === 'undefined') return 'ar';
+
+  const value = [
+    document.documentElement.lang,
+    readCookie('locale'),
+    readCookie('NEXT_LOCALE'),
+    readCookie('matrix_locale'),
+    window.localStorage.getItem('locale') || '',
+    window.localStorage.getItem('lang') || '',
+    window.localStorage.getItem('matrix_locale') || '',
+  ]
+    .join(' ')
+    .toLowerCase();
+
+  return value.includes('en') ? 'en' : 'ar';
+}
+
+function readTheme(): Theme {
+  if (typeof window === 'undefined') return 'dark';
+
+  const value = [
+    document.documentElement.dataset.theme || '',
+    document.documentElement.className || '',
+    readCookie('theme'),
+    readCookie('matrix_theme'),
+    window.localStorage.getItem('theme') || '',
+    window.localStorage.getItem('mode') || '',
+    window.localStorage.getItem('matrix_theme') || '',
+  ]
+    .join(' ')
+    .toLowerCase();
+
+  return value.includes('light') ? 'light' : 'dark';
+}
+
+export default function OurWorkPage() {
+  const [locale, setLocale] = useState<OurWorkLocale>('ar');
+  const [theme, setTheme] = useState<Theme>('dark');
+
+  useEffect(() => {
+    function sync() {
+      setLocale(readLocale());
+      setTheme(readTheme());
+    }
+
+    sync();
+
+    const observer = new MutationObserver(sync);
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['lang', 'dir', 'class', 'data-theme'],
+    });
+
+    window.addEventListener('storage', sync);
+    window.addEventListener('focus', sync);
+    window.addEventListener('matrix:locale-change', sync);
+    window.addEventListener('matrix:theme-change', sync);
+
+    const timer = window.setInterval(sync, 500);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('storage', sync);
+      window.removeEventListener('focus', sync);
+      window.removeEventListener('matrix:locale-change', sync);
+      window.removeEventListener('matrix:theme-change', sync);
+      window.clearInterval(timer);
+    };
+  }, []);
+
+  const t = getOurWorkTranslation(locale);
+
+  const technologiesCount = new Set(
+    t.projects.flatMap((project) => project.technologies),
+  ).size;
+
+  return (
+    <main
+      className={styles.page}
+      data-theme={theme}
+      dir={t.dir}
+      lang={t.lang}
+    >
+      <section className={styles.container}>
+        <div className={styles.eyebrow}>{t.eyebrow}</div>
+
+        <h1 className={styles.title}>{t.title}</h1>
+
+        <p className={styles.description}>{t.description}</p>
+
+        <div className={styles.stats}>
+          <div className={styles.stat}>
+            <strong>{t.projects.length}</strong>
+            <span>{t.stats.projects}</span>
+          </div>
+
+          <div className={styles.stat}>
+            <strong>{t.projects.length}</strong>
+            <span>{t.stats.featured}</span>
+          </div>
+
+          <div className={styles.stat}>
+            <strong>{technologiesCount}</strong>
+            <span>{t.stats.technologies}</span>
+          </div>
+        </div>
+
+        <div className={styles.grid}>
+          {t.projects.map((project) => (
+            <Link
+              key={project.slug}
+              href={`/our-work/${project.slug}`}
+              className={styles.card}
+            >
+              <div className={styles.cover}>
+                <div>
+                  <strong>{project.title}</strong>
+                  <br />
+                  <span>{project.category}</span>
+                </div>
+              </div>
+
+              <div className={styles.body}>
+                <h2 className={styles.cardTitle}>{project.title}</h2>
+
+                <p className={styles.client}>{project.client}</p>
+
+                <p className={styles.summary}>{project.description}</p>
+
+                <div className={styles.tags}>
+                  {project.technologies.map((tech) => (
+                    <span key={tech} className={styles.tag}>
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+
+                <div className={styles.action}>{t.actions.viewDetails}</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+}

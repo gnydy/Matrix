@@ -1,0 +1,241 @@
+export type FieldType = 'text' | 'textarea' | 'number' | 'select' | 'checkbox' | 'tags';
+
+export type FieldConfig = {
+  name: string;
+  label: string;
+  type: FieldType;
+  required?: boolean;
+  options?: string[];
+};
+
+export type ResourceConfig = {
+  resource: string;
+  title: string;
+  subtitle: string;
+  primaryAction: string;
+  readOnly?: boolean;
+  fields: FieldConfig[];
+  columns: string[];
+};
+
+export const configs = {
+  leads: {
+    resource: 'leads',
+    title: 'طلبات العملاء',
+    subtitle: 'بيانات حقيقية محفوظة من طلبات العملاء والمتابعات.',
+    primaryAction: 'إضافة Lead',
+    fields: [
+      { name: 'name', label: 'الاسم', type: 'text', required: true },
+      { name: 'phone', label: 'الهاتف', type: 'text', required: true },
+      { name: 'email', label: 'البريد', type: 'text' },
+      { name: 'source', label: 'المصدر', type: 'select', options: ['website', 'whatsapp', 'facebook', 'manual'] },
+      { name: 'message', label: 'تفاصيل الطلب', type: 'textarea' },
+      { name: 'status', label: 'الحالة', type: 'select', options: ['new', 'active', 'review', 'archived'] },
+    ],
+    columns: ['name', 'phone', 'source', 'status', 'createdAt'],
+  },
+
+  visitors: {
+    resource: 'visitors',
+    title: 'الزوار',
+    subtitle: 'تسجيل وتحليل زيارات الموقع بشكل قابل للربط لاحقًا بالتحليلات.',
+    primaryAction: 'إضافة زيارة',
+    fields: [
+      { name: 'path', label: 'الصفحة', type: 'text', required: true },
+      { name: 'source', label: 'المصدر', type: 'text' },
+      { name: 'visits', label: 'عدد الزيارات', type: 'number' },
+      { name: 'status', label: 'الحالة', type: 'select', options: ['active', 'archived'] },
+    ],
+    columns: ['path', 'source', 'visits', 'status', 'createdAt'],
+  },
+
+  customers: {
+    resource: 'customers',
+    title: 'العملاء',
+    subtitle: 'إدارة العملاء الحقيقيين بعد تحويلهم من Leads.',
+    primaryAction: 'إضافة عميل',
+    fields: [
+      { name: 'name', label: 'اسم العميل', type: 'text', required: true },
+      { name: 'sector', label: 'القطاع', type: 'text' },
+      { name: 'phone', label: 'الهاتف', type: 'text' },
+      { name: 'email', label: 'البريد', type: 'text' },
+      { name: 'status', label: 'الحالة', type: 'select', options: ['active', 'review', 'archived'] },
+    ],
+    columns: ['name', 'sector', 'phone', 'status', 'createdAt'],
+  },
+
+  quotes: {
+    resource: 'quotes',
+    title: 'عروض الأسعار',
+    subtitle: 'حفظ عروض الأسعار وربطها بالعميل والمشروع لاحقًا.',
+    primaryAction: 'إضافة عرض سعر',
+    fields: [
+      { name: 'customerName', label: 'العميل', type: 'text', required: true },
+      { name: 'amount', label: 'القيمة', type: 'number' },
+      { name: 'currency', label: 'العملة', type: 'select', options: ['EGP', 'USD'] },
+      { name: 'status', label: 'الحالة', type: 'select', options: ['draft', 'review', 'published', 'archived'] },
+    ],
+    columns: ['customerName', 'amount', 'currency', 'status', 'createdAt'],
+  },
+
+  projects: {
+    resource: 'projects',
+    title: 'المشاريع',
+    subtitle: 'متابعة المشاريع الحقيقية والمراحل ونسبة الإنجاز.',
+    primaryAction: 'إضافة مشروع',
+    fields: [
+      { name: 'title', label: 'اسم المشروع', type: 'text', required: true },
+      { name: 'customerName', label: 'العميل', type: 'text' },
+      { name: 'stage', label: 'المرحلة', type: 'text' },
+      { name: 'progress', label: 'نسبة الإنجاز', type: 'number' },
+      { name: 'status', label: 'الحالة', type: 'select', options: ['active', 'review', 'published', 'archived'] },
+    ],
+    columns: ['title', 'customerName', 'stage', 'progress', 'status'],
+  },
+
+  payments: {
+    resource: 'payments',
+    title: 'المدفوعات',
+    subtitle: 'تسجيل المدفوع والمتبقي لكل عميل أو مشروع.',
+    primaryAction: 'تسجيل دفعة',
+    fields: [
+      { name: 'customerName', label: 'العميل', type: 'text', required: true },
+      { name: 'projectName', label: 'المشروع', type: 'text' },
+      { name: 'paid', label: 'المدفوع', type: 'number' },
+      { name: 'remaining', label: 'المتبقي', type: 'number' },
+      { name: 'currency', label: 'العملة', type: 'select', options: ['EGP', 'USD'] },
+    ],
+    columns: ['customerName', 'projectName', 'paid', 'remaining', 'currency'],
+  },
+
+  services: {
+    resource: 'services',
+    title: 'كتالوج الخدمات',
+    subtitle: 'الخدمات التي تظهر في الموقع ويمكن إدارتها من الداشبورد.',
+    primaryAction: 'إضافة خدمة',
+    fields: [
+      { name: 'titleAr', label: 'العنوان العربي', type: 'text', required: true },
+      { name: 'titleEn', label: 'English Title', type: 'text', required: true },
+      { name: 'descriptionAr', label: 'الوصف العربي', type: 'textarea' },
+      { name: 'descriptionEn', label: 'English Description', type: 'textarea' },
+      { name: 'status', label: 'الحالة', type: 'select', options: ['draft', 'published', 'archived'] },
+    ],
+    columns: ['titleAr', 'titleEn', 'status', 'createdAt'],
+  },
+
+  packages: {
+    resource: 'packages',
+    title: 'الباقات',
+    subtitle: 'إدارة الباقات والأسعار والوصف.',
+    primaryAction: 'إضافة باقة',
+    fields: [
+      { name: 'name', label: 'اسم الباقة', type: 'text', required: true },
+      { name: 'priceLabelAr', label: 'السعر عربي', type: 'text' },
+      { name: 'priceLabelEn', label: 'Price English', type: 'text' },
+      { name: 'descriptionAr', label: 'الوصف العربي', type: 'textarea' },
+      { name: 'descriptionEn', label: 'English Description', type: 'textarea' },
+      { name: 'status', label: 'الحالة', type: 'select', options: ['draft', 'published', 'archived'] },
+    ],
+    columns: ['name', 'priceLabelAr', 'priceLabelEn', 'status'],
+  },
+
+  contents: {
+    resource: 'contents',
+    title: 'إدارة المحتوى',
+    subtitle: 'محتوى الصفحات والترجمة من الداشبورد.',
+    primaryAction: 'إضافة محتوى',
+    fields: [
+      { name: 'page', label: 'الصفحة', type: 'text', required: true },
+      { name: 'key', label: 'المفتاح', type: 'text', required: true },
+      { name: 'ar', label: 'العربي', type: 'textarea' },
+      { name: 'en', label: 'English', type: 'textarea' },
+      { name: 'status', label: 'الحالة', type: 'select', options: ['draft', 'published', 'archived'] },
+    ],
+    columns: ['page', 'key', 'status', 'updatedAt'],
+  },
+
+  users: {
+    resource: 'users',
+    title: 'المستخدمون',
+    subtitle: 'إدارة مستخدمي لوحة التحكم.',
+    primaryAction: 'إضافة مستخدم',
+    fields: [
+      { name: 'name', label: 'الاسم', type: 'text', required: true },
+      { name: 'email', label: 'البريد', type: 'text', required: true },
+      { name: 'role', label: 'الدور', type: 'select', options: ['Owner', 'Admin', 'Sales', 'Support', 'Developer'] },
+      { name: 'status', label: 'الحالة', type: 'select', options: ['active', 'archived'] },
+    ],
+    columns: ['name', 'email', 'role', 'status'],
+  },
+
+  roles: {
+    resource: 'roles',
+    title: 'الأدوار والصلاحيات',
+    subtitle: 'إدارة أدوار الفريق وصلاحياته.',
+    primaryAction: 'إضافة دور',
+    fields: [
+      { name: 'name', label: 'اسم الدور', type: 'text', required: true },
+      { name: 'permissions', label: 'الصلاحيات', type: 'tags' },
+      { name: 'status', label: 'الحالة', type: 'select', options: ['active', 'archived'] },
+    ],
+    columns: ['name', 'permissions', 'status'],
+  },
+
+  auditLogs: {
+    resource: 'auditLogs',
+    title: 'سجل النشاطات',
+    subtitle: 'كل عملية إنشاء أو تعديل أو حذف تسجل هنا تلقائيًا.',
+    primaryAction: 'قراءة فقط',
+    readOnly: true,
+    fields: [],
+    columns: ['actor', 'action', 'resource', 'createdAt'],
+  },
+
+  trash: {
+    resource: 'trash',
+    title: 'سلة المهملات',
+    subtitle: 'كل العناصر المحذوفة Soft Delete تظهر هنا.',
+    primaryAction: 'قراءة فقط',
+    readOnly: true,
+    fields: [],
+    columns: ['resource', 'title', 'status', 'deletedAt'],
+  },
+
+  commands: {
+    resource: 'commands',
+    title: 'مركز الأوامر',
+    subtitle: 'تسجيل الأوامر المسموحة فقط. لا يوجد Terminal مفتوح.',
+    primaryAction: 'تسجيل أمر',
+    fields: [
+      { name: 'command', label: 'الأمر', type: 'select', options: ['build:marketing', 'backup:db', 'sync:portfolio'] },
+      { name: 'allowed', label: 'مسموح', type: 'checkbox' },
+      { name: 'result', label: 'النتيجة', type: 'textarea' },
+      { name: 'status', label: 'الحالة', type: 'select', options: ['published', 'review', 'archived'] },
+    ],
+    columns: ['command', 'allowed', 'result', 'status', 'createdAt'],
+  },
+
+  portfolio: {
+    resource: 'portfolio',
+    title: 'إدارة أعمالنا',
+    subtitle: 'إضافة وتعديل أعمال Matrix مثل Time Zone وRafiq من الداشبورد الحقيقي.',
+    primaryAction: 'إضافة مشروع',
+    fields: [
+      { name: 'slug', label: 'Slug', type: 'text', required: true },
+      { name: 'titleAr', label: 'العنوان العربي', type: 'text', required: true },
+      { name: 'titleEn', label: 'English Title', type: 'text', required: true },
+      { name: 'client', label: 'العميل', type: 'text', required: true },
+      { name: 'categoryAr', label: 'التصنيف العربي', type: 'text' },
+      { name: 'categoryEn', label: 'English Category', type: 'text' },
+      { name: 'descriptionAr', label: 'الوصف العربي', type: 'textarea' },
+      { name: 'descriptionEn', label: 'English Description', type: 'textarea' },
+      { name: 'projectUrl', label: 'رابط المشروع', type: 'text' },
+      { name: 'logoUrl', label: 'رابط اللوجو', type: 'text' },
+      { name: 'coverUrl', label: 'رابط الغلاف', type: 'text' },
+      { name: 'technologies', label: 'التقنيات', type: 'tags' },
+      { name: 'featured', label: 'مميز', type: 'checkbox' },
+      { name: 'status', label: 'الحالة', type: 'select', options: ['draft', 'published', 'archived'] },
+    ],
+    columns: ['titleAr', 'client', 'categoryAr', 'status', 'createdAt'],
+  },
+} satisfies Record<string, ResourceConfig>;

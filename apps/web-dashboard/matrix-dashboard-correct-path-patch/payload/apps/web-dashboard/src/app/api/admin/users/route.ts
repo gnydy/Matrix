@@ -1,0 +1,9 @@
+import { NextResponse } from 'next/server';
+import { prisma } from '@allinall/database';
+import { getDashboardSession } from '@/lib/auth';
+import { canAccessResource } from '@/lib/permissions';
+import { hashPassword } from '@/lib/password';
+import { recordAudit } from '@/lib/audit';
+const roles=['owner','admin','sales','support','developer','project_manager','accountant','hr_manager','auditor','viewer'];
+export async function GET(){const s=await getDashboardSession();if(!s||!canAccessResource(s.user.role,'users','read'))return NextResponse.json({error:'غير مصرح'},{status:403});const items=await prisma.matrixAdminUser.findMany({where:{deletedAt:null},select:{id:true,email:true,name:true,role:true,status:true,lastLoginAt:true,createdAt:true,updatedAt:true},orderBy:{updatedAt:'desc'}});return NextResponse.json({items});}
+export async function POST(request:Request){const s=await getDashboardSession();if(!s||!canAccessResource(s.user.role,'users','create'))return NextResponse.json({error:'غير مصرح'},{status:403});try{const b=await request.json();const email=String(b.email||'').trim().toLowerCase();const name=String(b.name||'').trim();const role=String(b.role||'viewer');if(!email||!name||!roles.includes(role))throw new Error('بيانات المستخدم غير مكتملة');if(role==='owner'&&s.user.role!=='owner')throw new Error('فقط المالك يمكنه إنشاء مالك آخر');const passwordHash=await hashPassword(String(b.password||''));const item=await prisma.matrixAdminUser.create({data:{email,name,role:role as never,status:'active',passwordHash}});await recordAudit({actorId:s.user.id,action:'users.create',entityType:'MatrixAdminUser',entityId:item.id,afterData:{email,name,role},requestHeaders:request.headers});return NextResponse.json({item},{status:201});}catch(e){return NextResponse.json({error:e instanceof Error?e.message:'تعذر الإنشاء'},{status:400});}}

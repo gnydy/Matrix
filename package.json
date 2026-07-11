@@ -7,11 +7,12 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
-    "marketing:build": "npm run build --prefix apps/web-marketing",
+    "marketing:clean": "node -e \"require('fs').rmSync('apps/web-marketing/.next',{recursive:true,force:true})\"",
+    "marketing:build": "pnpm --filter @allinall/web-marketing build",
+    "stack:clean": "node -e \"const fs=require('fs');['web-marketing','web-platform'].forEach(a=>fs.rmSync('apps/'+a+'/.next',{recursive:true,force:true}))\"",
     "marketing:start": "npm run start --prefix apps/web-marketing",
-    "marketing:dev": "pnpm --filter @allinall/web-marketing exec next dev --port 3000 --hostname 127.0.0.1",
+    "marketing:dev": "pnpm --filter @allinall/web-marketing dev",
     "platform:dev": "pnpm --filter @allinall/web-platform exec next dev --port 3001 --hostname 127.0.0.1",
-    "erp:dev": "pnpm --filter @allinall/web-erp dev",
     "platform:build": "pnpm --filter @allinall/web-platform build",
     "db:generate": "pnpm --filter @allinall/database db:generate",
     "db:push": "pnpm --filter @allinall/database db:push",
@@ -20,7 +21,6 @@
     "api:dev": "pnpm --filter @allinall/api dev",
     "api:build": "pnpm --filter @allinall/api build",
     "stack:start": "node scripts/stack-matrix.mjs",
-    "stack:test": "node scripts/smoke-test-matrix.mjs",
     "stack:gateway": "node scripts/gateway-matrix.mjs",
     "prod:hosts": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/add-hosts.ps1",
     "stack:firewall": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/open-firewall.ps1",
@@ -40,10 +40,14 @@
     "@netlify/plugin-nextjs": "^5.9.4",
     "bcryptjs": "^2.4.3",
     "netlify-cli": "^23.4.3",
+    "prisma": "^6.9.0",
     "turbo": "^2.5.4"
   },
   "packageManager": "pnpm@9.15.0",
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.9.0"
   }
 }

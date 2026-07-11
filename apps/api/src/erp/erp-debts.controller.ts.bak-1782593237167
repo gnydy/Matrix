@@ -1,0 +1,112 @@
+﻿import { BadRequestException, Body, Controller, Get, Post } from '@nestjs/common';
+import { createPayableSchema, createReceivableSchema } from '@allinall/erp';
+import { CurrentUser } from '../auth/auth.decorators';
+import type { JwtPayload } from '../auth/jwt.strategy';
+import { PrismaService } from '../prisma/prisma.service';
+import { ErpContextService } from './erp-context.service';
+
+@Controller('erp/debts')
+export class ErpDebtsController {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly ctx: ErpContextService,
+  ) {}
+
+  @Get('receivables')
+  async receivables(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const data = await this.prisma.erpReceivable.findMany({
+      where: { companyId: company.id },
+      include: { party: true, schedules: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    return { ok: true, data };
+  }
+
+  @Post('receivables')
+  async createReceivable(@CurrentUser() user: JwtPayload, @Body() body: unknown) {
+    const company = await this.ctx.requireCompany(user);
+    const input = createReceivableSchema.parse(body);
+
+    const party = await this.prisma.erpParty.findFirst({
+      where: { id: input.partyId, companyId: company.id, deletedAt: null },
+    });
+
+    if (!party) throw new BadRequestException('العميل غير صالح');
+
+    const data = await this.prisma.erpReceivable.create({
+      data: {
+        companyId: company.id,
+        partyId: input.partyId,
+        ref: input.ref ?? this.ctx.nextRef('REC'),
+        amount: input.amount,
+        paidAmount: input.paidAmount,
+        dueDate: input.dueDate,
+        status: input.status,
+      },
+      include: { party: true, schedules: true },
+    });
+
+    return { ok: true, data };
+  }
+
+  @Get('payables')
+  async payables(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const data = await this.prisma.erpPayable.findMany({
+      where: { companyId: company.id },
+      include: { party: true, schedules: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    return { ok: true, data };
+  }
+
+  @Post('payables')
+  async createPayable(@CurrentUser() user: JwtPayload, @Body() body: unknown) {
+    const company = await this.ctx.requireCompany(user);
+    const input = createPayableSchema.parse(body);
+
+    const party = await this.prisma.erpParty.findFirst({
+      where: { id: input.partyId, companyId: company.id, deletedAt: null },
+    });
+
+    if (!party) throw new BadRequestException('المورد غير صالح');
+
+    const data = await this.prisma.erpPayable.create({
+      data: {
+        companyId: company.id,
+        partyId: input.partyId,
+        ref: input.ref ?? this.ctx.nextRef('PAY'),
+        amount: input.amount,
+        paidAmount: input.paidAmount,
+        dueDate: input.dueDate,
+        status: input.status,
+      },
+      include: { party: true, schedules: true },
+    });
+
+    return { ok: true, data };
+  }
+
+  @Get('overview')
+  async overview(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const [receivables, payables] = await Promise.all([
+      this.prisma.erpReceivable.findMany({ where: { companyId: company.id } }),
+      this.prisma.erpPayable.findMany({ where: { companyId: company.id } }),
+    ]);
+
+    const sumOpen = (rows: { amount: unknown; paidAmount: unknown }[]) =>
+      rows.reduce((s, r) => s + (Number(r.amount) - Number(r.paidAmount)), 0);
+
+    return {
+      ok: true,
+      data: {
+        receivableOpen: sumOpen(receivables),
+        payableOpen: sumOpen(payables),
+        receivableCount: receivables.length,
+        payableCount: payables.length,
+      },
+    };
+  }
+}

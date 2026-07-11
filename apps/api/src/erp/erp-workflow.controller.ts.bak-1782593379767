@@ -1,0 +1,65 @@
+import { BadRequestException, Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { createWorkflowInstanceSchema, updateWorkflowInstanceSchema } from '@allinall/erp';
+import type { Prisma } from '@allinall/database';
+import { Permissions } from '../auth/auth.guard';
+import { CurrentUser } from '../auth/auth.decorators';
+import type { JwtPayload } from '../auth/jwt.strategy';
+import { PrismaService } from '../prisma/prisma.service';
+import { ErpContextService } from './erp-context.service';
+
+@Controller('erp/workflow')
+export class ErpWorkflowController {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly ctx: ErpContextService,
+  ) {}
+
+  @Get('instances')
+  @Permissions('workflow:read')
+  async instances(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const data = await this.prisma.erpWorkflowInstance.findMany({
+      where: { companyId: company.id },
+      orderBy: { updatedAt: 'desc' },
+      take: 200,
+    });
+    return { ok: true, data };
+  }
+
+  @Post('instances')
+  @Permissions('workflow:write')
+  async createInstance(@CurrentUser() user: JwtPayload, @Body() body: unknown) {
+    const company = await this.ctx.requireCompany(user);
+    const input = createWorkflowInstanceSchema.parse(body);
+    const data = await this.prisma.erpWorkflowInstance.create({
+      data: {
+        companyId: company.id,
+        module: input.module,
+        entityType: input.entityType,
+        entityId: input.entityId,
+        currentStep: input.currentStep,
+        status: input.status,
+        metadata: (input.metadata ?? {}) as Prisma.InputJsonValue,
+      },
+    });
+    return { ok: true, data };
+  }
+
+  @Patch('instances/:id')
+  @Permissions('workflow:write')
+  async updateInstance(@CurrentUser() user: JwtPayload, @Param('id') id: string, @Body() body: unknown) {
+    const company = await this.ctx.requireCompany(user);
+    const input = updateWorkflowInstanceSchema.parse(body);
+    const existing = await this.prisma.erpWorkflowInstance.findFirst({ where: { id, companyId: company.id } });
+    if (!existing) throw new BadRequestException('Workflow instance not found');
+    const data = await this.prisma.erpWorkflowInstance.update({
+      where: { id },
+      data: {
+        currentStep: input.currentStep,
+        status: input.status,
+        metadata: input.metadata === undefined ? undefined : (input.metadata as Prisma.InputJsonValue),
+      },
+    });
+    return { ok: true, data };
+  }
+}

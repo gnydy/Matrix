@@ -15,6 +15,9 @@
   # مطلوب في Netlify UI → Environment variables:
   # DATABASE_URL = postgresql://...
   # NEXT_PUBLIC_SITE_URL = https://cerulean-tartufo-5a529e.netlify.app
+  # GOOGLE_SITE_VERIFICATION = (من Search Console)
+  # LEAD_NOTIFY_EMAIL = omargamal3107@gmail.com
+  # SMTP_HOST, SMTP_USER, SMTP_PASS = Gmail App Password
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"

@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #f8fafc; color: #0f172a; }
+.card-shadow { box-shadow: 0 24px 60px rgba(15,23,42,.10); }
+.scrollbar-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(15,23,42,.18); border-radius: 999px; }

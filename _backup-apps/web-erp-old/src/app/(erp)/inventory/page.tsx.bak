@@ -1,0 +1,91 @@
+﻿import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { ErpShell } from '@/components/erp-shell';
+import { ModuleFaq } from '@/components/module-faq';
+import { ModuleAuditChecklist } from '@/components/module-audit-checklist';
+import { getSession } from '@/lib/auth';
+import { erpFetch } from '@/lib/api';
+
+export default async function InventoryPage() {
+  const session = await getSession();
+  if (!session) redirect('/login');
+
+  const [overview, products, warehouses] = await Promise.all([
+    erpFetch<{ counts: Record<string, number> }>('/erp/inventory/overview'),
+    erpFetch<Array<{ id: string; sku: string; name: string; salePrice: number; stockLevels: unknown[] }>>(
+      '/erp/inventory/products',
+    ),
+    erpFetch<Array<{ id: string; name: string; code: string | null }>>('/erp/inventory/warehouses'),
+  ]);
+
+  return (
+    <ErpShell userName={session.name}>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">Ø§Ù„Ù…Ø®Ø²ÙˆÙ†</h1>
+          <p className="mt-1 text-muted">Ø§Ù„Ù…Ù†ØªØ¬Ø§ØªØŒ Ø§Ù„Ù…Ø®Ø§Ø²Ù†ØŒ Ø§Ù„Ø­Ø±ÙƒØ§ØªØŒ Ø§Ù„Ø¬Ø±Ø¯</p>
+        </div>
+        <Link href="/inventory/audits" className="btn-primary">
+          Ù†Ø¸Ø§Ù… Ø§Ù„Ø¬Ø±Ø¯
+        </Link>
+      </div>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-4">
+        {Object.entries(overview.counts).map(([k, v]) => (
+          <div key={k} className="stat-card">
+            <p className="text-sm text-muted">{k}</p>
+            <p className="mt-1 text-2xl font-bold">{v}</p>
+          </div>
+        ))}
+      </div>
+
+      <h2 className="mb-3 mt-8 text-lg font-semibold">Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª</h2>
+      <div className="overflow-x-auto rounded-2xl border border-border">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>SKU</th>
+              <th>Ø§Ù„Ø§Ø³Ù…</th>
+              <th>Ø³Ø¹Ø± Ø§Ù„Ø¨ÙŠØ¹</th>
+              <th>Ù…Ø³ØªÙˆÙŠØ§Øª</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((p) => (
+              <tr key={p.id}>
+                <td>{p.sku}</td>
+                <td>{p.name}</td>
+                <td>{Number(p.salePrice).toFixed(2)}</td>
+                <td>{p.stockLevels.length}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h2 className="mb-3 mt-8 text-lg font-semibold">Ø§Ù„Ù…Ø®Ø§Ø²Ù†</h2>
+      <div className="overflow-x-auto rounded-2xl border border-border">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Ø§Ù„Ø§Ø³Ù…</th>
+              <th>Ø§Ù„Ø±Ù…Ø²</th>
+            </tr>
+          </thead>
+          <tbody>
+            {warehouses.map((w) => (
+              <tr key={w.id}>
+                <td>{w.name}</td>
+                <td>{w.code ?? 'â€”'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <ModuleAuditChecklist module="inventory" />
+      <ModuleFaq module="inventory" />
+    </ErpShell>
+  );
+}
+

@@ -1,0 +1,211 @@
+import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { createPartySchema, createPurchaseDocSchema, postDocumentSchema } from '@allinall/erp';
+import { CurrentUser } from '../auth/auth.decorators';
+import type { JwtPayload } from '../auth/jwt.strategy';
+import { PrismaService } from '../prisma/prisma.service';
+import { ErpContextService } from './erp-context.service';
+
+type Tx = any;
+
+@Controller('erp/purchases')
+export class ErpPurchasesController {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly ctx: ErpContextService,
+  ) {}
+
+  private async account(tx: Tx, companyId: string, code: string) {
+    return tx.erpAccount.findFirst({ where: { companyId, code, deletedAt: null, isActive: true } });
+  }
+
+  private async createJournalForPurchase(tx: Tx, companyId: string, ref: string, amount: number, createdBy: string) {
+    const inventory = await this.account(tx, companyId, '1200');
+    const payable = await this.account(tx, companyId, '2000');
+    if (!inventory || !payable || amount <= 0) return;
+    await tx.erpJournalEntry.create({
+      data: {
+        companyId,
+        ref: `JE-${ref}`,
+        status: 'posted',
+        postedAt: new Date(),
+        memo: `ترحيل فاتورة شراء ${ref}`,
+        createdBy,
+        lines: { create: [
+          { accountId: inventory.id, debit: amount, credit: 0, memo: 'مخزون' },
+          { accountId: payable.id, debit: 0, credit: amount, memo: 'مديونية مورد' },
+        ] },
+      },
+    }).catch(() => undefined);
+  }
+
+  @Get('documents')
+  async documents(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const data = await this.prisma.erpPurchaseDocument.findMany({
+      where: { companyId: company.id },
+      include: { party: true, lines: { include: { product: true } }, payable: true },
+      orderBy: { createdAt: 'desc' },
+      take: 200,
+    });
+    return { ok: true, data };
+  }
+
+  @Get('parties')
+  async parties(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const data = await this.prisma.erpParty.findMany({
+      where: { companyId: company.id, deletedAt: null, type: { in: ['supplier', 'both'] } },
+      orderBy: { name: 'asc' },
+    });
+    return { ok: true, data };
+  }
+
+  @Post('parties')
+  async createParty(@CurrentUser() user: JwtPayload, @Body() body: unknown) {
+    const company = await this.ctx.requireCompany(user);
+    const input = createPartySchema.parse({ type: 'supplier', ...(body as Record<string, unknown>) });
+    const data = await this.prisma.erpParty.create({ data: { companyId: company.id, ...input, email: input.email || null } });
+    return { ok: true, data };
+  }
+
+
+  @Delete('parties/:id')
+  async deleteParty(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
+    const company = await this.ctx.requireCompany(user);
+
+    const party = await this.prisma.erpParty.findFirst({
+      where: {
+        id,
+        companyId: company.id,
+        deletedAt: null,
+        type: { in: ['supplier', 'both'] },
+      },
+    });
+
+    if (!party) {
+      throw new BadRequestException('المورد غير موجود');
+    }
+
+    const [purchaseDocuments, payables] = await Promise.all([
+      this.prisma.erpPurchaseDocument.count({
+        where: { companyId: company.id, partyId: id },
+      }),
+      this.prisma.erpPayable.count({
+        where: { companyId: company.id, partyId: id },
+      }),
+    ]);
+
+    if (purchaseDocuments > 0 || payables > 0) {
+      throw new BadRequestException('لا يمكن حذف مورد عليه فواتير أو مديونيات');
+    }
+
+    if (party.type === 'both') {
+      const data = await this.prisma.erpParty.update({
+        where: { id: party.id },
+        data: { type: 'customer' },
+      });
+
+      return { ok: true, data };
+    }
+
+    const data = await this.prisma.erpParty.update({
+      where: { id: party.id },
+      data: { deletedAt: new Date() },
+    });
+
+    return { ok: true, data };
+  }
+
+  @Post('documents')
+  async createDocument(@CurrentUser() user: JwtPayload, @Body() body: unknown) {
+    const company = await this.ctx.requireCompany(user);
+    const input = createPurchaseDocSchema.parse(body);
+    const party = await this.prisma.erpParty.findFirst({ where: { id: input.partyId, companyId: company.id, deletedAt: null, type: { in: ['supplier', 'both'] } } });
+    if (!party) throw new BadRequestException('المورد غير موجود');
+    for (const line of input.lines) {
+      if (!line.productId) continue;
+      const product = await this.prisma.erpProduct.findFirst({ where: { id: line.productId, companyId: company.id, deletedAt: null } });
+      if (!product) throw new BadRequestException('صنف غير موجود في فاتورة الشراء');
+    }
+    const ref = input.ref ?? this.ctx.nextRef('PUR');
+    const lines = input.lines.map((l) => ({ productId: l.productId || null, description: l.description, quantity: l.quantity, unitPrice: l.unitPrice, lineTotal: l.quantity * l.unitPrice }));
+    const subtotal = lines.reduce((s, l) => s + l.lineTotal, 0);
+    const data = await this.prisma.erpPurchaseDocument.create({
+      data: { companyId: company.id, partyId: input.partyId, type: input.type, ref, note: input.note, subtotal, grandTotal: subtotal, lines: { create: lines } },
+      include: { lines: { include: { product: true } }, party: true },
+    });
+    return { ok: true, data };
+  }
+
+
+  @Delete('documents/:id')
+  async deleteDocument(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
+    const company = await this.ctx.requireCompany(user);
+
+    const doc = await this.prisma.erpPurchaseDocument.findFirst({
+      where: {
+        id,
+        companyId: company.id,
+      },
+      include: {
+        payable: true,
+        lines: { select: { id: true } },
+      },
+    });
+
+    if (!doc) {
+      throw new BadRequestException('فاتورة الشراء غير موجودة');
+    }
+
+    if (doc.status === 'posted' || doc.payable) {
+      throw new BadRequestException('لا يمكن حذف فاتورة شراء مرحلة. استخدم الإلغاء أو المرتجع');
+    }
+
+    const lineIds = doc.lines.map((line: { id: string }) => line.id);
+
+    if (lineIds.length > 0) {
+      await this.prisma.erpPurchaseLine.deleteMany({
+        where: {
+          id: { in: lineIds },
+        },
+      });
+    }
+
+    const data = await this.prisma.erpPurchaseDocument.delete({
+      where: {
+        id: doc.id,
+      },
+    });
+
+    return { ok: true, data };
+  }
+
+  @Patch('documents/:id/post')
+  async postDocument(@CurrentUser() user: JwtPayload, @Param('id') id: string, @Body() body: unknown) {
+    const company = await this.ctx.requireCompany(user);
+    const input = postDocumentSchema.parse(body ?? {});
+    const result = await this.prisma.$transaction(async (tx) => {
+      const doc = await tx.erpPurchaseDocument.findFirst({ where: { id, companyId: company.id }, include: { lines: { include: { product: true } }, payable: true } });
+      if (!doc) throw new BadRequestException('فاتورة الشراء غير موجودة');
+      if (doc.status === 'posted') return doc;
+      if (doc.status === 'cancelled') throw new BadRequestException('لا يمكن ترحيل فاتورة ملغاة');
+      const stockLines = doc.lines.filter((l) => l.productId && l.product?.type === 'stock');
+      if (stockLines.length > 0 && !input.warehouseId) throw new BadRequestException('يجب إرسال warehouseId لترحيل أصناف مخزنية');
+      for (const line of stockLines) {
+        const level = await tx.erpStockLevel.findUnique({ where: { productId_warehouseId: { productId: line.productId as string, warehouseId: input.warehouseId as string } } });
+        const current = level ? Number(level.quantity) : 0;
+        const qty = Number(line.quantity);
+        if (level) await tx.erpStockLevel.update({ where: { id: level.id }, data: { quantity: current + qty } });
+        else await tx.erpStockLevel.create({ data: { productId: line.productId as string, warehouseId: input.warehouseId as string, quantity: qty } });
+        await tx.erpStockMovement.create({ data: { companyId: company.id, productId: line.productId as string, warehouseId: input.warehouseId as string, type: 'in', quantity: qty, refType: 'purchase_invoice', refId: doc.id, note: `شراء ${doc.ref}`, createdBy: user.sub } });
+      }
+      if (doc.type === 'invoice' && !doc.payable) {
+        await tx.erpPayable.create({ data: { companyId: company.id, partyId: doc.partyId, purchaseDocId: doc.id, ref: `PAY-${doc.ref}`, amount: doc.grandTotal, dueDate: doc.dueDate } });
+        await this.createJournalForPurchase(tx, company.id, doc.ref, Number(doc.grandTotal), user.sub);
+      }
+      await tx.erpWorkflowInstance.create({ data: { companyId: company.id, module: 'purchases', entityType: 'purchase_document', entityId: doc.id, currentStep: 'posted', status: 'done', metadata: { ref: doc.ref } } }).catch(() => undefined);
+      return tx.erpPurchaseDocument.update({ where: { id: doc.id }, data: { status: 'posted' }, include: { party: true, lines: { include: { product: true } }, payable: true } });
+    });
+    return { ok: true, data: result };
+  }
+}

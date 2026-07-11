@@ -1,0 +1,186 @@
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+
+type ControlRecord = {
+  id: string;
+  title: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  [key: string]: unknown;
+};
+
+type ControlDB = {
+  leads: ControlRecord[];
+  visitors: ControlRecord[];
+  customers: ControlRecord[];
+  quotes: ControlRecord[];
+  projects: ControlRecord[];
+  payments: ControlRecord[];
+  services: ControlRecord[];
+  packages: ControlRecord[];
+  contents: ControlRecord[];
+  users: ControlRecord[];
+  roles: ControlRecord[];
+  auditLogs: ControlRecord[];
+  commands: ControlRecord[];
+  portfolio: ControlRecord[];
+};
+
+export type PublicRequestInput = {
+  name: string;
+  phone: string;
+  email?: string;
+  company?: string;
+  requestType?: string;
+  service?: string;
+  budget?: string;
+  message?: string;
+  page?: string;
+  source?: string;
+  locale?: string;
+  userAgent?: string;
+  ip?: string;
+};
+
+const dbPath = process.env.MATRIX_DASHBOARD_DB_PATH ?? 'E:/Matrix/apps/web-dashboard/data/control-db.json';
+
+function now() {
+  return new Date().toISOString();
+}
+
+function makeId(prefix: string) {
+  return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+}
+
+function leadNumber() {
+  const year = new Date().getFullYear();
+  const serial = String(Date.now()).slice(-6);
+  return `MATRIX-${year}-${serial}`;
+}
+
+function emptyDB(): ControlDB {
+  return {
+    leads: [],
+    visitors: [],
+    customers: [],
+    quotes: [],
+    projects: [],
+    payments: [],
+    services: [],
+    packages: [],
+    contents: [],
+    users: [],
+    roles: [],
+    auditLogs: [],
+    commands: [],
+    portfolio: [],
+  };
+}
+
+function ensureDB() {
+  if (!existsSync(dbPath)) {
+    mkdirSync(dirname(dbPath), { recursive: true });
+    writeFileSync(dbPath, JSON.stringify(emptyDB(), null, 2), 'utf8');
+  }
+}
+
+function readDB(): ControlDB {
+  ensureDB();
+
+  const raw = readFileSync(dbPath, 'utf8');
+  const parsed = JSON.parse(raw) as Partial<ControlDB>;
+
+  return {
+    ...emptyDB(),
+    ...parsed,
+  };
+}
+
+function writeDB(db: ControlDB) {
+  mkdirSync(dirname(dbPath), { recursive: true });
+  writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf8');
+}
+
+function clean(value: unknown) {
+  return String(value ?? '').trim();
+}
+
+function addAudit(
+  db: ControlDB,
+  input: {
+    action: string;
+    resource: string;
+    recordId?: string;
+    actor?: string;
+  },
+) {
+  const audit: ControlRecord = {
+    id: makeId('audit'),
+    title: input.action,
+    action: input.action,
+    resource: input.resource,
+    recordId: input.recordId ?? '',
+    actor: input.actor ?? 'Website',
+    status: 'published',
+    createdAt: now(),
+    updatedAt: now(),
+    deletedAt: null,
+  };
+
+  db.auditLogs.unshift(audit);
+}
+
+export function createPublicLead(input: PublicRequestInput) {
+  const db = readDB();
+
+  const createdAt = now();
+  const number = leadNumber();
+
+  const name = clean(input.name);
+  const phone = clean(input.phone);
+  const email = clean(input.email);
+  const company = clean(input.company);
+  const requestType = clean(input.requestType || 'general');
+  const service = clean(input.service || 'website');
+  const budget = clean(input.budget);
+  const message = clean(input.message);
+  const source = clean(input.source || 'website');
+
+  const lead: ControlRecord = {
+    id: makeId('lead'),
+    leadNumber: number,
+    title: name || company || phone || number,
+    name,
+    phone,
+    email,
+    company,
+    requestType,
+    service,
+    budget,
+    message,
+    source,
+    page: clean(input.page || '/'),
+    locale: clean(input.locale || 'ar'),
+    ip: clean(input.ip),
+    userAgent: clean(input.userAgent),
+    status: 'new',
+    createdAt,
+    updatedAt: createdAt,
+    deletedAt: null,
+  };
+
+  db.leads.unshift(lead);
+
+  addAudit(db, {
+    action: `Created website lead: ${number}`,
+    resource: 'leads',
+    recordId: lead.id,
+    actor: 'Website',
+  });
+
+  writeDB(db);
+
+  return lead;
+}

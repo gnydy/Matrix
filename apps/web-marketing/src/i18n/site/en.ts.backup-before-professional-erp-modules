@@ -1,0 +1,203 @@
+export const en = {
+  common: {
+    brandName: 'Matrix',
+    brandSub: 'AllInAll',
+    contactNow: 'Contact now',
+    requestSystem: 'Request your system',
+    learnMore: 'Learn more',
+    viewDetails: 'View details',
+    send: 'Send',
+    loading: 'Loading',
+  },
+
+  header: {
+    services: 'Services',
+    erp: 'ERP',
+    packages: 'Packages',
+    about: 'About',
+    work: 'Our Work',
+    contact: 'Contact',
+    contactNow: 'Contact now',
+    language: 'العربية',
+    theme: 'Theme',
+  },
+
+  home: {
+    badge: 'Integrated Arabic ERP platform',
+    titleLine1: 'Your entire business',
+    titleLine2: 'in one system',
+    description:
+      'Accounting, inventory, sales, purchasing, HR, and full customer lifecycle — Arabic-first, multi-branch, cloud or dedicated deployment.',
+    primaryAction: 'Request your system',
+    secondaryAction: 'Explore ERP',
+  },
+
+  services: {
+    badge: 'Matrix Services',
+    title: 'Complete digital services for companies that need clarity, control, and growth.',
+    description:
+      'We do not just build pages. We create practical digital solutions that help your company present itself professionally, receive customer requests, organize operations, and turn daily chaos into a manageable system.',
+    items: [
+      {
+        title: 'Professional Company Websites',
+        description:
+          'A trustworthy and polished website that presents your company clearly, explains your services, and turns visitors into potential clients.',
+      },
+      {
+        title: 'E-commerce Stores',
+        description:
+          'A professional store for products, categories, images, prices, and customer requests with a clean experience ready for advertising.',
+      },
+      {
+        title: 'Landing Pages for Campaigns',
+        description:
+          'Focused pages built for advertising campaigns, designed to collect requests and increase conversions without distracting the customer.',
+      },
+      {
+        title: 'ERP & Company Management Systems',
+        description:
+          'A unified system to manage customers, requests, inventory, sales, purchasing, accounting, users, and permissions in one place.',
+      },
+      {
+        title: 'Custom Business Systems',
+        description:
+          'A system built around how your company actually works, such as quotation management, order tracking, daily operations, or internal workflows.',
+      },
+      {
+        title: 'Dashboards & Control Centers',
+        description:
+          'A structured dashboard to manage website content, requests, customers, portfolio, packages, services, and users without editing code.',
+      },
+      {
+        title: 'Customer Request Management',
+        description:
+          'A system that receives customer requests from the website, organizes them by status, and helps your team follow every lead properly.',
+      },
+      {
+        title: 'CRM Customer Management',
+        description:
+          'Organize customer data, lead status, last follow-up, source, and important notes so sales opportunities are not lost.',
+      },
+      {
+        title: 'Portfolio & Work Management',
+        description:
+          'A professional section to showcase company work with project details, images, links, categories, and Arabic/English descriptions.',
+      },
+      {
+        title: 'Booking & Appointment Systems',
+        description:
+          'A suitable solution for clinics, centers, services, and consultations to organize appointments and reduce scattered WhatsApp messages.',
+      },
+      {
+        title: 'WhatsApp & Request Form Integration',
+        description:
+          'Make it easier for customers to contact the company and connect requests to the right follow-up channel.',
+      },
+      {
+        title: 'Google Visibility & SEO Setup',
+        description:
+          'Prepare the website for search engines through page structure, titles, descriptions, speed, and organized content.',
+      },
+      {
+        title: 'Analytics & Performance Tracking',
+        description:
+          'Understand where visitors come from, which pages perform best, which ads generate requests, and where customers drop off.',
+      },
+      {
+        title: 'Digital Positioning & Content Structure',
+        description:
+          'Organize how the company presents itself online: message, services, sections, copy, and communication style.',
+      },
+      {
+        title: 'Ongoing Support & Improvement',
+        description:
+          'Maintain the website or system after launch, fix issues, add improvements, and develop new features as the company grows.',
+      },
+    ],
+  },
+
+  erp: {
+    badge: 'AllInAll ERP',
+    title: 'A scalable Arabic ERP system for companies.',
+    description:
+      'A platform for managing daily operations, customers, branches, users, inventory, sales, purchasing, and reports.',
+    features: [
+      'Multi-company and multi-branch',
+      'Advanced permissions',
+      'Customer and request management',
+      'Inventory, sales, and purchasing',
+      'Operational and management reports',
+      'Cloud or dedicated deployment',
+    ],
+  },
+
+  packages: {
+    badge: 'Packages',
+    title: 'Clear packages based on company size and needs.',
+    description:
+      'Start with a professional website or a custom system, then expand into a full ERP based on the client’s needs and budget.',
+    plans: [
+      {
+        name: 'Starter',
+        description: 'Suitable for company websites, service pages, and early digital presence.',
+      },
+      {
+        name: 'Business',
+        description: 'Suitable for companies that need a professional website with request forms and tracking.',
+      },
+      {
+        name: 'ERP',
+        description: 'Suitable for companies that need a complete internal management system.',
+      },
+    ],
+  },
+
+  about: {
+    badge: 'About us',
+    title: 'Matrix builds practical software systems, not just pages.',
+    description:
+      'We focus on digital solutions that help companies organize operations, reduce chaos, and turn data and requests into a manageable system.',
+  },
+
+  ourWork: {
+    badge: 'Portfolio / Our Work',
+    title: 'Digital work designed to build trust and convert visitors into leads.',
+    description:
+      'Selected examples across websites, systems, dashboards, ERP, and custom digital solutions that Matrix can deliver for clients.',
+    viewDetails: 'View Details',
+    projects: [
+      {
+        slug: 'time-zone-watches',
+        title: 'Time Zone Watches',
+        category: 'Luxury Watch Store',
+        description:
+          'A premium luxury-watch store experience with refined product presentation and a direct customer request flow.',
+      },
+      {
+        slug: 'aia-erp-platform',
+        title: 'AIA ERP Platform',
+        category: 'ERP System',
+        description:
+          'An ERP platform for managing companies, leads, customers, inventory, sales, and purchasing.',
+      },
+    ],
+  },
+
+  contact: {
+    badge: 'Contact us',
+    title: 'Start your project or request a consultation.',
+    description:
+      'Send us your project details or company needs, and we will review the request and suggest the best execution path.',
+    name: 'Name',
+    phone: 'Phone number',
+    email: 'Email',
+    message: 'Request details',
+    submit: 'Send request',
+  },
+
+  footer: {
+    description:
+      'Matrix builds professional websites, ERP systems, dashboards, and custom digital solutions for companies.',
+    rights: 'All rights reserved.',
+  },
+} as const;

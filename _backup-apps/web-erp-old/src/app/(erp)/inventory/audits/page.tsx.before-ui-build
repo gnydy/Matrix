@@ -1,0 +1,84 @@
+﻿import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { ErpShell } from '@/components/erp-shell';
+import { ModuleFaq } from '@/components/module-faq';
+import { ModuleAuditChecklist } from '@/components/module-audit-checklist';
+import { getSession } from '@/lib/auth';
+import { erpFetch } from '@/lib/api';
+import { CreateAuditForm } from '@/components/create-audit-form';
+
+const statusLabels: Record<string, string> = {
+  draft: 'Ù…Ø³ÙˆØ¯Ø©',
+  counting: 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø¹Ø¯',
+  posted: 'Ù…Ø±Ø­Ù‘Ù„',
+  cancelled: 'Ù…Ù„ØºÙ‰',
+};
+
+type AuditRow = {
+  id: string;
+  ref: string;
+  status: string;
+  warehouse: { name: string };
+  _count: { lines: number };
+  createdAt: string;
+};
+
+export default async function AuditsPage() {
+  const session = await getSession();
+  if (!session) redirect('/login');
+
+  const [audits, warehouses] = await Promise.all([
+    erpFetch<AuditRow[]>('/erp/inventory/audits'),
+    erpFetch<Array<{ id: string; name: string }>>('/erp/inventory/warehouses'),
+  ]);
+
+  return (
+    <ErpShell userName={session.name}>
+      <div className="mb-6">
+        <Link href="/inventory" className="text-sm text-primary hover:underline">
+          â† Ø§Ù„Ù…Ø®Ø²ÙˆÙ†
+        </Link>
+        <h1 className="mt-2 text-2xl font-bold">Ù†Ø¸Ø§Ù… Ø§Ù„Ø¬Ø±Ø¯</h1>
+        <p className="text-muted">Ø¥Ù†Ø´Ø§Ø¡ Ø¬Ø±Ø¯ØŒ Ø¹Ø¯Ù‘ Ø§Ù„Ø£ØµÙ†Ø§ÙØŒ ØªØ±Ø­ÙŠÙ„ Ø§Ù„ÙØ±ÙˆÙ‚Ø§Øª</p>
+      </div>
+
+      <CreateAuditForm warehouses={warehouses} />
+
+      <h2 className="mb-3 mt-8 text-lg font-semibold">Ø³Ø¬Ù„ Ø§Ù„Ø¬Ø±Ø¯</h2>
+      <div className="overflow-x-auto rounded-2xl border border-border">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Ø§Ù„Ù…Ø±Ø¬Ø¹</th>
+              <th>Ø§Ù„Ù…Ø®Ø²Ù†</th>
+              <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
+              <th>Ø§Ù„Ø¨Ù†ÙˆØ¯</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {audits.map((a) => (
+              <tr key={a.id}>
+                <td>{a.ref}</td>
+                <td>{a.warehouse.name}</td>
+                <td>
+                  <span className="badge bg-card">{statusLabels[a.status] ?? a.status}</span>
+                </td>
+                <td>{a._count.lines}</td>
+                <td>
+                  <Link href={`/inventory/audits/${a.id}`} className="text-primary hover:underline">
+                    ÙØªØ­
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <ModuleAuditChecklist module="inventory" />
+      <ModuleFaq module="inventory" />
+    </ErpShell>
+  );
+}
+

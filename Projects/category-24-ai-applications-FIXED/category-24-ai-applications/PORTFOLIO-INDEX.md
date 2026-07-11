@@ -1,0 +1,22 @@
+# Portfolio Index
+
+- AIWriter Studio — AI writing workspace with drafts and templates. Includes frontend screens and backend mock API routes.
+- AIResume Builder — Resume optimization and scoring interface. Includes frontend screens and backend mock API routes.
+- AIDocument Analyzer — Document summary and extraction console. Includes frontend screens and backend mock API routes.
+- AIImage Prompt Lab — Image prompt generator and gallery mock. Includes frontend screens and backend mock API routes.
+- AIMeeting Summarizer — Meeting transcript summary and action items. Includes frontend screens and backend mock API routes.
+- AICode Review Desk — Code review findings and risk notes. Includes frontend screens and backend mock API routes.
+- AISales Email Generator — Sales email generation and sequence UI. Includes frontend screens and backend mock API routes.
+- AIContract Analyzer — Contract clauses and risk extraction mock. Includes frontend screens and backend mock API routes.
+- AIData Insight Tool — Dataset question interface and charts. Includes frontend screens and backend mock API routes.
+- AIResearch Assistant — Research notes, sources and synthesis workspace. Includes frontend screens and backend mock API routes.
+- AIProduct Description — Commerce product copy generator. Includes frontend screens and backend mock API routes.
+- AIMarketing Planner — Campaign angle and content calendar generator. Includes frontend screens and backend mock API routes.
+- AIFinance Forecast — Forecast, scenario and variance mock UI. Includes frontend screens and backend mock API routes.
+- AIHR Screening Tool — Candidate fit and interview question generator. Includes frontend screens and backend mock API routes.
+- AICustomer Sentiment — Reviews and tickets sentiment dashboard. Includes frontend screens and backend mock API routes.
+- AIEducation Tutor — Adaptive tutor and quiz generator UI. Includes frontend screens and backend mock API routes.
+- AIMedical Triage Mock — Non-diagnostic triage interface mock. Includes frontend screens and backend mock API routes.
+- AISecurity Log Analyzer — Security log explanation and prioritization. Includes frontend screens and backend mock API routes.
+- AIAutomation Builder — Prompt-to-workflow automation builder. Includes frontend screens and backend mock API routes.
+- AIAgent Control Center — Multi-agent orchestration dashboard. Includes frontend screens and backend mock API routes.

@@ -1,0 +1,22 @@
+# Portfolio Index
+
+- StockPilot Warehouse — Warehouse product catalog and movement control. Includes frontend screens and backend mock API routes.
+- LowStock Alert Board — Low stock monitoring for fast-moving items. Includes frontend screens and backend mock API routes.
+- SupplierChain Inventory — Supplier orders and restock management. Includes frontend screens and backend mock API routes.
+- MultiWarehouse HQ — Multi-location warehouse tracking. Includes frontend screens and backend mock API routes.
+- BarcodeStock Counter — Barcode-first stock control UI. Includes frontend screens and backend mock API routes.
+- ColdStorage Inventory — Temperature-sensitive stock dashboard. Includes frontend screens and backend mock API routes.
+- PharmaStock Control — Pharmacy inventory with expiry alerts. Includes frontend screens and backend mock API routes.
+- RetailShelf Replenishment — Retail shelf refill and branch transfer UI. Includes frontend screens and backend mock API routes.
+- AutoParts Inventory — Spare parts stock and fitment catalog. Includes frontend screens and backend mock API routes.
+- FoodBatch Traceability — Batch, expiry and supplier trace mock. Includes frontend screens and backend mock API routes.
+- ConstructionMaterials Yard — Materials, tools, and site transfers. Includes frontend screens and backend mock API routes.
+- FactoryMaterials MRP — Production materials and reservation board. Includes frontend screens and backend mock API routes.
+- EcommerceStock Sync — Online store inventory and channel counts. Includes frontend screens and backend mock API routes.
+- HotelSupply Inventory — Hotel linens, amenities and consumables. Includes frontend screens and backend mock API routes.
+- ClinicSupplies Tracker — Medical supplies and department requests. Includes frontend screens and backend mock API routes.
+- AssetInventory Register — Company assets and custody tracking. Includes frontend screens and backend mock API routes.
+- PurchaseOrder Desk — PO creation and approval dashboard. Includes frontend screens and backend mock API routes.
+- CycleCount Mobile Kit — Stocktaking screens and variance reports. Includes frontend screens and backend mock API routes.
+- WarehouseOps Executive — Large warehouse control room. Includes frontend screens and backend mock API routes.
+- InventoryOS Enterprise — Enterprise inventory operations platform. Includes frontend screens and backend mock API routes.

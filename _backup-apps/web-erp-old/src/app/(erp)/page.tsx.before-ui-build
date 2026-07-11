@@ -1,0 +1,74 @@
+import { redirect } from 'next/navigation';
+import { ErpShell } from '@/components/erp-shell';
+import { getSession } from '@/lib/auth';
+import { erpFetch } from '@/lib/api';
+import { ERP_MODULES } from '@allinall/erp';
+import Link from 'next/link';
+
+export default async function ErpDashboardPage() {
+  const session = await getSession();
+  if (!session) redirect('/login');
+
+  type CoreOverview = { company: { name: string }; counts: Record<string, number> };
+  type InventoryOverview = { counts: Record<string, number> };
+  type DebtsOverview = { receivableOpen: number; payableOpen: number };
+
+  let core: CoreOverview | null = null;
+  let inventory: InventoryOverview | null = null;
+  let debts: DebtsOverview | null = null;
+
+  try {
+    [core, inventory, debts] = await Promise.all([
+      erpFetch<CoreOverview>('/erp/core/overview'),
+      erpFetch<InventoryOverview>('/erp/inventory/overview'),
+      erpFetch<DebtsOverview>('/erp/debts/overview'),
+    ]);
+  } catch {
+    /* API قد لا يكون جاهزاً بعد */
+  }
+
+  return (
+    <ErpShell userName={session.name}>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold">لوحة التحكم</h1>
+        <p className="text-muted">
+          {core?.company?.name ? `الشركة: ${core.company.name}` : 'مرحباً بك في Matrix ERP'}
+        </p>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="stat-card">
+          <p className="text-sm text-muted">المنتجات</p>
+          <p className="mt-1 text-2xl font-bold">{inventory?.counts?.products ?? '—'}</p>
+        </div>
+        <div className="stat-card">
+          <p className="text-sm text-muted">المخازن</p>
+          <p className="mt-1 text-2xl font-bold">{inventory?.counts?.warehouses ?? '—'}</p>
+        </div>
+        <div className="stat-card">
+          <p className="text-sm text-muted">ذمم مدينة</p>
+          <p className="mt-1 text-2xl font-bold">{debts?.receivableOpen?.toFixed(0) ?? '—'}</p>
+        </div>
+        <div className="stat-card">
+          <p className="text-sm text-muted">ذمم دائنة</p>
+          <p className="mt-1 text-2xl font-bold">{debts?.payableOpen?.toFixed(0) ?? '—'}</p>
+        </div>
+      </div>
+
+      <h2 className="mb-4 mt-10 text-lg font-semibold">المديولات</h2>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {ERP_MODULES.map((m) => (
+          <Link
+            key={m.key}
+            href={m.path}
+            className="stat-card transition hover:border-primary/50"
+          >
+            <span className="text-2xl">{m.icon}</span>
+            <h3 className="mt-2 font-semibold">{m.labelAr}</h3>
+            <p className="mt-1 text-sm text-muted">{m.descriptionAr}</p>
+          </Link>
+        ))}
+      </div>
+    </ErpShell>
+  );
+}

@@ -1,0 +1,75 @@
+name: Matrix UI AI Security
+
+on:
+  pull_request:
+    paths:
+      - 'apps/web-marketing/**'
+      - 'apps/web-platform/**'
+      - 'apps/web-erp/**'
+      - 'packages/database/**'
+      - 'packages/security/**'
+      - '.github/workflows/matrix-ui-ai-security.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: matrix-ui-ai-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      DATABASE_URL: postgresql://matrix:matrix@127.0.0.1:5432/matrix_ci
+      OPENAI_API_KEY: test-key-not-used-at-build-time
+      MATRIX_SECURITY_PEPPER: ci-only-pepper
+      MATRIX_CHAT_WEBHOOK_SECRET: ci-only-webhook-secret
+      MATRIX_ALLOWED_ORIGINS: http://localhost:3010
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: matrix
+          POSTGRES_PASSWORD: matrix
+          POSTGRES_DB: matrix_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Generate Prisma client
+        run: pnpm --filter @allinall/database db:generate
+      - name: Validate database schema
+        run: pnpm --filter @allinall/database exec prisma validate
+      - name: Build shared database package
+        run: pnpm --filter @allinall/database build
+      - name: Lint marketing app
+        run: pnpm --filter @allinall/web-marketing lint
+      - name: Lint platform app
+        run: pnpm --filter @allinall/web-platform lint
+      - name: Lint ERP app
+        run: pnpm --filter @allinall/web-erp lint
+      - name: Build marketing app
+        run: pnpm --filter @allinall/web-marketing build
+      - name: Build platform app
+        run: pnpm --filter @allinall/web-platform build
+      - name: Build ERP app
+        run: pnpm --filter @allinall/web-erp build
+      - name: Audit production dependencies
+        run: pnpm audit --prod --audit-level high

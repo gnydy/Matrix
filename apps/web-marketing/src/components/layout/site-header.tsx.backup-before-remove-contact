@@ -1,0 +1,295 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
+
+type Locale = 'ar' | 'en';
+type Theme = 'light' | 'dark';
+
+const navItems = [
+  { href: '/services', ar: 'الخدمات', en: 'Services' },
+  { href: '/services/erp', ar: 'ERP', en: 'ERP' },
+  { href: '/packages', ar: 'الباقات', en: 'Packages' },
+  { href: '/about', ar: 'من نحن', en: 'About' },
+  { href: '/our-work', ar: 'أعمالنا', en: 'Our Work' },
+  { href: '/contact', ar: 'تواصل', en: 'Contact' },
+];
+
+function readStoredLocale(): Locale {
+  return 'ar';
+}
+
+function readStoredTheme(): Theme {
+  if (typeof window === 'undefined') return 'dark';
+
+  const value =
+    window.localStorage.getItem('theme') ||
+    window.localStorage.getItem('mode') ||
+    window.localStorage.getItem('matrix_theme') ||
+    document.documentElement.dataset.theme ||
+    'dark';
+
+  return value.toLowerCase().includes('light') ? 'light' : 'dark';
+}
+
+function applyLocale(locale: Locale) {
+  document.documentElement.lang = locale;
+  document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr';
+
+  window.localStorage.setItem('locale', locale);
+  window.localStorage.setItem('lang', locale);
+  window.localStorage.setItem('matrix_locale', locale);
+
+  document.cookie = `locale=${locale}; path=/; max-age=31536000; SameSite=Lax`;
+  document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=31536000; SameSite=Lax`;
+  document.cookie = `matrix_locale=${locale}; path=/; max-age=31536000; SameSite=Lax`;
+
+  window.dispatchEvent(new Event('storage'));
+}
+
+function applyTheme(theme: Theme) {
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.classList.remove('light', 'dark');
+  document.documentElement.classList.add(theme);
+
+  window.localStorage.setItem('theme', theme);
+  window.localStorage.setItem('mode', theme);
+  window.localStorage.setItem('matrix_theme', theme);
+
+  document.cookie = `theme=${theme}; path=/; max-age=31536000; SameSite=Lax`;
+  document.cookie = `matrix_theme=${theme}; path=/; max-age=31536000; SameSite=Lax`;
+
+  window.dispatchEvent(new Event('storage'));
+}
+
+export function SiteHeader() {
+  const pathname = usePathname();
+  const [locale, setLocale] = useState<Locale>('ar');
+  const [theme, setTheme] = useState<Theme>('dark');
+
+  useEffect(() => {
+    const currentLocale = readStoredLocale();
+    const currentTheme = readStoredTheme();
+
+    setLocale(currentLocale);
+    setTheme(currentTheme);
+
+    applyLocale(currentLocale);
+    applyTheme(currentTheme);
+  }, []);
+
+  const isAr = locale === 'ar';
+
+  const labels = useMemo(
+    () => ({
+      quote: isAr ? 'اطلب عرضًا' : 'Request Quote',
+      contactNow: isAr ? 'تواصل الآن' : 'Contact Now',
+      lang: isAr ? 'English' : 'العربية',
+      brandSub: 'AllInAll',
+    }),
+    [isAr],
+  );
+
+  function toggleLocale() {
+    const next = locale === 'ar' ? 'en' : 'ar';
+    setLocale(next);
+    applyLocale(next);
+  }
+
+  function toggleTheme() {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    applyTheme(next);
+  }
+
+  return (
+    <header
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 50,
+        background: '#0f172a',
+        borderBottom: '1px solid rgba(148, 163, 184, 0.18)',
+        direction: isAr ? 'rtl' : 'ltr',
+      }}
+    >
+      <div
+        style={{
+          width: 'min(1180px, calc(100% - 32px))',
+          margin: '0 auto',
+          minHeight: 72,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 18,
+        }}
+      >
+ <Link
+  href="/"
+  aria-label="Matrix Home"
+  style={{
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 10,
+    direction: 'rtl',
+    textDecoration: 'none',
+    whiteSpace: 'nowrap',
+  }}
+>
+  <span
+    style={{
+      width: 44,
+      height: 44,
+      borderRadius: '999px',
+      display: 'grid',
+      placeItems: 'center',
+      overflow: 'hidden',
+      background: '#ffffff',
+      border: '1px solid rgba(148, 163, 184, 0.25)',
+      boxShadow: '0 10px 28px rgba(37, 99, 235, 0.25)',
+      flexShrink: 0,
+    }}
+  >
+    <img
+      src="/brand/logo.png"
+      alt="Matrix Logo"
+      style={{
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        display: 'block',
+      }}
+    />
+  </span>
+
+  <span
+    style={{
+      color: '#f8fafc',
+      fontSize: 20,
+      fontWeight: 900,
+      letterSpacing: '-0.03em',
+      lineHeight: 1,
+    }}
+  >
+    Matrix
+  </span>
+</Link>
+
+        <nav
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            flex: 1,
+          }}
+        >
+          {navItems.map((item) => {
+            const active =
+              pathname === item.href ||
+              (item.href !== '/' && pathname?.startsWith(`${item.href}/`));
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                style={{
+                  color: active ? '#f8fafc' : '#94a3b8',
+                  background: active ? 'rgba(37, 99, 235, 0.28)' : 'transparent',
+                  border: active
+                    ? '1px solid rgba(96, 165, 250, 0.18)'
+                    : '1px solid transparent',
+                  textDecoration: 'none',
+                  padding: '10px 13px',
+                  borderRadius: 12,
+                  fontWeight: 800,
+                  fontSize: 14,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {isAr ? item.ar : item.en}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <Link
+            href="/contact"
+            style={{
+              color: '#f8fafc',
+              textDecoration: 'none',
+              padding: '12px 16px',
+              borderRadius: 13,
+              border: '1px solid rgba(148, 163, 184, 0.18)',
+              background: 'rgba(15, 23, 42, 0.6)',
+              fontWeight: 900,
+            }}
+          >
+            {labels.contactNow}
+          </Link>
+
+          <Link
+            href="/request"
+            style={{
+              color: 'white',
+              textDecoration: 'none',
+              padding: '12px 16px',
+              borderRadius: 13,
+              background: '#3b82f6',
+              fontWeight: 900,
+              boxShadow: '0 14px 34px rgba(37, 99, 235, 0.32)',
+            }}
+          >
+            {labels.quote}
+          </Link>
+
+          <button
+            type="button"
+            onClick={toggleTheme}
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 13,
+              border: '1px solid rgba(148, 163, 184, 0.18)',
+              background: 'rgba(15, 23, 42, 0.6)',
+              color: '#f8fafc',
+              cursor: 'pointer',
+              fontSize: 18,
+            }}
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? '☼' : '☾'}
+          </button>
+
+          <button
+            type="button"
+            onClick={toggleLocale}
+            style={{
+              height: 44,
+              padding: '0 14px',
+              borderRadius: 13,
+              border: '1px solid rgba(148, 163, 184, 0.18)',
+              background: 'rgba(15, 23, 42, 0.6)',
+              color: '#cbd5e1',
+              cursor: 'pointer',
+              fontWeight: 900,
+            }}
+          >
+            {labels.lang}
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export default SiteHeader;

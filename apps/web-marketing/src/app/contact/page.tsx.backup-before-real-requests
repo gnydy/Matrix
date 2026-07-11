@@ -1,0 +1,5 @@
+import { TranslatedPage } from '../../components/marketing/translated-page';
+
+export default function ContactPage() {
+  return <TranslatedPage section="contact" />;
+}

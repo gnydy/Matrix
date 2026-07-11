@@ -1,0 +1,33 @@
+﻿name: Dangerous Command Guard
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  dangerous-command-guard:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+
+      - name: Scan for dangerous commands
+        run: |
+          PATTERNS="Remove-Item|rm -rf|rimraf|fs.unlink|fs.rm|DROP TABLE|TRUNCATE TABLE|DELETE FROM|git push --force|git reset --hard"
+
+          if grep -R -E "$PATTERNS" . \
+            --exclude-dir=.git \
+            --exclude-dir=node_modules \
+            --exclude-dir=dist \
+            --exclude-dir=build; then
+            echo "Dangerous command detected."
+            exit 1
+          fi
+
+          echo "No dangerous commands detected."

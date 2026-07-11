@@ -10,6 +10,7 @@ import { RolesModule } from './roles/roles.module';
 import { TenantsModule } from './tenants/tenants.module';
 import { PublicModule } from './public/public.module';
 import { AuditModule } from './audit/audit.module';
+import { ErpModule } from './erp/erp.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { AuditModule } from './audit/audit.module';
     RolesModule,
     TenantsModule,
     PublicModule,
+    ErpModule,
   ],
 })
 export class AppModule {}

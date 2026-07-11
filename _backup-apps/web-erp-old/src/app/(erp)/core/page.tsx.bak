@@ -1,0 +1,69 @@
+﻿import { redirect } from 'next/navigation';
+import { ErpShell } from '@/components/erp-shell';
+import { ModuleFaq } from '@/components/module-faq';
+import { ModuleAuditChecklist } from '@/components/module-audit-checklist';
+import { getSession } from '@/lib/auth';
+import { erpFetch } from '@/lib/api';
+
+export default async function CorePage() {
+  const session = await getSession();
+  if (!session) redirect('/login');
+
+  const [overview, branches] = await Promise.all([
+    erpFetch<{ company: { name: string; currency: string }; counts: Record<string, number> }>(
+      '/erp/core/overview',
+    ),
+    erpFetch<Array<{ id: string; name: string; code: string | null; departments: unknown[] }>>(
+      '/erp/core/branches',
+    ),
+  ]);
+
+  return (
+    <ErpShell userName={session.name}>
+      <h1 className="text-2xl font-bold">Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ§Øª</h1>
+      <p className="mt-1 text-muted">Ø§Ù„Ø´Ø±ÙƒØ©ØŒ Ø§Ù„ÙØ±ÙˆØ¹ØŒ Ø§Ù„Ø£Ù‚Ø³Ø§Ù…ØŒ Ø§Ù„Ø³Ù†ÙˆØ§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ©</p>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        <div className="stat-card">
+          <p className="text-sm text-muted">Ø§Ù„Ø´Ø±ÙƒØ©</p>
+          <p className="mt-1 font-semibold">{overview.company.name}</p>
+          <p className="text-xs text-muted">Ø§Ù„Ø¹Ù…Ù„Ø©: {overview.company.currency}</p>
+        </div>
+        <div className="stat-card">
+          <p className="text-sm text-muted">Ø§Ù„ÙØ±ÙˆØ¹</p>
+          <p className="mt-1 text-2xl font-bold">{overview.counts.branches}</p>
+        </div>
+        <div className="stat-card">
+          <p className="text-sm text-muted">Ø§Ù„Ø£Ù‚Ø³Ø§Ù…</p>
+          <p className="mt-1 text-2xl font-bold">{overview.counts.departments}</p>
+        </div>
+      </div>
+
+      <h2 className="mb-3 mt-8 text-lg font-semibold">Ø§Ù„ÙØ±ÙˆØ¹</h2>
+      <div className="overflow-x-auto rounded-2xl border border-border">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Ø§Ù„Ø§Ø³Ù…</th>
+              <th>Ø§Ù„Ø±Ù…Ø²</th>
+              <th>Ø§Ù„Ø£Ù‚Ø³Ø§Ù…</th>
+            </tr>
+          </thead>
+          <tbody>
+            {branches.map((b) => (
+              <tr key={b.id}>
+                <td>{b.name}</td>
+                <td>{b.code ?? 'â€”'}</td>
+                <td>{b.departments.length}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <ModuleAuditChecklist module="core" />
+      <ModuleFaq module="core" />
+    </ErpShell>
+  );
+}
+

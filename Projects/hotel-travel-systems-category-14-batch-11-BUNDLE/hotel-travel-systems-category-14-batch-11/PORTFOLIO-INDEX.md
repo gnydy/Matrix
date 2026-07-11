@@ -1,0 +1,22 @@
+# Portfolio Index — Category 14 Hotel & Travel Systems
+
+- **LuxeStay Resort Booking**: Luxury resort booking platform for premium hotels and beachfront resorts. Suitable for Five-star resorts and luxury hotel chains.
+- **TripCraft Travel Agency**: Modern travel agency system for selling curated trips, tours, and itineraries. Suitable for Travel agencies and tour operators.
+- **SuiteDesk Hotel PMS Front**: Hotel property management frontend with bookings, availability, and guest operations. Suitable for Boutique hotels and serviced apartments.
+- **NomadPass Adventure Tours**: Adventure travel booking site for expeditions, hiking, diving, and guided tours. Suitable for Adventure tour companies.
+- **SkyBridge Flight & Hotel**: Flight-and-hotel package booking frontend for bundled travel offers. Suitable for Online travel agencies and package sellers.
+- **MedinaHajj Pilgrimage Planner**: Pilgrimage travel planner for groups, hotels, transfers, and guided schedules. Suitable for Hajj/Umrah agencies and religious travel operators.
+- **CoastalVilla Rental Portal**: Vacation villa booking platform with availability, amenities, and owner dashboard. Suitable for Villa rental companies and property managers.
+- **CityBreak Hotel Deals**: Urban hotel deals and weekend escape booking frontend. Suitable for City hotels and deal aggregators.
+- **CruiseHarbor Booking**: Cruise package booking platform with cabins, routes, decks, and guest portal. Suitable for Cruise companies and marine travel agencies.
+- **SafariBase Expedition Travel**: Safari and expedition travel platform for camps, guides, and luxury trips. Suitable for Safari operators and destination management companies.
+- **BusinessStay Corporate Travel**: Corporate travel and hotel booking UI for companies and travel managers. Suitable for Corporate travel departments and B2B agencies.
+- **HostelHive Budget Stays**: Hostel and budget accommodation booking frontend with shared rooms and community. Suitable for Hostel chains and budget travel platforms.
+- **WellnessRetreat Planner**: Wellness retreat booking system for yoga, spa, detox, and health programs. Suitable for Wellness resorts and retreat organizers.
+- **EventStay Group Blocks**: Hotel room block and event stay management frontend. Suitable for Conference hotels, event planners, and venues.
+- **DestinationPro DMC Portal**: Destination management portal for agencies handling trips, vendors, and itineraries. Suitable for DMCs and inbound travel operators.
+- **Aparthotel FlexStay**: Aparthotel booking frontend for short and long stays with flexible rates. Suitable for Aparthotels and serviced residence operators.
+- **EcoTrail Sustainable Travel**: Sustainable travel platform showing eco impact, packages, and responsible trips. Suitable for Eco lodges and sustainable travel companies.
+- **RailVoyage Packages**: Rail vacation booking interface with routes, cabins, schedules, and trip planner. Suitable for Rail tourism companies and travel agencies.
+- **IslandHop MultiDestination**: Multi-destination island hopping planner and booking frontend. Suitable for Island resorts and multi-city tour companies.
+- **TravelOps Control Tower**: Travel operations dashboard for agencies managing bookings, guests, vendors, and issues. Suitable for Large travel agencies and operations teams.

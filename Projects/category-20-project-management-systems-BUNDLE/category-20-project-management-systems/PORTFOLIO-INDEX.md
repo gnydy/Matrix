@@ -1,0 +1,22 @@
+# Portfolio Index
+
+- TaskForge Project Desk — Task management with project health cards. Includes frontend screens and backend mock API routes.
+- KanbanPilot Studio — Visual kanban board for teams. Includes frontend screens and backend mock API routes.
+- TimelinePro Delivery — Gantt-like project timeline UI. Includes frontend screens and backend mock API routes.
+- MilestoneHQ Program Board — Milestones, owners and executive summary. Includes frontend screens and backend mock API routes.
+- AgencyFlow Projects — Client projects and creative approvals. Includes frontend screens and backend mock API routes.
+- SoftwareSprint Manager — Sprints, backlog and release planning. Includes frontend screens and backend mock API routes.
+- ConstructionProject OS — Site stages, contractors and inspections. Includes frontend screens and backend mock API routes.
+- MarketingCampaign Planner — Campaign tasks, channels and deliverables. Includes frontend screens and backend mock API routes.
+- ResearchLab Projects — Research tasks, experiments and outputs. Includes frontend screens and backend mock API routes.
+- EventProject Control — Event planning timeline and suppliers. Includes frontend screens and backend mock API routes.
+- LegalCase Project Desk — Legal matter tasks and document stages. Includes frontend screens and backend mock API routes.
+- ManufacturingProject Board — Work orders, procurement and deadlines. Includes frontend screens and backend mock API routes.
+- ConsultingDelivery Hub — Consulting engagement delivery dashboard. Includes frontend screens and backend mock API routes.
+- FreelancerClient Projects — Simple client project portal. Includes frontend screens and backend mock API routes.
+- ProductRoadmap Team — Product features and sprint velocity. Includes frontend screens and backend mock API routes.
+- DesignApproval Workflow — Design comments and approval gates. Includes frontend screens and backend mock API routes.
+- OperationsInitiatives HQ — Internal company initiatives tracker. Includes frontend screens and backend mock API routes.
+- PortfolioManager PMO — PMO dashboard across many projects. Includes frontend screens and backend mock API routes.
+- RiskIssue Tracker — Risks, blockers and issue escalation. Includes frontend screens and backend mock API routes.
+- EnterprisePM Command — Enterprise project command center. Includes frontend screens and backend mock API routes.

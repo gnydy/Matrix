@@ -1,0 +1,5 @@
+import { OverviewPage } from '../../components/control/overview-page';
+
+export default function ControlPage() {
+  return <OverviewPage />;
+}

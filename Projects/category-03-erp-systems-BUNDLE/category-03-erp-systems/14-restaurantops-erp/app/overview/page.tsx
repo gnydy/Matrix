@@ -1,0 +1,5 @@
+import ModulePage from '@/components/ModulePage';
+
+export default function Page() {
+  return <ModulePage title="Executive Overview" description="Executive Overview module for RestaurantOps ERP. Includes realistic cards, tables, actions and frontend states." />;
+}

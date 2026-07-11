@@ -1,0 +1,25 @@
+name: Matrix Dashboard CI
+on:
+  pull_request:
+    paths: ['apps/web-dashboard/**','packages/database/prisma/**','pnpm-lock.yaml','package.json']
+  push:
+    branches: [main]
+    paths: ['apps/web-dashboard/**','packages/database/prisma/**','pnpm-lock.yaml','package.json']
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec prisma format --schema packages/database/prisma/schema.prisma
+      - run: pnpm exec prisma generate --schema packages/database/prisma/schema.prisma
+      - run: pnpm --filter @allinall/web-dashboard typecheck
+      - run: pnpm --filter @allinall/web-dashboard build
+        env:
+          DATABASE_URL: postgresql://matrix:matrix@127.0.0.1:5432/matrix?schema=public
+          MATRIX_DASHBOARD_SESSION_SECRET: ci-only-secret-ci-only-secret-ci-only-secret-ci-only-secret

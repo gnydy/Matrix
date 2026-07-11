@@ -1,0 +1,41 @@
+export const mainNav = [
+  { href: '/services', label: 'الخدمات' },
+  { href: '/services/erp', label: 'ERP' },
+  { href: '/packages', label: 'الباقات' },
+  { href: '/about', label: 'من نحن' },
+  {
+    href: '/our-work',
+    label: 'أعمالنا',
+    labelEn: 'Our Work',
+    title: 'أعمالنا',
+    titleEn: 'Our Work',
+  },
+  { href: '/contact', label: 'تواصل' },
+] as const;
+
+export const footerNav = {
+  product: [
+    { href: '/services/erp', label: 'AllInAll ERP' },
+    { href: '/services/custom', label: 'أنظمة مخصصة' },
+    { href: '/services/web-mobile', label: 'مواقع وتطبيقات' },
+    { href: '/packages', label: 'الباقات' },
+    { href: '/calculator', label: 'احسب احتياجك' },
+    { href: '/request', label: 'اطلب نظامك' },
+  ],
+  company: [
+    { href: '/our-work', label: 'من نحن' },
+  {
+    href: '/our-work',
+    label: 'أعمالنا',
+    labelEn: 'Our Work',
+    title: 'أعمالنا',
+    titleEn: 'Our Work',
+  },
+    { href: '/contact', label: 'تواصل' },
+    { href: '/Our Work', label: 'أعمالنا' },
+  ],
+  legal: [
+    { href: '/privacy', label: 'الخصوصية' },
+    { href: '/terms', label: 'الشروط' },
+  ],
+} as const;

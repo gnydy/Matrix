@@ -1,0 +1,33 @@
+{
+  "name": "@allinall/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "build": "tsc -p tsconfig.json",
+    "db:generate": "prisma generate --schema prisma/schema.prisma",
+    "db:push": "prisma db push --schema prisma/schema.prisma",
+    "db:seed": "tsx prisma/seed.ts",
+    "setup": "pnpm db:generate && pnpm db:push && pnpm db:seed"
+  },
+  "dependencies": {
+    "@prisma/client": "latest",
+    "bcryptjs": "latest",
+    "cors": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "jsonwebtoken": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "latest",
+    "@types/cors": "latest",
+    "@types/express": "latest",
+    "@types/jsonwebtoken": "latest",
+    "prisma": "latest",
+    "tsx": "latest",
+    "typescript": "latest"
+  }
+}

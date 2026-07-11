@@ -1,0 +1,34 @@
+﻿name: No Delete Guard
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  prevent-deletions:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check deleted files
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          DELETED_FILES=$(git diff --name-status origin/${{ github.base_ref }}...HEAD | grep '^D' || true)
+
+          if [ -n "$DELETED_FILES" ]; then
+            echo "Deleted files detected. Deletion is not allowed."
+            echo "$DELETED_FILES"
+            exit 1
+          fi
+
+          echo "No deleted files detected."

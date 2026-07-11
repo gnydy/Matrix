@@ -1,0 +1,47 @@
+﻿import { Body, Controller, Get, Post } from '@nestjs/common';
+import { createWorkflowInstanceSchema } from '@allinall/erp';
+import { CurrentUser } from '../auth/auth.decorators';
+import type { JwtPayload } from '../auth/jwt.strategy';
+import { PrismaService } from '../prisma/prisma.service';
+import type { Prisma } from '@allinall/database';
+import { ErpContextService } from './erp-context.service';
+
+@Controller('erp/workflow')
+export class ErpWorkflowController {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly ctx: ErpContextService,
+  ) {}
+
+  @Get('instances')
+  async instances(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const data = await this.prisma.erpWorkflowInstance.findMany({
+      where: { companyId: company.id },
+      orderBy: { updatedAt: 'desc' },
+      take: 100,
+    });
+    return { ok: true, data };
+  }
+
+  @Post('instances')
+  async createInstance(@CurrentUser() user: JwtPayload, @Body() body: unknown) {
+    const company = await this.ctx.requireCompany(user);
+    const input = createWorkflowInstanceSchema.parse(body);
+
+    const data = await this.prisma.erpWorkflowInstance.create({
+      data: {
+        companyId: company.id,
+        module: input.module,
+        entityType: input.entityType,
+        entityId: input.entityId,
+        currentStep: input.currentStep,
+        status: input.status,
+        metadata: (input.metadata ?? {}) as Prisma.InputJsonValue,
+      },
+    });
+
+    return { ok: true, data };
+  }
+}
+

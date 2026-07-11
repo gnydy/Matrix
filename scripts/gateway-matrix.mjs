@@ -76,11 +76,16 @@ const server = http.createServer((req, res) => {
 
 server.on('upgrade', (req, socket, head) => {
   const path = req.url ?? '/';
-  let targetBase = MARKETING;
-  if (path.startsWith('/control')) targetBase = PLATFORM;
-  else if (path.startsWith('/erp')) targetBase = ERP;
-
-  if ((path.startsWith('/control') || path.startsWith('/erp')) && !isLocalAddress(req)) {
+  const targetBase = path.startsWith('/control')
+    ? PLATFORM
+    : path.startsWith('/erp')
+      ? ERP
+      : MARKETING;
+  if (path.startsWith('/control') && !isLocalAddress(req)) {
+    socket.destroy();
+    return;
+  }
+  if (path.startsWith('/erp') && !isLocalAddress(req)) {
     socket.destroy();
     return;
   }
@@ -120,7 +125,7 @@ server.listen(PORT, HOST, () => {
   for (const u of urls) console.log(`  ${u}/`);
   console.log('Control Center — من هذا الجهاز فقط:');
   console.log(`  http://127.0.0.1:${PORT}/control`);
-  console.log('AllInAll ERP — من هذا الجهاز فقط:');
+  console.log('ERP — من هذا الجهاز فقط:');
   console.log(`  http://127.0.0.1:${PORT}/erp`);
 });
 

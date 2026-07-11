@@ -1,0 +1,116 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
+import { ContactNowButton } from '@/components/layout/contact-now-button';
+import { LanguageSwitcher } from '@/components/layout/language-switcher';
+import type { Messages } from '@/i18n/messages';
+import type { Locale } from '@/i18n/config';
+
+type NavItem = { href: string; label: string };
+
+type Props = {
+  locale: Locale;
+  t: Messages;
+  mainNav: readonly NavItem[];
+};
+
+export function SiteHeader({ locale, t, mainNav }: Props) {
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const langLabel = locale === 'ar' ? t.lang.switchToEn : t.lang.switchToAr;
+
+  return (
+    <header className="glass-nav sticky top-0 z-50">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+        <Link href="/" className="flex shrink-0 items-center gap-2.5">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-sm font-bold text-white">
+            M
+          </span>
+          <span className="hidden font-bold text-lg sm:inline">
+            Matrix <span className="text-sm font-normal text-muted">AllInAll</span>
+          </span>
+        </Link>
+
+        <nav className="hidden items-center gap-0.5 lg:flex" aria-label={t.nav.mainNav}>
+          {mainNav.map((item) => {
+            const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+                  active
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-muted hover:bg-background hover:text-foreground'
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="hidden items-center gap-2 sm:flex">
+          <LanguageSwitcher locale={locale} label={langLabel} />
+          <ThemeToggle />
+          <ContactNowButton variant="header" />
+          <Link
+            href="/request"
+            className="inline-flex min-h-[44px] items-center rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
+          >
+            {t.nav.requestQuote}
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-2 sm:hidden">
+          <LanguageSwitcher locale={locale} label={langLabel} />
+          <ThemeToggle />
+          <button
+            type="button"
+            className="min-h-[44px] min-w-[44px] rounded-lg border border-border p-2.5 lg:hidden"
+            aria-expanded={open}
+            aria-label={t.nav.openMenu}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <span className="mb-1 block h-0.5 w-5 bg-foreground" />
+            <span className="mb-1 block h-0.5 w-5 bg-foreground" />
+            <span className="block h-0.5 w-5 bg-foreground" />
+          </button>
+        </div>
+      </div>
+
+      {open && (
+        <nav className="border-t border-border px-4 py-4 lg:hidden" aria-label={t.nav.mobileNav}>
+          <ul className="flex flex-col gap-1">
+            {mainNav.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className="block min-h-[44px] rounded-lg px-3 py-3 text-base font-medium"
+                  onClick={() => setOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+            <li className="pt-2">
+              <ContactNowButton variant="menu" onClick={() => setOpen(false)} />
+            </li>
+            <li className="pt-2">
+              <Link
+                href="/request"
+                className="flex min-h-[44px] items-center justify-center rounded-xl bg-primary py-3 font-semibold text-white"
+                onClick={() => setOpen(false)}
+              >
+                {t.nav.requestQuote}
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      )}
+    </header>
+  );
+}

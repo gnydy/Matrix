@@ -1,0 +1,378 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users             User[]
+  parties           ErpParty[]
+  warehouses        ErpWarehouse[]
+  products          ErpProduct[]
+  stockLevels       ErpStockLevel[]
+  stockMovements    ErpStockMovement[]
+  salesDocuments    ErpSalesDocument[]
+  purchaseDocuments ErpPurchaseDocument[]
+  receivables       ErpReceivable[]
+  payables          ErpPayable[]
+  accounts          ErpAccount[]
+  journalEntries    ErpJournalEntry[]
+  employees         HrEmployee[]
+  projects          ErpProject[]
+  productionOrders  ErpProductionOrder[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  companyId    String
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("owner")
+  status       String   @default("active")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+}
+
+model ErpParty {
+  id        String    @id @default(cuid())
+  companyId String
+  type      String
+  name      String
+  phone     String?
+  email     String?
+  address   String?
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  company           Company               @relation(fields: [companyId], references: [id])
+  salesDocuments    ErpSalesDocument[]
+  purchaseDocuments ErpPurchaseDocument[]
+  receivables       ErpReceivable[]
+  payables          ErpPayable[]
+
+  @@index([companyId, type])
+}
+
+model ErpWarehouse {
+  id        String    @id @default(cuid())
+  companyId String
+  code      String
+  name      String
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  company        Company            @relation(fields: [companyId], references: [id])
+  stockLevels    ErpStockLevel[]
+  stockMovements ErpStockMovement[]
+
+  @@unique([companyId, code])
+}
+
+model ErpProduct {
+  id         String    @id @default(cuid())
+  companyId  String
+  sku        String
+  barcode    String?
+  name       String
+  type       String    @default("stock")
+  unit       String    @default("قطعة")
+  costPrice  Decimal   @default(0)
+  salePrice  Decimal   @default(0)
+  deletedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  company        Company             @relation(fields: [companyId], references: [id])
+  stockLevels    ErpStockLevel[]
+  stockMovements ErpStockMovement[]
+  salesLines     ErpSalesLine[]
+  purchaseLines  ErpPurchaseLine[]
+
+  @@unique([companyId, sku])
+  @@index([companyId, name])
+}
+
+model ErpStockLevel {
+  id          String   @id @default(cuid())
+  companyId   String
+  productId   String
+  warehouseId String
+  quantity    Decimal  @default(0)
+  updatedAt   DateTime @updatedAt
+
+  company   Company      @relation(fields: [companyId], references: [id])
+  product   ErpProduct   @relation(fields: [productId], references: [id])
+  warehouse ErpWarehouse @relation(fields: [warehouseId], references: [id])
+
+  @@unique([productId, warehouseId])
+  @@index([companyId, warehouseId])
+}
+
+model ErpStockMovement {
+  id          String   @id @default(cuid())
+  companyId   String
+  productId   String
+  warehouseId String
+  type        String
+  quantity    Decimal
+  refType     String?
+  refId       String?
+  note        String?
+  createdBy   String?
+  createdAt   DateTime @default(now())
+
+  company   Company      @relation(fields: [companyId], references: [id])
+  product   ErpProduct   @relation(fields: [productId], references: [id])
+  warehouse ErpWarehouse @relation(fields: [warehouseId], references: [id])
+
+  @@index([companyId, productId])
+}
+
+model ErpSalesDocument {
+  id         String   @id @default(cuid())
+  companyId  String
+  partyId    String
+  type       String   @default("invoice")
+  ref        String
+  note       String?
+  subtotal   Decimal  @default(0)
+  grandTotal Decimal  @default(0)
+  status     String   @default("draft")
+  postedAt   DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  company    Company        @relation(fields: [companyId], references: [id])
+  party      ErpParty       @relation(fields: [partyId], references: [id])
+  lines      ErpSalesLine[]
+  receivable ErpReceivable?
+
+  @@unique([companyId, ref])
+  @@index([companyId, status])
+}
+
+model ErpSalesLine {
+  id          String   @id @default(cuid())
+  salesDocId  String
+  productId   String?
+  description String
+  quantity    Decimal
+  unitPrice   Decimal
+  lineTotal   Decimal
+
+  salesDoc ErpSalesDocument @relation(fields: [salesDocId], references: [id], onDelete: Cascade)
+  product  ErpProduct?      @relation(fields: [productId], references: [id])
+}
+
+model ErpPurchaseDocument {
+  id         String   @id @default(cuid())
+  companyId  String
+  partyId    String
+  type       String   @default("invoice")
+  ref        String
+  note       String?
+  subtotal   Decimal  @default(0)
+  grandTotal Decimal  @default(0)
+  status     String   @default("draft")
+  postedAt   DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  company Company           @relation(fields: [companyId], references: [id])
+  party   ErpParty          @relation(fields: [partyId], references: [id])
+  lines   ErpPurchaseLine[]
+  payable ErpPayable?
+
+  @@unique([companyId, ref])
+  @@index([companyId, status])
+}
+
+model ErpPurchaseLine {
+  id            String   @id @default(cuid())
+  purchaseDocId String
+  productId     String?
+  description   String
+  quantity      Decimal
+  unitPrice     Decimal
+  lineTotal     Decimal
+
+  purchaseDoc ErpPurchaseDocument @relation(fields: [purchaseDocId], references: [id], onDelete: Cascade)
+  product     ErpProduct?         @relation(fields: [productId], references: [id])
+}
+
+model ErpReceivable {
+  id         String   @id @default(cuid())
+  companyId  String
+  partyId    String
+  salesDocId String   @unique
+  amount     Decimal
+  paidAmount Decimal  @default(0)
+  status     String   @default("open")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  company  Company          @relation(fields: [companyId], references: [id])
+  party    ErpParty         @relation(fields: [partyId], references: [id])
+  salesDoc ErpSalesDocument @relation(fields: [salesDocId], references: [id])
+}
+
+model ErpPayable {
+  id            String   @id @default(cuid())
+  companyId     String
+  partyId       String
+  purchaseDocId String   @unique
+  amount        Decimal
+  paidAmount    Decimal  @default(0)
+  status        String   @default("open")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  company     Company             @relation(fields: [companyId], references: [id])
+  party       ErpParty            @relation(fields: [partyId], references: [id])
+  purchaseDoc ErpPurchaseDocument @relation(fields: [purchaseDocId], references: [id])
+}
+
+model ErpAccount {
+  id        String   @id @default(cuid())
+  companyId String
+  code      String
+  name      String
+  type      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company          @relation(fields: [companyId], references: [id])
+  lines   ErpJournalLine[]
+
+  @@unique([companyId, code])
+}
+
+model ErpJournalEntry {
+  id        String    @id @default(cuid())
+  companyId String
+  ref       String
+  memo      String?
+  status    String    @default("posted")
+  postedAt  DateTime?
+  createdBy String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  company Company          @relation(fields: [companyId], references: [id])
+  lines   ErpJournalLine[]
+
+  @@unique([companyId, ref])
+}
+
+model ErpJournalLine {
+  id        String  @id @default(cuid())
+  entryId   String
+  accountId String
+  debit     Decimal @default(0)
+  credit    Decimal @default(0)
+  memo      String?
+
+  entry   ErpJournalEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  account ErpAccount      @relation(fields: [accountId], references: [id])
+}
+
+model HrEmployee {
+  id          String    @id @default(cuid())
+  companyId   String
+  code        String
+  name        String
+  phone       String?
+  jobTitle    String?
+  department  String?
+  baseSalary  Decimal   @default(0)
+  status      String    @default("active")
+  hiredAt     DateTime?
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  company    Company        @relation(fields: [companyId], references: [id])
+  attendance HrAttendance[]
+  payroll    HrPayroll[]
+
+  @@unique([companyId, code])
+}
+
+model HrAttendance {
+  id         String   @id @default(cuid())
+  companyId  String
+  employeeId String
+  date       String
+  status     String
+  checkIn    String?
+  checkOut   String?
+  note       String?
+  createdAt  DateTime @default(now())
+
+  employee HrEmployee @relation(fields: [employeeId], references: [id])
+
+  @@index([companyId, date])
+}
+
+model HrPayroll {
+  id         String   @id @default(cuid())
+  companyId  String
+  employeeId String
+  month      String
+  baseSalary Decimal  @default(0)
+  additions  Decimal  @default(0)
+  deductions Decimal  @default(0)
+  netSalary  Decimal  @default(0)
+  status     String   @default("paid")
+  note       String?
+  createdAt  DateTime @default(now())
+
+  employee HrEmployee @relation(fields: [employeeId], references: [id])
+
+  @@index([companyId, month])
+}
+
+model ErpProject {
+  id        String   @id @default(cuid())
+  companyId String
+  code      String
+  name      String
+  status    String   @default("active")
+  budget    Decimal  @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@unique([companyId, code])
+}
+
+model ErpProductionOrder {
+  id        String   @id @default(cuid())
+  companyId String
+  code      String
+  product   String
+  quantity  Decimal  @default(0)
+  status    String   @default("planned")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@unique([companyId, code])
+}

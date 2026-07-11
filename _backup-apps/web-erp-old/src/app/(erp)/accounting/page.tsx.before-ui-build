@@ -1,0 +1,71 @@
+﻿import { redirect } from 'next/navigation';
+import { ErpShell } from '@/components/erp-shell';
+import { ModuleFaq } from '@/components/module-faq';
+import { ModuleAuditChecklist } from '@/components/module-audit-checklist';
+import { getSession } from '@/lib/auth';
+import { erpFetch } from '@/lib/api';
+
+export default async function AccountingPage() {
+  const session = await getSession();
+  if (!session) redirect('/login');
+
+  const [accounts, entries] = await Promise.all([
+    erpFetch<Array<{ code: string; name: string; type: string }>>('/erp/accounting/accounts'),
+    erpFetch<Array<{ ref: string; status: string; memo: string | null }>>('/erp/accounting/entries'),
+  ]);
+
+  return (
+    <ErpShell userName={session.name}>
+      <h1 className="text-2xl font-bold">Ø§Ù„Ù…Ø­Ø§Ø³Ø¨Ø©</h1>
+      <p className="mt-1 text-muted">Ø¯Ù„ÙŠÙ„ Ø§Ù„Ø­Ø³Ø§Ø¨Ø§Øª ÙˆØ§Ù„Ù‚ÙŠÙˆØ¯ Ø§Ù„ÙŠÙˆÙ…ÙŠØ©</p>
+
+      <h2 className="mb-3 mt-6 text-lg font-semibold">Ø¯Ù„ÙŠÙ„ Ø§Ù„Ø­Ø³Ø§Ø¨Ø§Øª</h2>
+      <div className="overflow-x-auto rounded-2xl border border-border">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Ø§Ù„Ø±Ù…Ø²</th>
+              <th>Ø§Ù„Ø§Ø³Ù…</th>
+              <th>Ø§Ù„Ù†ÙˆØ¹</th>
+            </tr>
+          </thead>
+          <tbody>
+            {accounts.map((a) => (
+              <tr key={a.code}>
+                <td>{a.code}</td>
+                <td>{a.name}</td>
+                <td>{a.type}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h2 className="mb-3 mt-8 text-lg font-semibold">Ø§Ù„Ù‚ÙŠÙˆØ¯</h2>
+      <div className="overflow-x-auto rounded-2xl border border-border">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Ø§Ù„Ù…Ø±Ø¬Ø¹</th>
+              <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
+              <th>Ø§Ù„Ø¨ÙŠØ§Ù†</th>
+            </tr>
+          </thead>
+          <tbody>
+            {entries.map((e, i) => (
+              <tr key={i}>
+                <td>{e.ref}</td>
+                <td>{e.status}</td>
+                <td>{e.memo ?? 'â€”'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <ModuleAuditChecklist module="accounting" />
+      <ModuleFaq module="accounting" />
+    </ErpShell>
+  );
+}
+

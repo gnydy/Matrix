@@ -21,6 +21,21 @@ const prismaCli = path.join(
 
 fs.mkdirSync(dataDir, { recursive: true });
 
+function runNodeScript(relativePath) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [path.join(root, relativePath)], {
+      cwd: root,
+      shell: false,
+      stdio: 'inherit',
+      env: { ...process.env, DATABASE_URL: databaseUrl },
+    });
+    child.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`exit ${code}`))));
+  });
+}
+
+console.log('دمج مخطط ERP...');
+await runNodeScript('scripts/merge-erp-schema.mjs');
+
 function runPrisma(args) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [prismaCli, ...args], {
@@ -36,8 +51,8 @@ function runPrisma(args) {
 console.log('قاعدة SQLite المحلية:', dbFile);
 console.log('');
 
-await runPrisma(['generate', '--schema=prisma/schema.sqlite.prisma']);
-await runPrisma(['db', 'push', '--schema=prisma/schema.sqlite.prisma']);
+await runPrisma(['generate', '--schema=prisma/schema.sqlite.merged.prisma']);
+await runPrisma(['db', 'push', '--schema=prisma/schema.sqlite.merged.prisma']);
 
 console.log('');
 console.log('تشغيل seed المرحلة A...');
@@ -53,6 +68,22 @@ await new Promise((resolve, reject) => {
     },
   );
   child.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`seed exit ${code}`))));
+});
+
+console.log('');
+console.log('تشغيل seed ERP...');
+await new Promise((resolve, reject) => {
+  const child = spawn(
+    process.execPath,
+    [path.join(root, 'scripts', 'seed-erp.mjs')],
+    {
+      cwd: root,
+      shell: false,
+      stdio: 'inherit',
+      env: { ...process.env, DATABASE_URL: databaseUrl },
+    },
+  );
+  child.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`erp seed exit ${code}`))));
 });
 
 console.log('');

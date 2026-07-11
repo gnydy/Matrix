@@ -1,0 +1,106 @@
+{
+  "leads": [],
+  "visitors": [],
+  "customers": [],
+  "quotes": [],
+  "projects": [],
+  "payments": [],
+  "services": [],
+  "packages": [],
+  "contents": [],
+  "users": [
+    {
+      "id": "user_1782953616280_40a357456d2c2",
+      "title": "Owner",
+      "name": "Owner",
+      "email": "owner@matrixall.com",
+      "role": "Owner",
+      "status": "active",
+      "createdAt": "2026-07-02T00:53:36.280Z",
+      "updatedAt": "2026-07-02T00:53:36.280Z",
+      "deletedAt": null
+    }
+  ],
+  "roles": [
+    {
+      "id": "role_1782953616280_57e9f3a0e4169",
+      "title": "Owner",
+      "name": "Owner",
+      "permissions": [
+        "*"
+      ],
+      "status": "active",
+      "createdAt": "2026-07-02T00:53:36.280Z",
+      "updatedAt": "2026-07-02T00:53:36.280Z",
+      "deletedAt": null
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "audit_1782953616280_daa62dab96cc8",
+      "title": "Seeded real dashboard database",
+      "action": "Seeded real dashboard database",
+      "resource": "system",
+      "recordId": "",
+      "actor": "Owner",
+      "status": "published",
+      "createdAt": "2026-07-02T00:53:36.280Z",
+      "updatedAt": "2026-07-02T00:53:36.280Z",
+      "deletedAt": null
+    }
+  ],
+  "commands": [],
+  "portfolio": [
+    {
+      "id": "portfolio_1782953616280_78b28cdff04718",
+      "title": "Time Zone Watches",
+      "slug": "time-zone-watches",
+      "titleAr": "Time Zone Watches",
+      "titleEn": "Time Zone Watches",
+      "client": "Time Zone",
+      "categoryAr": "متجر ساعات فاخر",
+      "categoryEn": "Luxury Watch Store",
+      "descriptionAr": "متجر ساعات فاخر يعرض المنتجات بصورة احترافية، مع تجربة داكنة راقية وربط مباشر بطلبات العملاء عبر واتساب.",
+      "descriptionEn": "A premium watch-store experience with refined product presentation, dark luxury direction, and direct WhatsApp customer requests.",
+      "projectUrl": "",
+      "logoUrl": "",
+      "coverUrl": "",
+      "technologies": [
+        "Next.js",
+        "React",
+        "SEO",
+        "WhatsApp"
+      ],
+      "featured": true,
+      "status": "published",
+      "createdAt": "2026-07-02T00:53:36.280Z",
+      "updatedAt": "2026-07-02T00:53:36.280Z",
+      "deletedAt": null
+    },
+    {
+      "id": "portfolio_1782953616280_77dfc09f9c0e2",
+      "title": "Rafiq",
+      "slug": "rafiq",
+      "titleAr": "Rafiq",
+      "titleEn": "Rafiq",
+      "client": "Rafiq",
+      "categoryAr": "منصة خدمات",
+      "categoryEn": "Services Platform",
+      "descriptionAr": "واجهة رقمية لعرض خدمات Rafiq بشكل منظم، بناء الثقة، وتسهيل وصول العميل إلى الخدمة المناسبة.",
+      "descriptionEn": "A digital interface for presenting Rafiq services clearly, building trust, and helping users reach the right service faster.",
+      "projectUrl": "",
+      "logoUrl": "",
+      "coverUrl": "",
+      "technologies": [
+        "Next.js",
+        "UI/UX",
+        "SEO"
+      ],
+      "featured": true,
+      "status": "published",
+      "createdAt": "2026-07-02T00:53:36.280Z",
+      "updatedAt": "2026-07-02T00:53:36.280Z",
+      "deletedAt": null
+    }
+  ]
+}

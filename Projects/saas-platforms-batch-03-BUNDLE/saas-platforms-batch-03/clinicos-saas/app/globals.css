@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #020617; color: #e5e7eb; }
+::selection { background: rgba(125, 211, 252, .35); color: white; }
+.grid-bg {
+  background-image: linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.055) 1px, transparent 1px);
+  background-size: 34px 34px;
+}
+.glass { background: rgba(15, 23, 42, .74); border: 1px solid rgba(255,255,255,.1); backdrop-filter: blur(18px); }
+.card-hover { transition: transform .25s ease, border-color .25s ease, background .25s ease; }
+.card-hover:hover { transform: translateY(-4px); border-color: rgba(255,255,255,.24); background: rgba(30,41,59,.78); }

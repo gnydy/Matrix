@@ -1,0 +1,774 @@
+// MATRIX_DASHBOARD_CORE_START
+
+enum MatrixAdminRole {
+  owner
+  admin
+  sales
+  support
+  developer
+  project_manager
+  accountant
+  hr_manager
+  auditor
+  viewer
+}
+
+enum MatrixAccountStatus {
+  active
+  disabled
+  suspended
+}
+
+enum MatrixPriority {
+  low
+  normal
+  high
+  urgent
+}
+
+enum MatrixLeadStatus {
+  new
+  contacted
+  needs_review
+  qualified
+  proposal_sent
+  won
+  lost
+  archived
+}
+
+enum MatrixCustomerStatus {
+  active
+  inactive
+  suspended
+  archived
+}
+
+enum MatrixOrderStatus {
+  draft
+  submitted
+  reviewing
+  quoted
+  approved
+  in_progress
+  completed
+  cancelled
+  archived
+}
+
+enum MatrixQuoteStatus {
+  draft
+  internal_review
+  sent
+  accepted
+  rejected
+  expired
+  cancelled
+}
+
+enum MatrixProjectStatus {
+  not_started
+  planning
+  in_progress
+  waiting_client
+  testing
+  delivered
+  closed
+  cancelled
+}
+
+enum MatrixTaskStatus {
+  todo
+  in_progress
+  blocked
+  review
+  done
+  cancelled
+}
+
+enum MatrixPaymentStatus {
+  pending
+  processing
+  paid
+  failed
+  refunded
+  cancelled
+}
+
+enum MatrixTransactionType {
+  payment
+  refund
+  expense
+  income
+  adjustment
+  commission
+}
+
+enum MatrixTransactionStatus {
+  pending
+  posted
+  failed
+  reversed
+}
+
+enum MatrixTemplateStatus {
+  draft
+  review
+  published
+  archived
+  disabled
+}
+
+enum MatrixTemplateType {
+  website
+  ecommerce
+  dashboard
+  system_ui
+  portal
+  marketplace
+  saas
+  admin_panel
+  mobile_ui
+  desktop_ui
+  ai_app
+  api
+  automation
+}
+
+enum MatrixSubscriptionStatus {
+  trial
+  active
+  overdue
+  suspended
+  cancelled
+  expired
+}
+
+enum MatrixTicketStatus {
+  open
+  in_progress
+  waiting_customer
+  resolved
+  closed
+}
+
+enum MatrixAuditResult {
+  success
+  failure
+  denied
+}
+
+model MatrixAdminUser {
+  id             String              @id @default(cuid())
+  email          String              @unique
+  name           String
+  passwordHash   String
+  role           MatrixAdminRole     @default(viewer)
+  status         MatrixAccountStatus @default(active)
+  locale         String              @default("ar")
+  lastLoginAt    DateTime?
+  passwordAt     DateTime            @default(now())
+  failedLogins   Int                 @default(0)
+  lockedUntil    DateTime?
+  sessions       MatrixAdminSession[]
+  assignedLeads  MatrixLead[]        @relation("MatrixLeadAssignee")
+  managedProjects MatrixProject[]    @relation("MatrixProjectManager")
+  assignedTasks  MatrixProjectTask[] @relation("MatrixTaskAssignee")
+  assignedTickets MatrixSupportTicket[] @relation("MatrixTicketAssignee")
+  activities     MatrixActivity[]
+  auditLogs      MatrixAuditLog[]
+  notifications  MatrixNotification[]
+  uploadedFiles  MatrixFile[]
+  updatedSettings MatrixSystemSetting[]
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  deletedAt      DateTime?
+
+  @@index([role, status])
+  @@index([deletedAt])
+  @@map("matrix_admin_users")
+}
+
+model MatrixAdminSession {
+  id         String          @id @default(cuid())
+  userId     String
+  user       MatrixAdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash  String          @unique
+  ipHash     String?
+  userAgent  String?
+  expiresAt  DateTime
+  lastSeenAt DateTime        @default(now())
+  createdAt  DateTime        @default(now())
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt])
+  @@map("matrix_admin_sessions")
+}
+
+model MatrixLoginAttempt {
+  id        String   @id @default(cuid())
+  emailHash String
+  ipHash    String?
+  success   Boolean  @default(false)
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([emailHash, createdAt])
+  @@index([ipHash, createdAt])
+  @@map("matrix_login_attempts")
+}
+
+model MatrixCustomer {
+  id            String               @id @default(cuid())
+  customerCode  String               @unique
+  name          String
+  tradeName     String?
+  email         String?
+  phone         String?
+  website       String?
+  address       String?
+  city          String?
+  country       String               @default("EG")
+  industry      String?
+  branchesCount Int                  @default(1)
+  usersCount    Int                  @default(1)
+  status        MatrixCustomerStatus @default(active)
+  contractType  String               @default("custom")
+  source        String?
+  notes         String?
+  metadata      Json?
+  contacts      MatrixCustomerContact[]
+  orders        MatrixOrder[]
+  quotes        MatrixQuote[]
+  projects      MatrixProject[]
+  payments      MatrixPayment[]
+  transactions  MatrixFinancialTransaction[]
+  subscriptions MatrixSubscription[]
+  tickets       MatrixSupportTicket[]
+  files         MatrixFile[]
+  activities    MatrixActivity[]
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  deletedAt     DateTime?
+
+  @@index([status, updatedAt])
+  @@index([name])
+  @@index([email])
+  @@index([phone])
+  @@index([deletedAt])
+  @@map("matrix_customers")
+}
+
+model MatrixCustomerContact {
+  id         String         @id @default(cuid())
+  customerId String
+  customer   MatrixCustomer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  name       String
+  title      String?
+  email      String?
+  phone      String?
+  isPrimary  Boolean        @default(false)
+  notes      String?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  deletedAt  DateTime?
+
+  @@index([customerId, isPrimary])
+  @@index([email])
+  @@map("matrix_customer_contacts")
+}
+
+model MatrixLead {
+  id           String            @id @default(cuid())
+  leadNumber   String            @unique
+  name         String
+  company      String?
+  email        String?
+  phone        String?
+  projectType  String
+  projectSize  String?
+  description  String?
+  usersExpected Int?
+  branchesCount Int?
+  deploymentType String?
+  preferredLanguage String       @default("ar")
+  source       String            @default("website")
+  status       MatrixLeadStatus  @default(new)
+  priority     MatrixPriority    @default(normal)
+  consent      Boolean           @default(false)
+  assignedToId String?
+  assignedTo   MatrixAdminUser?  @relation("MatrixLeadAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  orders       MatrixOrder[]
+  quotes       MatrixQuote[]
+  activities   MatrixActivity[]
+  metadata     Json?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  deletedAt    DateTime?
+
+  @@index([status, priority, updatedAt])
+  @@index([assignedToId, status])
+  @@index([email])
+  @@index([phone])
+  @@index([deletedAt])
+  @@map("matrix_leads")
+}
+
+model MatrixOrder {
+  id          String            @id @default(cuid())
+  orderNumber String            @unique
+  customerId  String?
+  customer    MatrixCustomer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  leadId      String?
+  lead        MatrixLead?       @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  type        String
+  title       String
+  description String?
+  status      MatrixOrderStatus @default(draft)
+  priority    MatrixPriority    @default(normal)
+  currency    String            @default("EGP")
+  subtotal    Decimal           @default(0) @db.Decimal(18, 2)
+  discount    Decimal           @default(0) @db.Decimal(18, 2)
+  tax         Decimal           @default(0) @db.Decimal(18, 2)
+  total       Decimal           @default(0) @db.Decimal(18, 2)
+  dueDate     DateTime?
+  notes       String?
+  metadata    Json?
+  items       MatrixOrderItem[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  deletedAt   DateTime?
+
+  @@index([status, updatedAt])
+  @@index([customerId, status])
+  @@index([leadId])
+  @@index([deletedAt])
+  @@map("matrix_orders")
+}
+
+model MatrixOrderItem {
+  id          String      @id @default(cuid())
+  orderId     String
+  order       MatrixOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  quantity    Decimal     @default(1) @db.Decimal(18, 3)
+  unitPrice   Decimal     @default(0) @db.Decimal(18, 2)
+  discount    Decimal     @default(0) @db.Decimal(18, 2)
+  tax         Decimal     @default(0) @db.Decimal(18, 2)
+  total       Decimal     @default(0) @db.Decimal(18, 2)
+  metadata    Json?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([orderId])
+  @@map("matrix_order_items")
+}
+
+model MatrixQuote {
+  id          String            @id @default(cuid())
+  quoteNumber String            @unique
+  customerId  String?
+  customer    MatrixCustomer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  leadId      String?
+  lead        MatrixLead?       @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  title       String
+  scope       String?
+  status      MatrixQuoteStatus @default(draft)
+  version     Int               @default(1)
+  currency    String            @default("EGP")
+  subtotal    Decimal           @default(0) @db.Decimal(18, 2)
+  discount    Decimal           @default(0) @db.Decimal(18, 2)
+  tax         Decimal           @default(0) @db.Decimal(18, 2)
+  total       Decimal           @default(0) @db.Decimal(18, 2)
+  paymentTerms String?
+  validUntil  DateTime?
+  acceptedAt  DateTime?
+  rejectedAt  DateTime?
+  notes       String?
+  items       MatrixQuoteItem[]
+  projects    MatrixProject[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  deletedAt   DateTime?
+
+  @@index([status, updatedAt])
+  @@index([customerId])
+  @@index([leadId])
+  @@index([deletedAt])
+  @@map("matrix_quotes")
+}
+
+model MatrixQuoteItem {
+  id          String      @id @default(cuid())
+  quoteId     String
+  quote       MatrixQuote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  quantity    Decimal     @default(1) @db.Decimal(18, 3)
+  unitPrice   Decimal     @default(0) @db.Decimal(18, 2)
+  discount    Decimal     @default(0) @db.Decimal(18, 2)
+  tax         Decimal     @default(0) @db.Decimal(18, 2)
+  total       Decimal     @default(0) @db.Decimal(18, 2)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([quoteId])
+  @@map("matrix_quote_items")
+}
+
+model MatrixProject {
+  id             String              @id @default(cuid())
+  projectNumber  String              @unique
+  name           String
+  customerId     String
+  customer       MatrixCustomer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  quoteId        String?
+  quote          MatrixQuote?        @relation(fields: [quoteId], references: [id], onDelete: SetNull)
+  managerId      String?
+  manager        MatrixAdminUser?    @relation("MatrixProjectManager", fields: [managerId], references: [id], onDelete: SetNull)
+  status         MatrixProjectStatus @default(not_started)
+  priority       MatrixPriority      @default(normal)
+  scope          String?
+  startDate      DateTime?
+  targetDate     DateTime?
+  deliveredAt    DateTime?
+  budget         Decimal             @default(0) @db.Decimal(18, 2)
+  currency       String              @default("EGP")
+  completion     Int                 @default(0)
+  notes          String?
+  metadata       Json?
+  milestones     MatrixProjectMilestone[]
+  tasks          MatrixProjectTask[]
+  payments       MatrixPayment[]
+  transactions   MatrixFinancialTransaction[]
+  files          MatrixFile[]
+  activities     MatrixActivity[]
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  deletedAt      DateTime?
+
+  @@index([customerId, status])
+  @@index([managerId, status])
+  @@index([targetDate])
+  @@index([deletedAt])
+  @@map("matrix_projects")
+}
+
+model MatrixProjectMilestone {
+  id          String        @id @default(cuid())
+  projectId   String
+  project     MatrixProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  status      MatrixTaskStatus @default(todo)
+  dueDate     DateTime?
+  completedAt DateTime?
+  order       Int           @default(0)
+  tasks       MatrixProjectTask[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([projectId, order])
+  @@map("matrix_project_milestones")
+}
+
+model MatrixProjectTask {
+  id          String        @id @default(cuid())
+  projectId   String
+  project     MatrixProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  milestoneId String?
+  milestone   MatrixProjectMilestone? @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+  assigneeId  String?
+  assignee    MatrixAdminUser? @relation("MatrixTaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  title       String
+  description String?
+  status      MatrixTaskStatus @default(todo)
+  priority    MatrixPriority @default(normal)
+  dueDate     DateTime?
+  completedAt DateTime?
+  estimateHours Decimal?     @db.Decimal(10, 2)
+  actualHours Decimal?       @db.Decimal(10, 2)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  deletedAt   DateTime?
+
+  @@index([projectId, status])
+  @@index([assigneeId, status])
+  @@index([milestoneId])
+  @@map("matrix_project_tasks")
+}
+
+model MatrixPayment {
+  id          String              @id @default(cuid())
+  reference   String              @unique
+  customerId  String
+  customer    MatrixCustomer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  projectId   String?
+  project     MatrixProject?      @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  status      MatrixPaymentStatus @default(pending)
+  method      String?
+  provider    String?
+  providerRef String?
+  currency    String              @default("EGP")
+  amount      Decimal             @db.Decimal(18, 2)
+  dueAt       DateTime?
+  paidAt      DateTime?
+  failedAt    DateTime?
+  notes       String?
+  metadata    Json?
+  transactions MatrixFinancialTransaction[]
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  deletedAt   DateTime?
+
+  @@index([customerId, status])
+  @@index([projectId])
+  @@index([status, dueAt])
+  @@index([deletedAt])
+  @@map("matrix_payments")
+}
+
+model MatrixFinancialTransaction {
+  id          String                  @id @default(cuid())
+  reference   String                  @unique
+  customerId  String?
+  customer    MatrixCustomer?         @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  projectId   String?
+  project     MatrixProject?          @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  paymentId   String?
+  payment     MatrixPayment?          @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  type        MatrixTransactionType
+  status      MatrixTransactionStatus @default(pending)
+  currency    String                  @default("EGP")
+  amount      Decimal                 @db.Decimal(18, 2)
+  occurredAt  DateTime                @default(now())
+  postedAt    DateTime?
+  description String?
+  metadata    Json?
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+  deletedAt   DateTime?
+
+  @@index([status, occurredAt])
+  @@index([customerId])
+  @@index([projectId])
+  @@index([paymentId])
+  @@index([deletedAt])
+  @@map("matrix_financial_transactions")
+}
+
+model MatrixTemplate {
+  id          String               @id @default(cuid())
+  code        String               @unique
+  slug        String               @unique
+  name        String
+  nameAr      String?
+  category    String
+  type        MatrixTemplateType
+  status      MatrixTemplateStatus @default(draft)
+  version     String               @default("1.0.0")
+  description String?
+  price       Decimal              @default(0) @db.Decimal(18, 2)
+  currency    String               @default("EGP")
+  stack       Json?
+  features    Json?
+  previewUrl  String?
+  repositoryUrl String?
+  thumbnailUrl String?
+  isFeatured  Boolean              @default(false)
+  downloads   Int                  @default(0)
+  salesCount  Int                  @default(0)
+  metadata    Json?
+  versions    MatrixTemplateVersion[]
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  publishedAt DateTime?
+  deletedAt   DateTime?
+
+  @@index([category, status])
+  @@index([type, status])
+  @@index([isFeatured, updatedAt])
+  @@index([deletedAt])
+  @@map("matrix_templates")
+}
+
+model MatrixTemplateVersion {
+  id          String         @id @default(cuid())
+  templateId  String
+  template    MatrixTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  version     String
+  changelog   String?
+  packageUrl  String?
+  checksum    String?
+  fileSize    BigInt?
+  isCurrent   Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+
+  @@unique([templateId, version])
+  @@index([templateId, isCurrent])
+  @@map("matrix_template_versions")
+}
+
+model MatrixSubscription {
+  id             String                   @id @default(cuid())
+  subscriptionCode String                 @unique
+  customerId     String
+  customer       MatrixCustomer           @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  planName       String
+  status         MatrixSubscriptionStatus @default(trial)
+  billingCycle   String                   @default("monthly")
+  currency       String                   @default("EGP")
+  amount         Decimal                  @default(0) @db.Decimal(18, 2)
+  startDate      DateTime
+  endDate        DateTime?
+  trialEndsAt    DateTime?
+  nextBillingAt  DateTime?
+  maxUsers       Int                      @default(1)
+  maxBranches    Int                      @default(1)
+  enabledModules Json?
+  entitlements   Json?
+  deploymentType String                   @default("saas")
+  notes          String?
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+  deletedAt      DateTime?
+
+  @@index([customerId, status])
+  @@index([status, nextBillingAt])
+  @@index([deletedAt])
+  @@map("matrix_subscriptions")
+}
+
+model MatrixSupportTicket {
+  id          String             @id @default(cuid())
+  ticketNumber String            @unique
+  customerId  String
+  customer    MatrixCustomer     @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  assignedToId String?
+  assignedTo  MatrixAdminUser?   @relation("MatrixTicketAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  subject     String
+  description String
+  status      MatrixTicketStatus @default(open)
+  priority    MatrixPriority     @default(normal)
+  category    String?
+  resolvedAt  DateTime?
+  closedAt    DateTime?
+  metadata    Json?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  deletedAt   DateTime?
+
+  @@index([customerId, status])
+  @@index([assignedToId, status])
+  @@index([priority, status])
+  @@index([deletedAt])
+  @@map("matrix_support_tickets")
+}
+
+model MatrixActivity {
+  id          String          @id @default(cuid())
+  actorId     String?
+  actor       MatrixAdminUser? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  customerId  String?
+  customer    MatrixCustomer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  leadId      String?
+  lead        MatrixLead?     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  projectId   String?
+  project     MatrixProject?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  type        String
+  title       String
+  description String?
+  metadata    Json?
+  createdAt   DateTime        @default(now())
+
+  @@index([customerId, createdAt])
+  @@index([leadId, createdAt])
+  @@index([projectId, createdAt])
+  @@index([actorId, createdAt])
+  @@map("matrix_activities")
+}
+
+model MatrixAuditLog {
+  id           String            @id @default(cuid())
+  actorId      String?
+  actor        MatrixAdminUser?  @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  actorType    String            @default("user")
+  action       String
+  entityType   String
+  entityId     String?
+  result       MatrixAuditResult @default(success)
+  beforeData   Json?
+  afterData    Json?
+  ipHash       String?
+  userAgent    String?
+  correlationId String?
+  failureReason String?
+  createdAt    DateTime          @default(now())
+
+  @@index([actorId, createdAt])
+  @@index([entityType, entityId, createdAt])
+  @@index([action, createdAt])
+  @@index([result, createdAt])
+  @@map("matrix_audit_logs")
+}
+
+model MatrixSystemSetting {
+  id          String          @id @default(cuid())
+  key         String          @unique
+  value       Json
+  description String?
+  isSecret    Boolean         @default(false)
+  updatedById String?
+  updatedBy   MatrixAdminUser? @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([isSecret])
+  @@map("matrix_system_settings")
+}
+
+model MatrixFile {
+  id          String          @id @default(cuid())
+  customerId  String?
+  customer    MatrixCustomer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  projectId   String?
+  project     MatrixProject?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  uploadedById String?
+  uploadedBy  MatrixAdminUser? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  entityType  String?
+  entityId    String?
+  fileName    String
+  storageKey  String          @unique
+  mimeType    String
+  sizeBytes   BigInt
+  checksum    String?
+  isPrivate   Boolean         @default(true)
+  metadata    Json?
+  createdAt   DateTime        @default(now())
+  deletedAt   DateTime?
+
+  @@index([customerId, createdAt])
+  @@index([projectId, createdAt])
+  @@index([entityType, entityId])
+  @@index([deletedAt])
+  @@map("matrix_files")
+}
+
+model MatrixNotification {
+  id        String          @id @default(cuid())
+  userId    String
+  user      MatrixAdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  body      String?
+  href      String?
+  metadata  Json?
+  readAt    DateTime?
+  createdAt DateTime        @default(now())
+
+  @@index([userId, readAt, createdAt])
+  @@map("matrix_notifications")
+}
+
+// MATRIX_DASHBOARD_CORE_END

@@ -1,0 +1,51 @@
+import { Controller, Get } from '@nestjs/common';
+import { CurrentUser } from '../auth/auth.decorators';
+import type { JwtPayload } from '../auth/jwt.strategy';
+import { PrismaService } from '../prisma/prisma.service';
+import { ErpContextService } from './erp-context.service';
+import type { ErpOk } from './erp-response';
+
+@Controller('erp/core')
+export class ErpCoreController {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly ctx: ErpContextService,
+  ) {}
+
+  @Get('overview')
+  async overview(@CurrentUser() user: JwtPayload): Promise<ErpOk> {
+    const company = await this.ctx.requireCompany(user);
+    const [branches, fiscalYears, departments] = await Promise.all([
+      this.prisma.erpBranch.count({ where: { companyId: company.id, deletedAt: null } }),
+      this.prisma.erpFiscalYear.count({ where: { companyId: company.id } }),
+      this.prisma.erpDepartment.count({
+        where: { branch: { companyId: company.id }, deletedAt: null },
+      }),
+    ]);
+    return {
+      ok: true,
+      data: { company, counts: { branches, fiscalYears, departments } },
+    };
+  }
+
+  @Get('branches')
+  async branches(@CurrentUser() user: JwtPayload): Promise<ErpOk> {
+    const company = await this.ctx.requireCompany(user);
+    const data = await this.prisma.erpBranch.findMany({
+      where: { companyId: company.id, deletedAt: null },
+      include: { departments: { where: { deletedAt: null } } },
+      orderBy: { name: 'asc' },
+    });
+    return { ok: true, data };
+  }
+
+  @Get('fiscal-years')
+  async fiscalYears(@CurrentUser() user: JwtPayload): Promise<ErpOk> {
+    const company = await this.ctx.requireCompany(user);
+    const data = await this.prisma.erpFiscalYear.findMany({
+      where: { companyId: company.id },
+      orderBy: { startsOn: 'desc' },
+    });
+    return { ok: true, data };
+  }
+}

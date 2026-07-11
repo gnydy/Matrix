@@ -1,7 +1,8 @@
 /**
- * تشغيل Matrix محلياً — موقع + Control Center + بوابة
+ * تشغيل Matrix محلياً — موقع + Control Center + API + بوابة
  */
 import { spawn } from 'node:child_process';
+import fs from 'node:fs';
 import http from 'node:http';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -55,25 +56,7 @@ function runNodeScript(relativePath, extraEnv = {}) {
   });
 }
 
-function waitForPortFree(port, attempts = 60) {
-  return new Promise((resolve, reject) => {
-    let left = attempts;
-    const tryListen = () => {
-      const srv = http.createServer();
-      srv.once('error', () => {
-        left -= 1;
-        if (left <= 0) reject(new Error(`port ${port} busy`));
-        else setTimeout(tryListen, 1000);
-      });
-      srv.once('listening', () => {
-        srv.close(() => resolve());
-      });
-      srv.listen(port, '127.0.0.1');
-    };
-    tryListen();
-  });
-}
-
+function waitFor(url, attempts = 120) {
   return new Promise((resolve, reject) => {
     let left = attempts;
     const tick = () => {
@@ -94,6 +77,23 @@ function waitForPortFree(port, attempts = 60) {
       else setTimeout(tick, 1000);
     };
     tick();
+  });
+}
+
+function waitForPortFree(port, attempts = 30) {
+  return new Promise((resolve, reject) => {
+    let left = attempts;
+    const tryListen = () => {
+      const srv = http.createServer();
+      srv.once('error', () => {
+        left -= 1;
+        if (left <= 0) reject(new Error(`port ${port} busy`));
+        else setTimeout(tryListen, 1000);
+      });
+      srv.once('listening', () => srv.close(() => resolve()));
+      srv.listen(port, '127.0.0.1');
+    };
+    tryListen();
   });
 }
 
@@ -146,11 +146,23 @@ await new Promise((resolve) => {
 
 await tryDb();
 
+function cleanNextCache(appFolder) {
+  const dir = path.join(root, 'apps', appFolder, '.next');
+  if (fs.existsSync(dir)) {
+    fs.rmSync(dir, { recursive: true, force: true });
+    console.log('نظّف ذاكرة البناء:', appFolder);
+  }
+}
+
+cleanNextCache('web-marketing');
+cleanNextCache('web-platform');
+cleanNextCache('web-erp');
+
 console.log('بناء الحزم المشتركة...');
 await new Promise((resolve, reject) => {
   const child = run(
     pnpm,
-    ['--filter', '@allinall/security', '--filter', '@allinall/config', '--filter', '@allinall/database', 'build'],
+    ['--filter', '@allinall/security', '--filter', '@allinall/config', '--filter', '@allinall/database', '--filter', '@allinall/erp', 'build'],
     { shell: isWin },
   );
   child.on('close', (code) => (code === 0 ? resolve() : reject(new Error('package build failed'))));
@@ -167,25 +179,13 @@ await waitForPortFree(4000);
 run(pnpm, ['--filter', '@allinall/api', 'start'], { shell: isWin });
 
 console.log(`تشغيل الموقع (منفذ ${marketingPort})...`);
-run(
-  pnpm,
-  ['--filter', '@allinall/web-marketing', 'exec', 'next', 'dev', '--port', marketingPort, '--hostname', '127.0.0.1'],
-  { shell: isWin },
-);
+run(pnpm, ['--filter', '@allinall/web-marketing', 'dev'], { shell: isWin });
 
 console.log(`تشغيل Control Center (منفذ ${platformPort})...`);
-run(
-  pnpm,
-  ['--filter', '@allinall/web-platform', 'exec', 'next', 'dev', '--port', platformPort, '--hostname', '127.0.0.1'],
-  { shell: isWin },
-);
+run(pnpm, ['--filter', '@allinall/web-platform', 'dev'], { shell: isWin });
 
-console.log(`تشغيل AllInAll ERP (منفذ ${erpPort})...`);
-run(
-  pnpm,
-  ['--filter', '@allinall/web-erp', 'exec', 'next', 'dev', '--port', erpPort, '--hostname', '127.0.0.1'],
-  { shell: isWin },
-);
+console.log(`تشغيل ERP (منفذ ${erpPort})...`);
+run(pnpm, ['--filter', '@allinall/web-erp', 'dev'], { shell: isWin });
 
 console.log('انتظار جاهزية الخدمات...');
 try {
@@ -207,7 +207,7 @@ try {
 }
 
 try {
-  await waitFor(`${erpUrl}/erp`);
+  await waitFor(`${erpUrl}/login`);
 } catch {
   console.log('ERP ما زال يُحمّل — انتظر ثم افتح /erp');
 }
@@ -245,7 +245,7 @@ console.log('');
 console.log('  Control Center — هذا الجهاز فقط:');
 console.log(`    http://127.0.0.1:${gatewayPort}/control`);
 console.log('');
-console.log('  AllInAll ERP — هذا الجهاز فقط:');
+console.log('  ERP — هذا الجهاز فقط:');
 console.log(`    http://127.0.0.1:${gatewayPort}/erp`);
 console.log('');
 console.log('  الدخول: admin@matrix.local / matrix_admin_change_me');

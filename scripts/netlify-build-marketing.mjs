@@ -39,7 +39,6 @@ const generateEnv = {
 };
 
 await run(pnpm, ['--filter', '@allinall/security', 'build']);
-await run(pnpm, ['--filter', '@allinall/database', 'build']);
 await run(pnpm, ['--filter', '@allinall/database', 'db:generate'], { env: generateEnv });
 await run(pnpm, ['--filter', '@allinall/web-marketing', 'build'], { env: generateEnv });
 

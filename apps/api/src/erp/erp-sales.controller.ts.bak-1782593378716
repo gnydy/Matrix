@@ -1,0 +1,146 @@
+import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Patch, Post } from '@nestjs/common';
+import { createPartySchema, createSalesDocSchema, postSalesDocSchema } from '@allinall/erp';
+import { Permissions } from '../auth/auth.guard';
+import { CurrentUser } from '../auth/auth.decorators';
+import type { JwtPayload } from '../auth/jwt.strategy';
+import { PrismaService } from '../prisma/prisma.service';
+import { ErpContextService } from './erp-context.service';
+
+@Controller('erp/sales')
+export class ErpSalesController {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly ctx: ErpContextService,
+  ) {}
+
+  private async resolveWarehouse(companyId: string, warehouseId?: string) {
+    if (warehouseId) {
+      const warehouse = await this.prisma.erpWarehouse.findFirst({ where: { id: warehouseId, companyId, deletedAt: null } });
+      if (!warehouse) throw new BadRequestException('Invalid warehouse');
+      return warehouse;
+    }
+    const warehouse = await this.prisma.erpWarehouse.findFirst({ where: { companyId, deletedAt: null }, orderBy: { createdAt: 'asc' } });
+    if (!warehouse) throw new BadRequestException('Create a warehouse first');
+    return warehouse;
+  }
+
+  @Get('documents')
+  @Permissions('sales:read')
+  async documents(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const data = await this.prisma.erpSalesDocument.findMany({
+      where: { companyId: company.id },
+      include: { party: true, lines: { include: { product: true } }, receivable: true },
+      orderBy: { createdAt: 'desc' },
+      take: 200,
+    });
+    return { ok: true, data };
+  }
+
+  @Get('documents/:id')
+  @Permissions('sales:read')
+  async document(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
+    const company = await this.ctx.requireCompany(user);
+    const data = await this.prisma.erpSalesDocument.findFirst({
+      where: { id, companyId: company.id },
+      include: { party: true, lines: { include: { product: true } }, receivable: true },
+    });
+    if (!data) throw new NotFoundException('Sales document not found');
+    return { ok: true, data };
+  }
+
+  @Get('parties')
+  @Permissions('sales:read')
+  async parties(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const data = await this.prisma.erpParty.findMany({
+      where: { companyId: company.id, deletedAt: null, type: { in: ['customer', 'both'] } },
+      orderBy: { name: 'asc' },
+    });
+    return { ok: true, data };
+  }
+
+  @Post('parties')
+  @Permissions('sales:write')
+  async createParty(@CurrentUser() user: JwtPayload, @Body() body: unknown) {
+    const company = await this.ctx.requireCompany(user);
+    const input = createPartySchema.parse({ ...(body as Record<string, unknown>), type: (body as Record<string, unknown>).type ?? 'customer' });
+    const data = await this.prisma.erpParty.create({ data: { companyId: company.id, ...input, email: input.email || null } });
+    return { ok: true, data };
+  }
+
+  @Post('documents')
+  @Permissions('sales:write')
+  async createDocument(@CurrentUser() user: JwtPayload, @Body() body: unknown) {
+    const company = await this.ctx.requireCompany(user);
+    const input = createSalesDocSchema.parse(body);
+    const party = await this.prisma.erpParty.findFirst({ where: { id: input.partyId, companyId: company.id, deletedAt: null, type: { in: ['customer', 'both'] } } });
+    if (!party) throw new BadRequestException('Invalid customer');
+
+    const lines = input.lines.map((line) => ({ ...line, lineTotal: line.quantity * line.unitPrice }));
+    const subtotal = lines.reduce((sum, line) => sum + line.lineTotal, 0);
+    const ref = input.ref ?? this.ctx.nextRef('SAL');
+
+    const data = await this.prisma.erpSalesDocument.create({
+      data: {
+        companyId: company.id,
+        partyId: input.partyId,
+        type: input.type,
+        ref,
+        note: input.note,
+        subtotal,
+        grandTotal: subtotal,
+        lines: { create: lines },
+      },
+      include: { party: true, lines: { include: { product: true } } },
+    });
+    return { ok: true, data };
+  }
+
+  @Patch('documents/:id/post')
+  @Permissions('sales:write')
+  async postDocument(@CurrentUser() user: JwtPayload, @Param('id') id: string, @Body() body: unknown) {
+    const company = await this.ctx.requireCompany(user);
+    const input = postSalesDocSchema.parse(body ?? {});
+    const doc = await this.prisma.erpSalesDocument.findFirst({
+      where: { id, companyId: company.id },
+      include: { lines: { include: { product: true } }, party: true, receivable: true },
+    });
+    if (!doc) throw new NotFoundException('Sales document not found');
+    if (doc.status === 'posted') return { ok: true, data: doc };
+    if (doc.status === 'cancelled') throw new BadRequestException('Cannot post cancelled document');
+    if (doc.type !== 'invoice') throw new BadRequestException('Only invoices can be posted');
+    if (doc.receivable) throw new BadRequestException('Document already has receivable');
+
+    const hasStockLines = doc.lines.some((line) => line.productId && line.product?.type === 'stock');
+    const warehouse = hasStockLines ? await this.resolveWarehouse(company.id, input.warehouseId) : null;
+
+    const data = await this.prisma.$transaction(async (tx) => {
+      if (warehouse) {
+        for (const line of doc.lines) {
+          const productId = line.productId;
+          if (!productId || line.product?.type !== 'stock') continue;
+          const quantity = Number(line.quantity);
+          const level = await tx.erpStockLevel.findUnique({ where: { productId_warehouseId: { productId, warehouseId: warehouse.id } } });
+          const current = level ? Number(level.quantity) : 0;
+          if (!level || current < quantity) throw new BadRequestException('Insufficient stock for ' + line.description);
+          await tx.erpStockLevel.update({ where: { id: level.id }, data: { quantity: current - quantity } });
+          await tx.erpStockMovement.create({
+            data: { companyId: company.id, productId, warehouseId: warehouse.id, type: 'out', quantity, refType: 'sales_invoice', refId: doc.id, note: doc.ref, createdBy: user.sub },
+          });
+        }
+      }
+
+      await tx.erpSalesDocument.update({ where: { id: doc.id }, data: { status: 'posted' } });
+      await tx.erpReceivable.create({
+        data: { companyId: company.id, partyId: doc.partyId, salesDocId: doc.id, ref: 'AR-' + doc.ref, amount: Number(doc.grandTotal), paidAmount: 0, status: 'open' },
+      });
+      return tx.erpSalesDocument.findUnique({
+        where: { id: doc.id },
+        include: { party: true, lines: { include: { product: true } }, receivable: true },
+      });
+    });
+
+    return { ok: true, data };
+  }
+}

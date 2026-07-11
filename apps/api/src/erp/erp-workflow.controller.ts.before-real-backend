@@ -1,0 +1,24 @@
+import { Controller, Get } from '@nestjs/common';
+import { CurrentUser } from '../auth/auth.decorators';
+import type { JwtPayload } from '../auth/jwt.strategy';
+import { PrismaService } from '../prisma/prisma.service';
+import { ErpContextService } from './erp-context.service';
+
+@Controller('erp/workflow')
+export class ErpWorkflowController {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly ctx: ErpContextService,
+  ) {}
+
+  @Get('instances')
+  async instances(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const data = await this.prisma.erpWorkflowInstance.findMany({
+      where: { companyId: company.id },
+      orderBy: { updatedAt: 'desc' },
+      take: 100,
+    });
+    return { ok: true, data };
+  }
+}

@@ -1,0 +1,242 @@
+
+==============================
+erp-sales.controller.ts
+==============================
+1:import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+2:import { createPartySchema, createSalesDocSchema, postDocumentSchema } from '@allinall/erp';
+3:import { CurrentUser } from '../auth/auth.decorators';
+4:import type { JwtPayload } from '../auth/jwt.strategy';
+5:import { PrismaService } from '../prisma/prisma.service';
+6:import { ErpContextService } from './erp-context.service';
+7:
+8:type Tx = any;
+9:
+10:@Controller('erp/sales')
+11:export class ErpSalesController {
+12:  constructor(
+13:    private readonly prisma: PrismaService,
+14:    private readonly ctx: ErpContextService,
+15:  ) {}
+16:
+17:  private async account(tx: Tx, companyId: string, code: string) {
+18:    return tx.erpAccount.findFirst({ where: { companyId, code, deletedAt: null, isActive: true } });
+19:  }
+20:
+21:  private async createJournalForSale(tx: Tx, companyId: string, ref: string, amount: number, createdBy: string) {
+22:    const receivable = await this.account(tx, companyId, '1100');
+23:    const revenue = await this.account(tx, companyId, '4000');
+24:    if (!receivable || !revenue || amount <= 0) return;
+25:    await tx.erpJournalEntry.create({
+26:      data: {
+27:        companyId,
+28:        ref: `JE-${ref}`,
+29:        status: 'posted',
+30:        postedAt: new Date(),
+31:        memo: `ترحيل فاتورة بيع ${ref}`,
+32:        createdBy,
+33:        lines: { create: [
+34:          { accountId: receivable.id, debit: amount, credit: 0, memo: 'مديونية عميل' },
+35:          { accountId: revenue.id, debit: 0, credit: amount, memo: 'إيراد مبيعات' },
+36:        ] },
+37:      },
+38:    }).catch(() => undefined);
+39:  }
+40:
+41:  @Get('documents')
+42:  async documents(@CurrentUser() user: JwtPayload) {
+43:    const company = await this.ctx.requireCompany(user);
+44:    const data = await this.prisma.erpSalesDocument.findMany({
+45:      where: { companyId: company.id },
+46:      include: { party: true, lines: { include: { product: true } }, receivable: true },
+47:      orderBy: { createdAt: 'desc' },
+48:      take: 200,
+49:    });
+50:    return { ok: true, data };
+51:  }
+52:
+53:  @Get('documents/:id')
+54:  async document(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
+55:    const company = await this.ctx.requireCompany(user);
+56:    const data = await this.prisma.erpSalesDocument.findFirst({
+57:      where: { id, companyId: company.id },
+58:      include: { party: true, lines: { include: { product: true } }, receivable: true },
+59:    });
+60:    if (!data) throw new BadRequestException('مستند البيع غير موجود');
+61:    return { ok: true, data };
+62:  }
+63:
+64:  @Get('parties')
+65:  async parties(@CurrentUser() user: JwtPayload) {
+66:    const company = await this.ctx.requireCompany(user);
+67:    const data = await this.prisma.erpParty.findMany({
+68:      where: { companyId: company.id, deletedAt: null, type: { in: ['customer', 'both'] } },
+69:      orderBy: { name: 'asc' },
+70:    });
+71:    return { ok: true, data };
+72:  }
+73:
+74:  @Post('parties')
+75:  async createParty(@CurrentUser() user: JwtPayload, @Body() body: unknown) {
+76:    const company = await this.ctx.requireCompany(user);
+77:    const input = createPartySchema.parse({ type: 'customer', ...(body as Record<string, unknown>) });
+78:    const data = await this.prisma.erpParty.create({ data: { companyId: company.id, ...input, email: input.email || null } });
+79:    return { ok: true, data };
+80:  }
+81:
+82:  @Post('documents')
+83:  async createDocument(@CurrentUser() user: JwtPayload, @Body() body: unknown) {
+84:    const company = await this.ctx.requireCompany(user);
+85:    const input = createSalesDocSchema.parse(body);
+86:    const party = await this.prisma.erpParty.findFirst({ where: { id: input.partyId, companyId: company.id, deletedAt: null, type: { in: ['customer', 'both'] } } });
+87:    if (!party) throw new BadRequestException('العميل غير موجود');
+88:
+89:    for (const line of input.lines) {
+90:      if (!line.productId) continue;
+91:      const product = await this.prisma.erpProduct.findFirst({ where: { id: line.productId, companyId: company.id, deletedAt: null } });
+92:      if (!product) throw new BadRequestException('صنف غير موجود في الفاتورة');
+93:    }
+94:
+95:    const ref = input.ref ?? this.ctx.nextRef('SAL');
+96:    const lines = input.lines.map((l) => ({ productId: l.productId || null, description: l.description, quantity: l.quantity, unitPrice: l.unitPrice, lineTotal: l.quantity * l.unitPrice }));
+97:    const subtotal = lines.reduce((s, l) => s + l.lineTotal, 0);
+98:    const data = await this.prisma.erpSalesDocument.create({
+99:      data: { companyId: company.id, partyId: input.partyId, type: input.type, ref, note: input.note, subtotal, grandTotal: subtotal, lines: { create: lines } },
+100:      include: { lines: { include: { product: true } }, party: true },
+101:    });
+102:    return { ok: true, data };
+103:  }
+104:
+105:  @Patch('documents/:id/post')
+106:  async postDocument(@CurrentUser() user: JwtPayload, @Param('id') id: string, @Body() body: unknown) {
+107:    const company = await this.ctx.requireCompany(user);
+108:    const input = postDocumentSchema.parse(body ?? {});
+109:    const result = await this.prisma.$transaction(async (tx) => {
+110:      const doc = await tx.erpSalesDocument.findFirst({
+111:        where: { id, companyId: company.id },
+112:        include: { lines: { include: { product: true } }, receivable: true },
+113:      });
+114:      if (!doc) throw new BadRequestException('فاتورة البيع غير موجودة');
+115:      if (doc.status === 'posted') return doc;
+116:      if (doc.status === 'cancelled') throw new BadRequestException('لا يمكن ترحيل فاتورة ملغاة');
+117:
+118:      const stockLines = doc.lines.filter((l) => l.productId && l.product?.type === 'stock');
+119:      if (stockLines.length > 0 && !input.warehouseId) throw new BadRequestException('يجب إرسال warehouseId لترحيل أصناف مخزنية');
+120:
+121:      for (const line of stockLines) {
+122:        const level = await tx.erpStockLevel.findUnique({ where: { productId_warehouseId: { productId: line.productId as string, warehouseId: input.warehouseId as string } } });
+123:        const current = level ? Number(level.quantity) : 0;
+124:        const qty = Number(line.quantity);
+125:        if (current < qty) throw new BadRequestException(`رصيد الصنف ${line.product?.sku ?? line.description} غير كافٍ`);
+126:        if (level) await tx.erpStockLevel.update({ where: { id: level.id }, data: { quantity: current - qty } });
+127:        await tx.erpStockMovement.create({
+128:          data: { companyId: company.id, productId: line.productId as string, warehouseId: input.warehouseId as string, type: 'out', quantity: qty, refType: 'sales_invoice', refId: doc.id, note: `بيع ${doc.ref}`, createdBy: user.sub },
+129:        });
+130:      }
+131:
+132:      if (doc.type === 'invoice' && !doc.receivable) {
+133:        await tx.erpReceivable.create({
+134:          data: { companyId: company.id, partyId: doc.partyId, salesDocId: doc.id, ref: `REC-${doc.ref}`, amount: doc.grandTotal, dueDate: doc.dueDate },
+135:        });
+136:        await this.createJournalForSale(tx, company.id, doc.ref, Number(doc.grandTotal), user.sub);
+137:      }
+138:
+139:      await tx.erpWorkflowInstance.create({
+140:        data: { companyId: company.id, module: 'sales', entityType: 'sales_document', entityId: doc.id, currentStep: 'posted', status: 'done', metadata: { ref: doc.ref } },
+141:      }).catch(() => undefined);
+142:
+143:      return tx.erpSalesDocument.update({ where: { id: doc.id }, data: { status: 'posted' }, include: { party: true, lines: { include: { product: true } }, receivable: true } });
+144:    });
+145:    return { ok: true, data: result };
+146:  }
+147:}
+148:
+
+==============================
+delete search in erp-sales.controller.ts
+==============================
+18:    return tx.erpAccount.findFirst({ where: { companyId, code, deletedAt: null, isActive: true } });
+68:      where: { companyId: company.id, deletedAt: null, type: { in: ['customer', 'both'] } },
+86:    const party = await this.prisma.erpParty.findFirst({ where: { id: input.partyId, companyId: company.id, deletedAt: null, type: { in: ['customer', 'both'] } } });
+91:      const product = await this.prisma.erpProduct.findFirst({ where: { id: line.productId, companyId: company.id, deletedAt: null } });
+
+==============================
+proxy route
+==============================
+1:import { NextResponse } from 'next/server';
+2:import { getToken } from '@/lib/auth';
+3:
+4:export const dynamic = 'force-dynamic';
+5:
+6:type RouteContext = {
+7:  params: Promise<{
+8:    path?: string[];
+9:  }>;
+10:};
+11:
+12:async function proxy(request: Request, context: RouteContext) {
+13:  const token = await getToken();
+14:
+15:  if (!token) {
+16:    return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+17:  }
+18:
+19:  const { path = [] } = await context.params;
+20:  const sourceUrl = new URL(request.url);
+21:  const baseUrl = process.env.MATRIX_API_URL || 'http://127.0.0.1:4000';
+22:  const targetUrl = `${baseUrl}/api/v1/erp/${path.join('/')}${sourceUrl.search}`;
+23:
+24:  const headers = new Headers();
+25:  headers.set('Authorization', `Bearer ${token}`);
+26:
+27:  const contentType = request.headers.get('content-type');
+28:  if (contentType) headers.set('Content-Type', contentType);
+29:
+30:  const init: RequestInit = {
+31:    method: request.method,
+32:    headers,
+33:    cache: 'no-store',
+34:  };
+35:
+36:  if (request.method !== 'GET' && request.method !== 'HEAD') {
+37:    const body = await request.text();
+38:    if (body) init.body = body;
+39:  }
+40:
+41:  const response = await fetch(targetUrl, init);
+42:  const text = await response.text();
+43:
+44:  return new NextResponse(text, {
+45:    status: response.status,
+46:    headers: {
+47:      'Content-Type': response.headers.get('content-type') || 'application/json',
+48:    },
+49:  });
+50:}
+51:
+52:export function GET(request: Request, context: RouteContext) {
+53:  return proxy(request, context);
+54:}
+55:
+56:export function POST(request: Request, context: RouteContext) {
+57:  return proxy(request, context);
+58:}
+59:
+60:export function PATCH(request: Request, context: RouteContext) {
+61:  return proxy(request, context);
+62:}
+63:
+64:export function PUT(request: Request, context: RouteContext) {
+65:  return proxy(request, context);
+66:}
+67:
+68:export function DELETE(request: Request, context: RouteContext) {
+69:  return proxy(request, context);
+70:}
+
+==============================
+customers ui delete code
+==============================
+72:  async function deleteCustomer(customer: Customer) {
+82:      await erpApi('sales/parties/' + customer.id, {
+83:        method: 'DELETE',
+172:                onClick={() => void deleteCustomer(customer)}

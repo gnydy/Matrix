@@ -1,0 +1,760 @@
+'use client';
+
+import type { CSSProperties, ReactNode } from 'react';
+import Link from 'next/link';
+import { useSiteSettings } from '../../i18n/site/client';
+
+export type MarketingSection =
+  | 'services'
+  | 'erp'
+  | 'packages'
+  | 'about'
+  | 'ourWork'
+  | 'contact';
+
+function palette(isLight: boolean) {
+  return {
+    bg: isLight ? '#f8fafc' : '#020617',
+    card: isLight ? '#ffffff' : '#0f172a',
+    text: isLight ? '#0f172a' : '#e5e7eb',
+    title: isLight ? '#0f172a' : '#f8fafc',
+    muted: isLight ? '#64748b' : '#94a3b8',
+    border: isLight ? '#e2e8f0' : 'rgba(148, 163, 184, 0.18)',
+    tag: isLight ? '#f1f5f9' : '#1e293b',
+    blue: isLight ? '#2563eb' : '#60a5fa',
+    blueSoft: isLight ? '#dbeafe' : 'rgba(37, 99, 235, 0.18)',
+  };
+}
+
+function PageShell({
+  badge,
+  title,
+  description,
+  children,
+  isLight,
+  dir,
+  locale,
+}: {
+  badge: string;
+  title: string;
+  description: string;
+  children: ReactNode;
+  isLight: boolean;
+  dir: 'rtl' | 'ltr';
+  locale: 'ar' | 'en';
+}) {
+  const c = palette(isLight);
+
+  return (
+    <main
+      lang={locale}
+      dir={dir}
+      style={{
+        minHeight: '100vh',
+        background: isLight
+          ? 'linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%)'
+          : 'radial-gradient(circle at top right, rgba(37, 99, 235, 0.20), transparent 34rem), #020617',
+        color: c.text,
+        padding: '72px 0',
+      }}
+    >
+      <section
+        style={{
+          width: 'min(1180px, calc(100% - 32px))',
+          margin: '0 auto',
+        }}
+      >
+        <div
+          style={{
+            display: 'inline-flex',
+            padding: '8px 14px',
+            borderRadius: 999,
+            background: c.blueSoft,
+            color: c.blue,
+            fontWeight: 900,
+            marginBottom: 20,
+          }}
+        >
+          {badge}
+        </div>
+
+        <h1
+          style={{
+            maxWidth: 950,
+            margin: 0,
+            color: c.title,
+            fontSize: 'clamp(38px, 6vw, 72px)',
+            lineHeight: 1.08,
+            letterSpacing: '-0.05em',
+            fontWeight: 950,
+          }}
+        >
+          {title}
+        </h1>
+
+        <p
+          style={{
+            maxWidth: 820,
+            marginTop: 20,
+            color: c.muted,
+            fontSize: 18,
+            lineHeight: 1.9,
+          }}
+        >
+          {description}
+        </p>
+
+        <div style={{ marginTop: 44 }}>{children}</div>
+      </section>
+    </main>
+  );
+}
+
+function Card({
+  title,
+  description,
+  meta,
+  isLight,
+  href,
+}: {
+  title: string;
+  description: string;
+  meta?: string;
+  isLight: boolean;
+  href?: string;
+}) {
+  const c = palette(isLight);
+
+  const style: CSSProperties = {
+    display: 'block',
+    padding: 24,
+    borderRadius: 24,
+    background: c.card,
+    border: `1px solid ${c.border}`,
+    color: c.text,
+    textDecoration: 'none',
+    boxShadow: isLight
+      ? '0 22px 60px rgba(15, 23, 42, 0.08)'
+      : '0 22px 60px rgba(0, 0, 0, 0.22)',
+  };
+
+  const content = (
+    <>
+      {meta ? (
+        <span
+          style={{
+            display: 'inline-flex',
+            marginBottom: 12,
+            color: c.blue,
+            fontWeight: 900,
+            fontSize: 13,
+          }}
+        >
+          {meta}
+        </span>
+      ) : null}
+
+      <h2
+        style={{
+          margin: 0,
+          color: c.title,
+          fontSize: 24,
+          lineHeight: 1.25,
+        }}
+      >
+        {title}
+      </h2>
+
+      <p
+        style={{
+          margin: '14px 0 0',
+          color: c.muted,
+          lineHeight: 1.8,
+        }}
+      >
+        {description}
+      </p>
+    </>
+  );
+
+  return href ? (
+    <Link href={href} style={style}>
+      {content}
+    </Link>
+  ) : (
+    <article style={style}>{content}</article>
+  );
+}
+
+function Grid({ children }: { children: ReactNode }) {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+        gap: 18,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+
+function FinalCta({
+  title,
+  description,
+  button,
+  isLight,
+}: {
+  title: string;
+  description: string;
+  button: string;
+  isLight: boolean;
+}) {
+  const c = palette(isLight);
+
+  return (
+    <div
+      style={{
+        marginTop: 46,
+        padding: 30,
+        borderRadius: 28,
+        background: isLight
+          ? 'linear-gradient(135deg, #ffffff, #eff6ff)'
+          : 'linear-gradient(135deg, #0f172a, #1e3a8a)',
+        border: `1px solid ${c.border}`,
+        textAlign: 'center',
+      }}
+    >
+      <h2
+        style={{
+          margin: 0,
+          color: c.title,
+          fontSize: 'clamp(28px, 4vw, 44px)',
+          lineHeight: 1.15,
+        }}
+      >
+        {title}
+      </h2>
+
+      <p
+        style={{
+          maxWidth: 720,
+          margin: '16px auto 0',
+          color: c.muted,
+          lineHeight: 1.9,
+          fontSize: 17,
+        }}
+      >
+        {description}
+      </p>
+
+      <Link
+        href="/request-system"
+        style={{
+          minHeight: 54,
+          marginTop: 24,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '0 26px',
+          borderRadius: 16,
+          background: '#3b82f6',
+          color: 'white',
+          textDecoration: 'none',
+          fontWeight: 950,
+          boxShadow: '0 16px 36px rgba(59, 130, 246, 0.35)',
+        }}
+      >
+        {button}
+      </Link>
+    </div>
+  );
+}
+
+export function TranslatedPage({ section }: { section: MarketingSection }) {
+  const { copy, locale, dir, isLight } = useSiteSettings();
+  const c = palette(isLight);
+
+  if (section === 'services') {
+    const data = copy.services;
+
+    return (
+      <PageShell
+        badge={data.badge}
+        title={data.title}
+        description={data.description}
+        isLight={isLight}
+        dir={dir}
+        locale={locale}
+      >
+        <Grid>
+          {data.items.map((item) => (
+            <Card
+              key={item.title}
+              title={item.title}
+              description={item.description}
+              isLight={isLight}
+            />
+          ))}
+        </Grid>
+
+        <FinalCta
+          isLight={isLight}
+          title={locale === 'ar' ? 'جاهز تطلب عرض مناسب لشركتك؟' : 'Ready to request a quote?'}
+          description={
+            locale === 'ar'
+              ? 'ارسل لنا احتياجك الآن، وسنراجع التفاصيل ونقترح عليك أفضل حل مناسب لشركتك.'
+              : 'Send us your requirements now, and we will review the details and suggest the best solution for your company.'
+          }
+          button={locale === 'ar' ? 'اطلب عرض' : 'Request a quote'}
+        />
+      </PageShell>
+    );
+  }
+  if (section === 'erp') {
+    const data = copy.erp;
+    const erpData = data as typeof data & {
+      modulesTitle?: string;
+      modulesDescription?: string;
+      modules?: {
+        title: string;
+        category: string;
+        description: string;
+      }[];
+    };
+
+    const modules =
+      erpData.modules ??
+      data.features.map((feature) => ({
+        title: feature,
+        category: locale === 'ar' ? 'ميزة أساسية' : 'Core Feature',
+        description:
+          locale === 'ar'
+            ? 'ميزة أساسية ضمن نظام ERP قابل للتوسع.'
+            : 'A core capability inside a scalable ERP system.',
+      }));
+
+    return (
+      <PageShell
+        badge={data.badge}
+        title={data.title}
+        description={data.description}
+        isLight={isLight}
+        dir={dir}
+        locale={locale}
+      >
+        <div style={{ marginBottom: 26 }}>
+          <h2 style={{ margin: 0, color: c.title, fontSize: 32 }}>
+            {erpData.modulesTitle ?? (locale === 'ar' ? 'موديولات ERP' : 'ERP Modules')}
+          </h2>
+
+          <p style={{ maxWidth: 860, color: c.muted, lineHeight: 1.9 }}>
+            {erpData.modulesDescription ??
+              (locale === 'ar'
+                ? 'مجموعة موديولات قابلة للتنفيذ حسب احتياج الشركة.'
+                : 'A set of modules that can be implemented based on company needs.')}
+          </p>
+        </div>
+
+        <Grid>
+          {modules.map((module) => (
+            <Card
+              key={`${module.category}-${module.title}`}
+              title={module.title}
+              meta={module.category}
+              description={module.description}
+              isLight={isLight}
+            />
+          ))}
+        </Grid>
+
+        <FinalCta
+          isLight={isLight}
+          title={locale === 'ar' ? 'هل تريد ERP مناسب لطبيعة شركتك؟' : 'Need an ERP built for your company?'}
+          description={
+            locale === 'ar'
+              ? 'ارسل طلبك الآن، وسنحدد معك الموديولات المناسبة، مراحل التنفيذ، وأفضل شكل للنظام حسب شركتك.'
+              : 'Send your request now, and we will define the right modules, implementation phases, and system structure for your company.'
+          }
+          button={locale === 'ar' ? 'اطلب عرض' : 'Request a quote'}
+        />
+      </PageShell>
+    );
+  }
+  if (section === 'packages') {
+    const data = copy.packages as typeof copy.packages & {
+      note?: string;
+      addonsTitle?: string;
+      addons?: string[];
+      plans?: {
+        title: string;
+        name?: string;
+        subtitle?: string;
+        priceLabelAr?: string;
+        priceLabelEn?: string;
+        bestFor?: string;
+        description: string;
+        scope?: string[];
+        flexibility?: string[];
+        features?: string[];
+        cta?: string;
+      }[];
+    };
+
+    const plans = data.plans ?? [];
+
+    return (
+      <PageShell
+        badge={data.badge}
+        title={data.title}
+        description={data.description}
+        isLight={isLight}
+        dir={dir}
+        locale={locale}
+      >
+        {data.note ? (
+          <div
+            style={{
+              marginBottom: 28,
+              padding: 22,
+              borderRadius: 22,
+              background: isLight ? '#eff6ff' : 'rgba(37, 99, 235, 0.12)',
+              border: `1px solid ${c.border}`,
+              color: c.muted,
+              lineHeight: 1.9,
+              fontWeight: 800,
+            }}
+          >
+            {data.note}
+          </div>
+        ) : null}
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
+            gap: 18,
+          }}
+        >
+          {plans.map((plan) => (
+            <div
+              key={plan.title}
+              style={{
+                padding: 24,
+                borderRadius: 28,
+                background: c.card,
+                border: `1px solid ${c.border}`,
+                boxShadow: isLight
+                  ? '0 18px 48px rgba(15, 23, 42, 0.07)'
+                  : '0 18px 48px rgba(0, 0, 0, 0.22)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 16,
+              }}
+            >
+              <div>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    padding: '7px 11px',
+                    borderRadius: 999,
+                    background: isLight ? '#dbeafe' : 'rgba(59, 130, 246, 0.16)',
+                    color: '#3b82f6',
+                    fontWeight: 950,
+                    fontSize: 13,
+                  }}
+                >
+                  {plan.subtitle ?? plan.name ?? plan.title}
+                </span>
+
+                <h2
+                  style={{
+                    margin: '14px 0 0',
+                    color: c.title,
+                    fontSize: 30,
+                    letterSpacing: '-0.04em',
+                  }}
+                >
+                  {plan.title}
+                </h2>
+
+                <strong
+                  style={{
+                    display: 'block',
+                    marginTop: 10,
+                    color: c.title,
+                    fontSize: 18,
+                  }}
+                >
+                  {locale === 'ar'
+                    ? plan.priceLabelAr ?? 'عرض مخصص'
+                    : plan.priceLabelEn ?? 'Custom quote'}
+                </strong>
+              </div>
+
+              <p style={{ margin: 0, color: c.muted, lineHeight: 1.85 }}>
+                {plan.description}
+              </p>
+
+              {plan.bestFor ? (
+                <div
+                  style={{
+                    padding: 14,
+                    borderRadius: 16,
+                    background: isLight ? '#f8fafc' : 'rgba(2, 6, 23, 0.45)',
+                    border: `1px solid ${c.border}`,
+                    color: c.muted,
+                    lineHeight: 1.75,
+                  }}
+                >
+                  <strong style={{ color: c.title }}>
+                    {locale === 'ar' ? 'مناسبة لـ: ' : 'Best for: '}
+                  </strong>
+                  {plan.bestFor}
+                </div>
+              ) : null}
+
+              {plan.scope?.length ? (
+                <div>
+                  <h3 style={{ color: c.title, margin: '0 0 10px' }}>
+                    {locale === 'ar' ? 'يشمل' : 'Includes'}
+                  </h3>
+                  <ul style={{ margin: 0, paddingInlineStart: 20, color: c.muted, lineHeight: 1.9 }}>
+                    {plan.scope.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+
+              {plan.flexibility?.length ? (
+                <div>
+                  <h3 style={{ color: c.title, margin: '0 0 10px' }}>
+                    {locale === 'ar' ? 'مرونة الباقة' : 'Flexibility'}
+                  </h3>
+                  <ul style={{ margin: 0, paddingInlineStart: 20, color: c.muted, lineHeight: 1.9 }}>
+                    {plan.flexibility.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+
+              <Link
+                href="/request-system"
+                style={{
+                  marginTop: 'auto',
+                  minHeight: 50,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 15,
+                  background: '#3b82f6',
+                  color: 'white',
+                  textDecoration: 'none',
+                  fontWeight: 950,
+                }}
+              >
+                {locale === 'ar' ? 'اطلب عرض' : 'Request a quote'}
+              </Link>
+            </div>
+          ))}
+        </div>
+
+        {data.addons?.length ? (
+          <div
+            style={{
+              marginTop: 34,
+              padding: 26,
+              borderRadius: 28,
+              background: c.card,
+              border: `1px solid ${c.border}`,
+            }}
+          >
+            <h2 style={{ margin: 0, color: c.title, fontSize: 32 }}>
+              {data.addonsTitle ?? (locale === 'ar' ? 'إضافات مرنة' : 'Flexible add-ons')}
+            </h2>
+
+            <div
+              style={{
+                marginTop: 18,
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 10,
+              }}
+            >
+              {data.addons.map((addon) => (
+                <span
+                  key={addon}
+                  style={{
+                    display: 'inline-flex',
+                    padding: '10px 13px',
+                    borderRadius: 999,
+                    background: isLight ? '#f8fafc' : 'rgba(2, 6, 23, 0.45)',
+                    border: `1px solid ${c.border}`,
+                    color: c.title,
+                    fontWeight: 850,
+                  }}
+                >
+                  {addon}
+                </span>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        <FinalCta
+          isLight={isLight}
+          title={locale === 'ar' ? 'اختر ما يناسبك أو اطلب باقة مخصصة بالكامل' : 'Choose a package or request a fully custom one'}
+          description={
+            locale === 'ar'
+              ? 'ارسل لنا طبيعة شركتك واحتياجك، وسنقترح عليك الباقة الأنسب بدون حشو أو تكلفة غير ضرورية.'
+              : 'Send us your company type and requirements, and we will suggest the right package without unnecessary scope or cost.'
+          }
+          button={locale === 'ar' ? 'اطلب عرض' : 'Request a quote'}
+        />
+      </PageShell>
+    );
+  }
+  if (section === 'about') {
+    const data = copy.about;
+
+    return (
+      <PageShell
+        badge={data.badge}
+        title={data.title}
+        description={data.description}
+        isLight={isLight}
+        dir={dir}
+        locale={locale}
+      >
+        <Grid>
+          <Card
+            title={copy.services.items[0].title}
+            description={copy.services.items[0].description}
+            isLight={isLight}
+          />
+          <Card
+            title={copy.services.items[1].title}
+            description={copy.services.items[1].description}
+            isLight={isLight}
+          />
+          <Card
+            title={copy.services.items[2].title}
+            description={copy.services.items[2].description}
+            isLight={isLight}
+          />
+        </Grid>
+      </PageShell>
+    );
+  }
+
+  if (section === 'ourWork') {
+    const data = copy.ourWork;
+
+    return (
+      <PageShell
+        badge={data.badge}
+        title={data.title}
+        description={data.description}
+        isLight={isLight}
+        dir={dir}
+        locale={locale}
+      >
+        <Grid>
+          {data.projects.map((project) => (
+            <Card
+              key={project.slug}
+              title={project.title}
+              meta={project.category}
+              description={project.description}
+              isLight={isLight}
+              href={`/our-work/${project.slug}`}
+            />
+          ))}
+        </Grid>
+      </PageShell>
+    );
+  }
+
+  const data = copy.contact;
+
+  return (
+    <PageShell
+      badge={data.badge}
+      title={data.title}
+      description={data.description}
+      isLight={isLight}
+      dir={dir}
+      locale={locale}
+    >
+      <form
+        onSubmit={(event) => event.preventDefault()}
+        style={{
+          maxWidth: 760,
+          padding: 24,
+          borderRadius: 26,
+          background: c.card,
+          border: `1px solid ${c.border}`,
+          display: 'grid',
+          gap: 14,
+        }}
+      >
+        {[
+          { label: data.name, type: 'text' },
+          { label: data.phone, type: 'tel' },
+          { label: data.email, type: 'email' },
+        ].map((field) => (
+          <label key={field.label} style={{ display: 'grid', gap: 8, color: c.text }}>
+            <span style={{ fontWeight: 900 }}>{field.label}</span>
+            <input
+              type={field.type}
+              style={{
+                minHeight: 48,
+                borderRadius: 14,
+                border: `1px solid ${c.border}`,
+                background: isLight ? '#ffffff' : '#020617',
+                color: c.text,
+                padding: '0 14px',
+                outline: 'none',
+              }}
+            />
+          </label>
+        ))}
+
+        <label style={{ display: 'grid', gap: 8, color: c.text }}>
+          <span style={{ fontWeight: 900 }}>{data.message}</span>
+          <textarea
+            rows={6}
+            style={{
+              borderRadius: 14,
+              border: `1px solid ${c.border}`,
+              background: isLight ? '#ffffff' : '#020617',
+              color: c.text,
+              padding: 14,
+              outline: 'none',
+              resize: 'vertical',
+            }}
+          />
+        </label>
+
+        <button
+          type="submit"
+          style={{
+            minHeight: 52,
+            border: 0,
+            borderRadius: 14,
+            background: '#3b82f6',
+            color: 'white',
+            fontWeight: 900,
+            cursor: 'pointer',
+          }}
+        >
+          {data.submit}
+        </button>
+      </form>
+    </PageShell>
+  );
+}

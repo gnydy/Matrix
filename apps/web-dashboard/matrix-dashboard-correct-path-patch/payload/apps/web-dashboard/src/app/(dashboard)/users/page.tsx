@@ -1,0 +1,1 @@
+import { requireDashboardSession } from '@/lib/auth';import { canAccessResource } from '@/lib/permissions';import { UsersManager } from '@/components/users-manager';export default async function UsersPage(){const s=await requireDashboardSession();if(!canAccessResource(s.user.role,'users','read'))return <div className="errorBox">غير مصرح.</div>;return <UsersManager/>}

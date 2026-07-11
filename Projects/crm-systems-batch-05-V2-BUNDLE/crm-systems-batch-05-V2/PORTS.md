@@ -1,0 +1,22 @@
+# Ports — CRM Systems Batch 05 V2
+
+- http://localhost:3080 — Pipeline Command CRM — `pipeline-command-crm`
+- http://localhost:3081 — Account 360 CRM — `account-360-crm`
+- http://localhost:3082 — Field Sales CRM — `field-sales-crm`
+- http://localhost:3083 — Real Estate Leads CRM — `real-estate-leads-crm`
+- http://localhost:3084 — Medical Patient CRM — `medical-patient-crm`
+- http://localhost:3085 — Agency Client CRM — `agency-client-crm`
+- http://localhost:3086 — SaaS Revenue CRM — `saas-revenue-crm`
+- http://localhost:3087 — Support Sales CRM — `support-sales-crm`
+- http://localhost:3088 — Automotive Dealer CRM — `automotive-dealer-crm`
+- http://localhost:3089 — Education Admissions CRM — `education-admissions-crm`
+- http://localhost:3090 — Legal Client CRM — `legal-client-crm`
+- http://localhost:3091 — Fintech Investor CRM — `fintech-investor-crm`
+- http://localhost:3092 — Hospitality Guest CRM — `hospitality-guest-crm`
+- http://localhost:3093 — Construction Bid CRM — `construction-bid-crm`
+- http://localhost:3094 — E-commerce Retention CRM — `ecommerce-retention-crm`
+- http://localhost:3095 — HR Recruitment CRM — `hr-recruitment-crm`
+- http://localhost:3096 — Nonprofit Donor CRM — `nonprofit-donor-crm`
+- http://localhost:3097 — Insurance Broker CRM — `insurance-broker-crm`
+- http://localhost:3098 — Manufacturing B2B CRM — `manufacturing-b2b-crm`
+- http://localhost:3099 — Executive Sales War Room — `executive-sales-war-room`

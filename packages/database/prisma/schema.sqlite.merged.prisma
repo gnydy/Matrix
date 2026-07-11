@@ -1,0 +1,995 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum LeadStatus {
+  new
+  contacted
+  needs_review
+  qualified
+  proposal_sent
+  won
+  lost
+  archived
+}
+
+enum LeadSource {
+  request
+  contact
+  calculator
+  whatsapp
+}
+
+model VisitorSession {
+  id          String     @id @default(cuid())
+  visitorId   String
+  firstSeenAt DateTime   @default(now())
+  lastSeenAt  DateTime   @updatedAt
+  userAgent   String?
+  referrer    String?
+  locale      String?
+  isActive    Boolean    @default(true)
+  pageViews   PageView[]
+  events      SiteEvent[]
+  leads       Lead[]
+
+  @@index([visitorId])
+  @@index([lastSeenAt])
+  @@index([isActive])
+}
+
+model PageView {
+  id          String         @id @default(cuid())
+  sessionId   String
+  session     VisitorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  path        String
+  title       String?
+  enteredAt   DateTime       @default(now())
+  leftAt      DateTime?
+  durationSec Int?
+
+  @@index([sessionId])
+  @@index([path])
+  @@index([enteredAt])
+}
+
+model SiteEvent {
+  id        String         @id @default(cuid())
+  sessionId String
+  session   VisitorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  type      String
+  path      String?
+  metadata  Json?
+  createdAt DateTime       @default(now())
+
+  @@index([sessionId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model Lead {
+  id          String        @id @default(cuid())
+  ref         String        @unique
+  source      LeadSource
+  status      LeadStatus    @default(new)
+  name        String
+  company     String?
+  phone       String?
+  email       String?
+  requestType String?
+  planId      String?
+  modules     Json          @default("[]")
+  message     String?
+  sessionId   String?
+  session     VisitorSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  notes       LeadNote[]
+  customer    Customer?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([status])
+  @@index([source])
+  @@index([createdAt])
+  @@index([sessionId])
+}
+
+model LeadNote {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  body      String
+  author    String   @default("admin")
+  createdAt DateTime @default(now())
+
+  @@index([leadId])
+}
+
+enum CustomerDeployment {
+  saas
+  dedicated
+  on_premise
+}
+
+enum CustomerStatus {
+  onboarding
+  active
+  suspended
+  churned
+}
+
+model Customer {
+  id             String             @id @default(cuid())
+  code           String             @unique
+  name           String
+  company        String?
+  phone          String?
+  email          String?
+  deploymentType CustomerDeployment @default(saas)
+  status         CustomerStatus     @default(onboarding)
+  planId         String?
+  leadId         String?            @unique
+  lead           Lead?              @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  notes          CustomerNote[]
+  quotes         Quote[]
+  payments       Payment[]
+  projects       Project[]
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  @@index([status])
+  @@index([deploymentType])
+  @@index([createdAt])
+}
+
+model CustomerNote {
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  body       String
+  author     String   @default("admin")
+  createdAt  DateTime @default(now())
+
+  @@index([customerId])
+}
+
+enum QuoteStatus {
+  draft
+  sent
+  accepted
+  rejected
+  expired
+}
+
+model Quote {
+  id          String      @id @default(cuid())
+  number      String      @unique
+  customerId  String
+  customer    Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  title       String?
+  description String?
+  amount      Float?
+  currency    String      @default("EGP")
+  status      QuoteStatus @default(draft)
+  validUntil  DateTime?
+  sentAt      DateTime?
+  acceptedAt  DateTime?
+  payment     Payment?
+  project     Project?
+  notes       QuoteNote[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([customerId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model QuoteNote {
+  id        String   @id @default(cuid())
+  quoteId   String
+  quote     Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  body      String
+  author    String   @default("admin")
+  createdAt DateTime @default(now())
+
+  @@index([quoteId])
+}
+
+enum PaymentStatus {
+  pending
+  recorded
+  overdue
+  cancelled
+}
+
+model Payment {
+  id         String        @id @default(cuid())
+  ref        String        @unique
+  customerId String
+  customer   Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  quoteId    String?       @unique
+  quote      Quote?        @relation(fields: [quoteId], references: [id], onDelete: SetNull)
+  amount     Float
+  currency   String        @default("EGP")
+  status     PaymentStatus @default(pending)
+  dueDate    DateTime?
+  paidAt     DateTime?
+  method     String?
+  notes      String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([customerId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([createdAt])
+}
+
+enum ProjectStatus {
+  planning
+  in_progress
+  on_hold
+  completed
+  cancelled
+}
+
+model Project {
+  id          String         @id @default(cuid())
+  code        String         @unique
+  name        String
+  customerId  String
+  customer    Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  quoteId     String?        @unique
+  quote       Quote?         @relation(fields: [quoteId], references: [id], onDelete: SetNull)
+  status      ProjectStatus  @default(planning)
+  description String?
+  startDate   DateTime?
+  dueDate     DateTime?
+  milestones  ProjectMilestone[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([customerId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ProjectMilestone {
+  id        String        @id @default(cuid())
+  projectId String
+  project   Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title     String
+  done      Boolean       @default(false)
+  dueDate   DateTime?
+  sortOrder Int           @default(0)
+  tasks     ProjectTask[]
+  createdAt DateTime      @default(now())
+
+  @@index([projectId])
+}
+
+model ProjectTask {
+  id          String           @id @default(cuid())
+  milestoneId String
+  milestone   ProjectMilestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  title       String
+  done        Boolean          @default(false)
+  sortOrder   Int              @default(0)
+  createdAt   DateTime         @default(now())
+
+  @@index([milestoneId])
+}
+
+enum AdminRole {
+  owner
+  admin
+  sales
+  project_manager
+  accountant
+}
+
+model AdminUser {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String
+  role      AdminRole @default(admin)
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([role])
+  @@index([active])
+}
+
+model LoginAudit {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email     String
+  success   Boolean
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([email])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String?
+  actor     String   @default("admin")
+  userId    String?
+  tenantId  String?
+  ip        String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([entity])
+  @@index([userId])
+  @@index([tenantId])
+  @@index([createdAt])
+}
+
+enum UserStatus {
+  active
+  suspended
+  invited
+}
+
+model Tenant {
+  id           String       @id @default(cuid())
+  name         String
+  slug         String       @unique
+  status       String       @default("active")
+  users        User[]
+  erpCompanies ErpCompany[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([status])
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  name         String
+  status       UserStatus @default(active)
+  tenantId     String?
+  tenant       Tenant?    @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  roles        UserRole[]
+  loginAudits  LoginAudit[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  deletedAt    DateTime?
+
+  @@index([tenantId])
+  @@index([status])
+}
+
+model Role {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  permissions Json       @default("[]")
+  users       UserRole[]
+  createdAt   DateTime   @default(now())
+
+  @@index([slug])
+}
+
+model UserRole {
+  userId String
+  roleId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+
+// ─── ERP Core ───────────────────────────────────────────────
+
+enum ErpCompanyStatus {
+  active
+  suspended
+  archived
+}
+
+enum ErpFiscalYearStatus {
+  open
+  closed
+}
+
+model ErpCompany {
+  id        String           @id @default(cuid())
+  tenantId  String
+  tenant    Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name      String
+  legalName String?
+  taxId     String?
+  currency  String           @default("SAR")
+  status    ErpCompanyStatus @default(active)
+  branches  ErpBranch[]
+  fiscalYears ErpFiscalYear[]
+  products  ErpProduct[]
+  warehouses ErpWarehouse[]
+  parties   ErpParty[]
+  accounts  ErpAccount[]
+  employees ErpEmployee[]
+  deletedAt DateTime?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@index([tenantId])
+  @@index([status])
+}
+
+model ErpBranch {
+  id          String     @id @default(cuid())
+  companyId   String
+  company     ErpCompany @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name        String
+  code        String?
+  address     String?
+  departments ErpDepartment[]
+  warehouses  ErpWarehouse[]
+  deletedAt   DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([companyId])
+}
+
+model ErpDepartment {
+  id        String     @id @default(cuid())
+  branchId  String
+  branch    ErpBranch  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  name      String
+  employees ErpEmployee[]
+  deletedAt DateTime?
+  createdAt DateTime   @default(now())
+
+  @@index([branchId])
+}
+
+model ErpFiscalYear {
+  id        String              @id @default(cuid())
+  companyId String
+  company   ErpCompany          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name      String
+  startsOn  DateTime
+  endsOn    DateTime
+  status    ErpFiscalYearStatus @default(open)
+  createdAt DateTime            @default(now())
+
+  @@index([companyId])
+  @@index([status])
+}
+
+// ─── Inventory ──────────────────────────────────────────────
+
+enum ErpProductType {
+  stock
+  service
+}
+
+enum ErpStockMovementType {
+  in
+  out
+  adjust
+  transfer
+}
+
+enum ErpStockAuditStatus {
+  draft
+  counting
+  posted
+  cancelled
+}
+
+model ErpProduct {
+  id          String         @id @default(cuid())
+  companyId   String
+  company     ErpCompany     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  sku         String
+  name        String
+  unit        String         @default("pcs")
+  type        ErpProductType @default(stock)
+  costPrice   Decimal        @default(0)
+  salePrice   Decimal        @default(0)
+  minStock    Decimal        @default(0)
+  stockLevels ErpStockLevel[]
+  movements   ErpStockMovement[]
+  auditLines  ErpStockAuditLine[]
+  salesLines  ErpSalesLine[]
+  purchaseLines ErpPurchaseLine[]
+  deletedAt   DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@unique([companyId, sku])
+  @@index([companyId])
+}
+
+model ErpWarehouse {
+  id        String     @id @default(cuid())
+  companyId String
+  company   ErpCompany @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  branchId  String?
+  branch    ErpBranch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  name      String
+  code      String?
+  levels    ErpStockLevel[]
+  movements ErpStockMovement[]
+  audits    ErpStockAudit[]
+  deletedAt DateTime?
+  createdAt DateTime   @default(now())
+
+  @@index([companyId])
+  @@index([branchId])
+}
+
+model ErpStockLevel {
+  id          String       @id @default(cuid())
+  productId   String
+  product     ErpProduct   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  warehouseId String
+  warehouse   ErpWarehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  quantity    Decimal      @default(0)
+  updatedAt   DateTime     @updatedAt
+
+  @@unique([productId, warehouseId])
+  @@index([warehouseId])
+}
+
+model ErpStockMovement {
+  id          String               @id @default(cuid())
+  companyId   String
+  productId   String
+  product     ErpProduct           @relation(fields: [productId], references: [id], onDelete: Cascade)
+  warehouseId String
+  warehouse   ErpWarehouse         @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  type        ErpStockMovementType
+  quantity    Decimal
+  refType     String?
+  refId       String?
+  note        String?
+  createdBy   String?
+  createdAt   DateTime             @default(now())
+
+  @@index([companyId])
+  @@index([productId])
+  @@index([warehouseId])
+  @@index([createdAt])
+}
+
+model ErpStockAudit {
+  id          String              @id @default(cuid())
+  companyId   String
+  warehouseId String
+  warehouse   ErpWarehouse        @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  ref         String
+  status      ErpStockAuditStatus @default(draft)
+  countedAt   DateTime?
+  postedAt    DateTime?
+  note        String?
+  createdBy   String?
+  lines       ErpStockAuditLine[]
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@unique([companyId, ref])
+  @@index([companyId])
+  @@index([warehouseId])
+  @@index([status])
+}
+
+model ErpStockAuditLine {
+  id           String        @id @default(cuid())
+  auditId      String
+  audit        ErpStockAudit @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  productId    String
+  product      ErpProduct    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  systemQty    Decimal       @default(0)
+  countedQty   Decimal       @default(0)
+  varianceQty  Decimal       @default(0)
+  note         String?
+
+  @@unique([auditId, productId])
+  @@index([auditId])
+}
+
+// ─── Parties (customers / suppliers) ────────────────────────
+
+enum ErpPartyType {
+  customer
+  supplier
+  both
+}
+
+model ErpParty {
+  id          String       @id @default(cuid())
+  companyId   String
+  company     ErpCompany   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  type        ErpPartyType @default(customer)
+  name        String
+  phone       String?
+  email       String?
+  taxId       String?
+  creditLimit Decimal      @default(0)
+  sales       ErpSalesDocument[]
+  purchases   ErpPurchaseDocument[]
+  receivables ErpReceivable[]
+  payables    ErpPayable[]
+  deletedAt   DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([companyId])
+  @@index([type])
+}
+
+// ─── Sales ──────────────────────────────────────────────────
+
+enum ErpDocStatus {
+  draft
+  confirmed
+  posted
+  cancelled
+}
+
+enum ErpSalesDocType {
+  quote
+  order
+  invoice
+}
+
+model ErpSalesDocument {
+  id         String          @id @default(cuid())
+  companyId  String
+  partyId    String
+  party      ErpParty        @relation(fields: [partyId], references: [id], onDelete: Restrict)
+  type       ErpSalesDocType
+  ref        String
+  status     ErpDocStatus    @default(draft)
+  docDate    DateTime        @default(now())
+  dueDate    DateTime?
+  subtotal   Decimal         @default(0)
+  taxTotal   Decimal         @default(0)
+  grandTotal Decimal         @default(0)
+  note       String?
+  lines      ErpSalesLine[]
+  receivable ErpReceivable?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  @@unique([companyId, ref])
+  @@index([companyId])
+  @@index([partyId])
+  @@index([type, status])
+}
+
+model ErpSalesLine {
+  id         String           @id @default(cuid())
+  documentId String
+  document   ErpSalesDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  productId  String?
+  product    ErpProduct?      @relation(fields: [productId], references: [id], onDelete: SetNull)
+  description String
+  quantity   Decimal          @default(1)
+  unitPrice  Decimal          @default(0)
+  lineTotal  Decimal          @default(0)
+
+  @@index([documentId])
+}
+
+// ─── Purchases ──────────────────────────────────────────────
+
+enum ErpPurchaseDocType {
+  order
+  invoice
+}
+
+model ErpPurchaseDocument {
+  id         String             @id @default(cuid())
+  companyId  String
+  partyId    String
+  party      ErpParty           @relation(fields: [partyId], references: [id], onDelete: Restrict)
+  type       ErpPurchaseDocType
+  ref        String
+  status     ErpDocStatus       @default(draft)
+  docDate    DateTime           @default(now())
+  dueDate    DateTime?
+  subtotal   Decimal            @default(0)
+  taxTotal   Decimal            @default(0)
+  grandTotal Decimal            @default(0)
+  note       String?
+  lines      ErpPurchaseLine[]
+  payable    ErpPayable?
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  @@unique([companyId, ref])
+  @@index([companyId])
+  @@index([partyId])
+}
+
+model ErpPurchaseLine {
+  id         String              @id @default(cuid())
+  documentId String
+  document   ErpPurchaseDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  productId  String?
+  product    ErpProduct?         @relation(fields: [productId], references: [id], onDelete: SetNull)
+  description String
+  quantity   Decimal             @default(1)
+  unitPrice  Decimal             @default(0)
+  lineTotal  Decimal             @default(0)
+
+  @@index([documentId])
+}
+
+// ─── Accounting ─────────────────────────────────────────────
+
+enum ErpAccountType {
+  asset
+  liability
+  equity
+  revenue
+  expense
+}
+
+enum ErpJournalStatus {
+  draft
+  posted
+  reversed
+}
+
+model ErpAccount {
+  id        String         @id @default(cuid())
+  companyId String
+  company   ErpCompany     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  code      String
+  name      String
+  type      ErpAccountType
+  parentId  String?
+  isActive  Boolean        @default(true)
+  lines     ErpJournalLine[]
+  deletedAt DateTime?
+  createdAt DateTime       @default(now())
+
+  @@unique([companyId, code])
+  @@index([companyId])
+  @@index([type])
+}
+
+model ErpJournalEntry {
+  id        String           @id @default(cuid())
+  companyId String
+  ref       String
+  status    ErpJournalStatus @default(draft)
+  entryDate DateTime         @default(now())
+  memo      String?
+  lines     ErpJournalLine[]
+  postedAt  DateTime?
+  createdBy String?
+  createdAt DateTime         @default(now())
+
+  @@unique([companyId, ref])
+  @@index([companyId])
+  @@index([status])
+}
+
+model ErpJournalLine {
+  id        String          @id @default(cuid())
+  entryId   String
+  entry     ErpJournalEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  accountId String
+  account   ErpAccount      @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  debit     Decimal         @default(0)
+  credit    Decimal         @default(0)
+  memo      String?
+
+  @@index([entryId])
+  @@index([accountId])
+}
+
+// ─── HR ─────────────────────────────────────────────────────
+
+enum ErpEmployeeStatus {
+  active
+  on_leave
+  terminated
+}
+
+enum ErpLeaveStatus {
+  pending
+  approved
+  rejected
+  cancelled
+}
+
+model ErpEmployee {
+  id           String            @id @default(cuid())
+  companyId    String
+  company      ErpCompany        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  departmentId String?
+  department   ErpDepartment?    @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  employeeNo   String
+  name         String
+  email        String?
+  phone        String?
+  jobTitle     String?
+  hireDate     DateTime?
+  status       ErpEmployeeStatus @default(active)
+  attendance   ErpAttendance[]
+  leaveRequests ErpLeaveRequest[]
+  deletedAt    DateTime?
+  createdAt    DateTime          @default(now())
+
+  @@unique([companyId, employeeNo])
+  @@index([companyId])
+}
+
+model ErpAttendance {
+  id         String      @id @default(cuid())
+  employeeId String
+  employee   ErpEmployee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  workDate   DateTime
+  checkIn    DateTime?
+  checkOut   DateTime?
+  note       String?
+
+  @@unique([employeeId, workDate])
+  @@index([employeeId])
+}
+
+model ErpLeaveRequest {
+  id         String         @id @default(cuid())
+  employeeId String
+  employee   ErpEmployee    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  startDate  DateTime
+  endDate    DateTime
+  reason     String?
+  status     ErpLeaveStatus @default(pending)
+  createdAt  DateTime       @default(now())
+
+  @@index([employeeId])
+  @@index([status])
+}
+
+// ─── Debts ──────────────────────────────────────────────────
+
+enum ErpDebtStatus {
+  open
+  partial
+  paid
+  overdue
+  written_off
+}
+
+model ErpReceivable {
+  id           String            @id @default(cuid())
+  companyId    String
+  partyId      String
+  party        ErpParty          @relation(fields: [partyId], references: [id], onDelete: Restrict)
+  salesDocId   String?           @unique
+  salesDoc     ErpSalesDocument? @relation(fields: [salesDocId], references: [id], onDelete: SetNull)
+  ref          String
+  amount       Decimal
+  paidAmount   Decimal           @default(0)
+  dueDate      DateTime?
+  status       ErpDebtStatus     @default(open)
+  schedules    ErpPaymentSchedule[]
+  createdAt    DateTime          @default(now())
+
+  @@unique([companyId, ref])
+  @@index([companyId])
+  @@index([partyId])
+}
+
+model ErpPayable {
+  id            String              @id @default(cuid())
+  companyId     String
+  partyId       String
+  party         ErpParty            @relation(fields: [partyId], references: [id], onDelete: Restrict)
+  purchaseDocId String?             @unique
+  purchaseDoc   ErpPurchaseDocument? @relation(fields: [purchaseDocId], references: [id], onDelete: SetNull)
+  ref           String
+  amount        Decimal
+  paidAmount    Decimal             @default(0)
+  dueDate       DateTime?
+  status        ErpDebtStatus       @default(open)
+  schedules     ErpPaymentSchedule[]
+  createdAt     DateTime            @default(now())
+
+  @@unique([companyId, ref])
+  @@index([companyId])
+  @@index([partyId])
+}
+
+enum ErpScheduleStatus {
+  pending
+  paid
+  overdue
+  cancelled
+}
+
+model ErpPaymentSchedule {
+  id            String            @id @default(cuid())
+  receivableId  String?
+  receivable    ErpReceivable?    @relation(fields: [receivableId], references: [id], onDelete: Cascade)
+  payableId     String?
+  payable       ErpPayable?       @relation(fields: [payableId], references: [id], onDelete: Cascade)
+  dueDate       DateTime
+  amount        Decimal
+  paidAmount    Decimal           @default(0)
+  status        ErpScheduleStatus @default(pending)
+
+  @@index([receivableId])
+  @@index([payableId])
+  @@index([dueDate])
+}
+
+// ─── Module FAQ & Workflow ──────────────────────────────────
+
+enum ErpModuleKey {
+  core
+  inventory
+  sales
+  purchases
+  accounting
+  hr
+  debts
+  workflow
+}
+
+model ErpModuleFaq {
+  id        String       @id @default(cuid())
+  module    ErpModuleKey
+  question  String
+  answer    String
+  sortOrder Int          @default(0)
+  locale    String       @default("ar")
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now())
+
+  @@index([module, locale])
+}
+
+model ErpWorkflowStep {
+  id        String       @id @default(cuid())
+  module    ErpModuleKey
+  stepKey   String
+  label     String
+  sortOrder Int          @default(0)
+  isActive  Boolean      @default(true)
+
+  @@unique([module, stepKey])
+}
+
+model ErpWorkflowInstance {
+  id          String       @id @default(cuid())
+  companyId   String
+  module      ErpModuleKey
+  entityType  String
+  entityId    String
+  currentStep String
+  status      String       @default("active")
+  metadata    Json?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([companyId, module])
+  @@index([entityType, entityId])
+}
+

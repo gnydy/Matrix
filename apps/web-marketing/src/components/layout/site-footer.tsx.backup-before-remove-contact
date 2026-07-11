@@ -1,0 +1,200 @@
+'use client';
+
+import Link from 'next/link';
+import { useSiteSettings } from '../../i18n/site/client';
+
+export function SiteFooter() {
+  const { copy, locale, dir, isLight } = useSiteSettings();
+
+  const footer = copy.footer ?? {};
+
+  const isAr = locale === 'ar';
+
+  const t = {
+    brand: footer.brand ?? 'Matrix',
+    description:
+      footer.description ??
+      (isAr
+        ? 'Matrix تبني مواقع احترافية، أنظمة ERP، لوحات تحكم، وحلول رقمية مخصصة للشركات.'
+        : 'Matrix builds professional websites, ERP systems, dashboards, and custom digital solutions for companies.'),
+    address: footer.address ?? (isAr ? 'مصر' : 'Egypt'),
+    email: footer.email ?? 'hello@matrixall.com',
+    phone: footer.phone ?? '01090833952',
+    rights: footer.rights ?? (isAr ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'),
+    columns: {
+      product: footer.columns?.product ?? (isAr ? 'المنتج' : 'Product'),
+      company: footer.columns?.company ?? (isAr ? 'الشركة' : 'Company'),
+      legal: footer.columns?.legal ?? (isAr ? 'قانوني' : 'Legal'),
+    },
+    links: {
+      erp: footer.links?.erp ?? 'AllInAll ERP',
+      customSystems: footer.links?.customSystems ?? (isAr ? 'أنظمة مخصصة' : 'Custom Systems'),
+      websites: footer.links?.websites ?? (isAr ? 'مواقع وتطبيقات' : 'Websites & Apps'),
+      packages: footer.links?.packages ?? (isAr ? 'الباقات' : 'Packages'),
+      request: footer.links?.request ?? (isAr ? 'اطلب نظامك' : 'Request your system'),
+      about: footer.links?.about ?? (isAr ? 'من نحن' : 'About'),
+      contact: footer.links?.contact ?? (isAr ? 'تواصل' : 'Contact'),
+      faq: footer.links?.faq ?? (isAr ? 'الأسئلة الشائعة' : 'FAQ'),
+      work: footer.links?.work ?? (isAr ? 'أعمالنا' : 'Our Work'),
+      privacy: footer.links?.privacy ?? (isAr ? 'الخصوصية' : 'Privacy'),
+      terms: footer.links?.terms ?? (isAr ? 'الشروط' : 'Terms'),
+    },
+  };
+
+  const bg = isLight ? '#f8fafc' : '#0f172a';
+  const text = isLight ? '#334155' : '#94a3b8';
+  const title = isLight ? '#0f172a' : '#f8fafc';
+  const border = isLight ? '#e2e8f0' : 'rgba(148, 163, 184, 0.14)';
+  const blue = isLight ? '#2563eb' : '#60a5fa';
+
+  return (
+    <footer
+      lang={locale}
+      dir={dir}
+      style={{
+        background: bg,
+        color: text,
+        borderTop: `1px solid ${border}`,
+        padding: '56px 0 22px',
+      }}
+    >
+      <div
+        style={{
+          width: 'min(1180px, calc(100% - 32px))',
+          margin: '0 auto',
+        }}
+      >
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(260px, 1.4fr) repeat(3, minmax(150px, 1fr))',
+            gap: 34,
+          }}
+        >
+          <div>
+            <strong
+              style={{
+                display: 'block',
+                color: title,
+                fontSize: 20,
+                marginBottom: 14,
+              }}
+            >
+              {t.brand}
+            </strong>
+
+            <p style={{ maxWidth: 360, lineHeight: 1.8, margin: 0 }}>
+              {t.description}
+            </p>
+
+            <div style={{ marginTop: 18, display: 'grid', gap: 8 }}>
+              <a href={`mailto:${t.email}`} style={{ color: blue, textDecoration: 'none' }}>
+                {t.email}
+              </a>
+
+              <a href={`tel:${t.phone}`} style={{ color: text, textDecoration: 'none' }}>
+                {t.phone}
+              </a>
+
+              <span>{t.address}</span>
+            </div>
+          </div>
+
+          <FooterColumn
+            title={t.columns.product}
+            links={[
+              [t.links.erp, '/services/erp'],
+              [t.links.customSystems, '/services'],
+              [t.links.websites, '/services'],
+              [t.links.packages, '/packages'],
+              [t.links.request, '/request-system'],
+            ]}
+            titleColor={title}
+            textColor={text}
+          />
+
+          <FooterColumn
+            title={t.columns.company}
+            links={[
+              [t.links.about, '/about'],
+              [t.links.contact, '/contact'],
+              [t.links.faq, '/faq'],
+              [t.links.work, '/our-work'],
+            ]}
+            titleColor={title}
+            textColor={text}
+          />
+
+          <FooterColumn
+            title={t.columns.legal}
+            links={[
+              [t.links.privacy, '/privacy'],
+              [t.links.terms, '/terms'],
+            ]}
+            titleColor={title}
+            textColor={text}
+          />
+        </div>
+
+        <div
+          style={{
+            marginTop: 42,
+            paddingTop: 22,
+            borderTop: `1px solid ${border}`,
+            display: 'flex',
+            justifyContent: 'space-between',
+            gap: 16,
+            flexWrap: 'wrap',
+            fontSize: 14,
+          }}
+        >
+          <span>© 2026 Matrix Platform. {t.rights}</span>
+          <span>{t.address}</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function FooterColumn({
+  title,
+  links,
+  titleColor,
+  textColor,
+}: {
+  title: string;
+  links: [string, string][];
+  titleColor: string;
+  textColor: string;
+}) {
+  return (
+    <div>
+      <strong
+        style={{
+          display: 'block',
+          color: titleColor,
+          marginBottom: 14,
+        }}
+      >
+        {title}
+      </strong>
+
+      <nav style={{ display: 'grid', gap: 12 }}>
+        {links.map(([label, href]) => (
+          <Link
+            key={`${label}-${href}`}
+            href={href}
+            style={{
+              color: textColor,
+              textDecoration: 'none',
+            }}
+          >
+            {label}
+          </Link>
+        ))}
+      </nav>
+    </div>
+  );
+}
+
+export default SiteFooter;

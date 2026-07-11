@@ -1,0 +1,127 @@
+import { Controller, Get } from '@nestjs/common';
+import { Permissions } from '../auth/auth.guard';
+import { CurrentUser } from '../auth/auth.decorators';
+import type { JwtPayload } from '../auth/jwt.strategy';
+import { PrismaService } from '../prisma/prisma.service';
+import { ErpContextService } from './erp-context.service';
+
+function sumGrandTotal(rows: { grandTotal: unknown }[]): number {
+  return rows.reduce((sum, row) => sum + Number(row.grandTotal), 0);
+}
+
+function sumDebt(rows: { amount: unknown; paidAmount: unknown }[]): { total: number; paid: number; open: number } {
+  return rows.reduce(
+    (acc, row) => {
+      const amount = Number(row.amount);
+      const paid = Number(row.paidAmount);
+      acc.total += amount;
+      acc.paid += paid;
+      acc.open += amount - paid;
+      return acc;
+    },
+    { total: 0, paid: 0, open: 0 },
+  );
+}
+
+@Controller('erp/reports')
+export class ErpReportsController {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly ctx: ErpContextService,
+  ) {}
+
+  @Get('dashboard')
+  @Permissions('erp:read')
+  async dashboard(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const [products, warehouses, customers, suppliers, sales, purchases, receivables, payables, stockLevels] = await Promise.all([
+      this.prisma.erpProduct.count({ where: { companyId: company.id, deletedAt: null } }),
+      this.prisma.erpWarehouse.count({ where: { companyId: company.id, deletedAt: null } }),
+      this.prisma.erpParty.count({ where: { companyId: company.id, deletedAt: null, type: { in: ['customer', 'both'] } } }),
+      this.prisma.erpParty.count({ where: { companyId: company.id, deletedAt: null, type: { in: ['supplier', 'both'] } } }),
+      this.prisma.erpSalesDocument.findMany({ where: { companyId: company.id, status: 'posted' } }),
+      this.prisma.erpPurchaseDocument.findMany({ where: { companyId: company.id, status: 'posted' } }),
+      this.prisma.erpReceivable.findMany({ where: { companyId: company.id } }),
+      this.prisma.erpPayable.findMany({ where: { companyId: company.id } }),
+      this.prisma.erpStockLevel.findMany({ where: { product: { companyId: company.id, deletedAt: null } }, include: { product: true, warehouse: true } }),
+    ]);
+
+    const lowStock = stockLevels.filter((level) => Number(level.quantity) <= Number(level.product.minStock));
+    return {
+      ok: true,
+      data: {
+        company,
+        counts: { products, warehouses, customers, suppliers, lowStock: lowStock.length },
+        totals: {
+          sales: sumGrandTotal(sales),
+          purchases: sumGrandTotal(purchases),
+          receivables: sumDebt(receivables),
+          payables: sumDebt(payables),
+        },
+      },
+    };
+  }
+
+  @Get('sales-summary')
+  @Permissions('sales:read')
+  async salesSummary(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const documents = await this.prisma.erpSalesDocument.findMany({
+      where: { companyId: company.id },
+      include: { party: true, lines: true },
+      orderBy: { createdAt: 'desc' },
+      take: 500,
+    });
+    const data = {
+      count: documents.length,
+      draft: documents.filter((d) => d.status === 'draft').length,
+      posted: documents.filter((d) => d.status === 'posted').length,
+      totalPosted: sumGrandTotal(documents.filter((d) => d.status === 'posted')),
+      documents,
+    };
+    return { ok: true, data };
+  }
+
+  @Get('purchase-summary')
+  @Permissions('purchases:read')
+  async purchaseSummary(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const documents = await this.prisma.erpPurchaseDocument.findMany({
+      where: { companyId: company.id },
+      include: { party: true, lines: true },
+      orderBy: { createdAt: 'desc' },
+      take: 500,
+    });
+    const data = {
+      count: documents.length,
+      draft: documents.filter((d) => d.status === 'draft').length,
+      posted: documents.filter((d) => d.status === 'posted').length,
+      totalPosted: sumGrandTotal(documents.filter((d) => d.status === 'posted')),
+      documents,
+    };
+    return { ok: true, data };
+  }
+
+  @Get('stock-summary')
+  @Permissions('inventory:read')
+  async stockSummary(@CurrentUser() user: JwtPayload) {
+    const company = await this.ctx.requireCompany(user);
+    const levels = await this.prisma.erpStockLevel.findMany({
+      where: { product: { companyId: company.id, deletedAt: null } },
+      include: { product: true, warehouse: true },
+      orderBy: { updatedAt: 'desc' },
+    });
+    const data = levels.map((level) => ({
+      productId: level.productId,
+      warehouseId: level.warehouseId,
+      sku: level.product.sku,
+      product: level.product.name,
+      warehouse: level.warehouse.name,
+      quantity: Number(level.quantity),
+      minStock: Number(level.product.minStock),
+      stockValue: Number(level.quantity) * Number(level.product.costPrice),
+      lowStock: Number(level.quantity) <= Number(level.product.minStock),
+    }));
+    return { ok: true, data };
+  }
+}

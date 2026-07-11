@@ -1,0 +1,68 @@
+'use client';
+
+import { useSiteSettings } from '../../i18n/site/client';
+
+const whatsappPhone = '201090833952';
+const contactHref = `https://wa.me/${whatsappPhone}`;
+
+export function ContactNowButton() {
+  const { copy, locale, dir, isLight } = useSiteSettings();
+
+  const label =
+    copy.common?.contactNow ??
+    (locale === 'ar' ? 'تواصل الآن' : 'Contact now');
+
+  return (
+    <a
+      href={contactHref}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={label}
+      lang={locale}
+      dir={dir}
+      style={{
+        position: 'fixed',
+        left: 18,
+        bottom: 18,
+        zIndex: 80,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 8,
+        minHeight: 48,
+        padding: '0 16px',
+        borderRadius: 999,
+        background: '#3b82f6',
+        color: 'white',
+        textDecoration: 'none',
+        fontWeight: 900,
+        fontSize: 15,
+        boxShadow: isLight
+          ? '0 16px 34px rgba(59, 130, 246, 0.32)'
+          : '0 16px 34px rgba(59, 130, 246, 0.42)',
+        border: '1px solid rgba(255, 255, 255, 0.18)',
+      }}
+    >
+      <span
+        aria-hidden="true"
+        style={{
+          width: 21,
+          height: 21,
+          borderRadius: 999,
+          display: 'grid',
+          placeItems: 'center',
+          background: '#22c55e',
+          color: 'white',
+          fontSize: 13,
+          lineHeight: 1,
+          flexShrink: 0,
+        }}
+      >
+        ☎
+      </span>
+
+      <span>{label}</span>
+    </a>
+  );
+}
+
+export default ContactNowButton;
